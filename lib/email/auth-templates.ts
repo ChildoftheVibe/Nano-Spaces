@@ -160,6 +160,31 @@ export function gracePeriodTemplate(graceEndsDate: string, billingUrl: string): 
   `)
 }
 
+export function reservationFlaggedTemplate(
+  roomName: string,
+  reason: string,
+  bookingTitle: string,
+  startTime: string,
+  endTime: string,
+): string {
+  const start = new Date(startTime).toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+  const end = new Date(endTime).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })
+  return layout(`
+    <h2>Your booking requires attention</h2>
+    <p>Your booking <strong>"${bookingTitle}"</strong> at <strong>${roomName}</strong> has been flagged and may no longer be valid.</p>
+    <p><strong>Reason:</strong> ${reason}</p>
+    <p><strong>Booking time:</strong> ${start} – ${end}</p>
+    <p>Please contact your organization administrator to resolve this booking. Your reservation has been marked as flagged but not cancelled — no action has been taken to your time slot yet.</p>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View my bookings</a></p>
+  `)
+}
+
 export function accountLockoutAdminTemplate(
   userName: string,
   userEmail: string,

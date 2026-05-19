@@ -1,0 +1,26 @@
+-- Locations — bookable rooms or buildings within an organization
+CREATE TABLE public.locations (
+  id                          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id                      uuid        NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  name                        text        NOT NULL,
+  description                 text,
+  notes                       text,
+  type                        text        NOT NULL CHECK (type IN ('room','building')),
+  capacity                    int,
+  photo_url                   text,
+  is_active                   boolean     NOT NULL DEFAULT true,
+  in_maintenance              boolean     NOT NULL DEFAULT false,
+  maintenance_from            timestamptz,
+  maintenance_to              timestamptz,
+  maintenance_note            text,
+  max_booking_duration_mins   int,
+  max_bookings_per_user_per_day int,
+  min_notice_hours            int         NOT NULL DEFAULT 24,
+  cancel_notice_hours         int         NOT NULL DEFAULT 24,
+  max_advance_days            int         NOT NULL DEFAULT 60,
+  approval_required           boolean     NOT NULL DEFAULT false,
+  nano_buffer_mins            int         NOT NULL DEFAULT 5,
+  ghost_buster_enabled        boolean     NOT NULL DEFAULT true,
+  ghost_buster_mins           int         NOT NULL DEFAULT 15,
+  created_at                  timestamptz NOT NULL DEFAULT now()
+);

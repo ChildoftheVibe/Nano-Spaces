@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run typecheck
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+      SUPABASE_SERVICE_ROLE_KEY: placeholder
+      NEXTAUTH_SECRET: placeholder-secret-at-least-32-chars-long
+      RESEND_API_KEY: placeholder
+      PAYPAL_CLIENT_ID: placeholder
+      PAYPAL_CLIENT_SECRET: placeholder
+      PAYPAL_WEBHOOK_ID: placeholder
+      PAYPAL_STARTER_PLAN_ID: placeholder
+      PAYPAL_GROWTH_PLAN_ID: placeholder
+      PAYPAL_ENVIRONMENT: sandbox
+      UPSTASH_REDIS_REST_URL: https://placeholder.upstash.io
+      UPSTASH_REDIS_REST_TOKEN: placeholder
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: placeholder
+      TURNSTILE_SECRET_KEY: placeholder
+      WEB_PUSH_PUBLIC_KEY: placeholder
+      WEB_PUSH_PRIVATE_KEY: placeholder
+      WEB_PUSH_EMAIL: mailto:placeholder@example.com
+      SENTRY_DSN: https://placeholder@sentry.io/123
+      SENTRY_AUTH_TOKEN: placeholder
+      NEXT_PUBLIC_APP_URL: https://placeholder.example.com
+      CRON_SECRET: placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
