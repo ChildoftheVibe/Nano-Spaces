@@ -185,6 +185,54 @@ export function reservationFlaggedTemplate(
   `)
 }
 
+export function bookingConfirmationTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+  endTime: string,
+  isPending: boolean,
+): string {
+  const statusMsg = isPending
+    ? '<p>Your booking is <strong>pending approval</strong> from an administrator. You will receive a follow-up email once it is reviewed.</p>'
+    : '<p>Your booking is <strong>confirmed</strong>. See you there!</p>'
+  return layout(`
+    <h2>Booking ${isPending ? 'Received' : 'Confirmed'}</h2>
+    <p>Hi ${userName},</p>
+    ${statusMsg}
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Title</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Start</td><td style="padding:8px 0">${startTime}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">End</td><td style="padding:8px 0">${endTime}</td></tr>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
+  `)
+}
+
+export function bookingCancellationTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+  cancelledByAdmin: boolean,
+): string {
+  const msg = cancelledByAdmin
+    ? '<p>An administrator has cancelled your booking. Please contact your organization if you have questions.</p>'
+    : '<p>Your booking has been successfully cancelled.</p>'
+  return layout(`
+    <h2>Booking Cancelled</h2>
+    <p>Hi ${userName},</p>
+    ${msg}
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Title</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Date</td><td style="padding:8px 0">${startTime}</td></tr>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
+  `)
+}
+
 export function accountLockoutAdminTemplate(
   userName: string,
   userEmail: string,

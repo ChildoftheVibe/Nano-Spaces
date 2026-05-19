@@ -267,35 +267,73 @@ PayPal subscription billing with PDF invoices, webhook handling, and trial track
 - Index `idx_orgs_trial_ends` (partial, status='trial')
 - Index `idx_orgs_expires_at` (partial, status='active')
 
+### Phase 7 — Billing Completion (complete)
+
+**Billing API routes** (`app/api/billing/`):
+
+- `subscribe/route.ts` — POST create PayPal subscription, update org `subscription_status`/`paypal_subscription_id`/`paypal_plan_id`
+- `cancel/route.ts` — POST cancel via `cancelSubscription()`, set grace period
+- `trial-reminder/route.ts` — cron: day-7 + day-13 trial nudge emails (`trial_day7_sent`/`trial_day13_sent` flags), secured by `CRON_SECRET`
+- `trial-expire/route.ts` — cron: set `subscription_status='expired'` for trials past `trial_ends_at`, secured by `CRON_SECRET`
+- `subscription-reminder/route.ts` — cron: payment reminder emails, secured by `CRON_SECRET`
+
+**Super-admin:**
+
+- `app/api/super-admin/orgs/route.ts` — GET list all orgs with subscription state (super_admin only)
+
+**Billing UI:**
+
+- `app/(user)/settings/billing/page.tsx` — plan details, upgrade/downgrade, invoice history with signed-URL PDF downloads, cancel subscription
+
+**Room management UI** (`app/(org-admin)/rooms/page.tsx`):
+
+- Room cards grid with status badges (Active / Maintenance / Inactive)
+- Modals: Add/Edit Room, Booking Settings (buffer, ghost-buster, limits), Availability Rule Builder (day toggles + time range + US holiday block), Blackout Dates (list/add/delete with recurring RRULE support), Maintenance Mode (toggle + date range + reason)
+- Photo upload via `POST /api/rooms/[id]/photo`
+- Tier limit banner when at room cap
+
+---
+
+### Phase 8 — Calendar & Booking UI (complete)
+
+**Calendar pages:**
+
+- `app/(user)/calendar/page.tsx` — SSR-safe shell (`dynamic(..., { ssr: false })`)
+- `app/(user)/calendar/calendar-client.tsx` — FullCalendar v6 (dayGrid + timeGrid + interaction plugins), month/week/day views, user timezone via `date-fns-tz`, custom nav toolbar, room filter, Export button
+
+**Calendar display rules:**
+
+- My bookings: solid blue (`event-mine`)
+- Others' bookings: light blue (`event-confirmed`)
+- Blocked/blackout/maintenance: light red (`event-blocked`, `display:'background'`)
+- Buffer zones: gray background (`display:'background'`, `backgroundColor:'#E5E7EB'`)
+
+**New Reservation modal:** react-hook-form + Zod, fields: Room, Title, Notes, Date, Start/End Time (local). Converts local → UTC via `fromZonedTime` before `POST /api/reservations`.
+
+**Reservation view modal:** edit title/notes inline, cancel with confirmation dialog, Add to Calendar (.ics), Copy (pre-fills new booking modal).
+
+**ICS export:** single event (`createEvent`) + bulk upcoming (`createEvents`), `startInputType: 'utc'` for Google Calendar/Outlook compatibility, client-side only.
+
+**API routes:**
+
+- `app/api/reservations/route.ts` — GET (all org members, returns reservations + blackouts + maintenanceWindows with `nano_buffer_mins` per reservation); POST (full validation chain: min_notice, max_advance, max_duration, availability rules, blackout overlap, nano-buffer, max-per-day, atomic RPC `create_reservation_with_locks`, confirmation email)
+- `app/api/reservations/[id]/route.ts` — PUT edit title/notes (owner or admin); DELETE cancel with `cancel_notice_hours` check (users only; admins bypass), notifies + emails booker if admin-cancelled
+- `app/api/calendar/rooms/route.ts` — GET active non-maintenance rooms for all org members
+
+**DB migration (`supabase/migrations/20240101000023_phase8.sql`):**
+
+- Updated `create_reservation_with_locks` RPC to accept `p_status text DEFAULT 'confirmed'`; inserts notification with type based on status
+
+**Email templates added** (`lib/email/auth-templates.ts`):
+
+- `bookingConfirmationTemplate(userName, bookingTitle, roomName, startTime, endTime, isPending)`
+- `bookingCancellationTemplate(userName, bookingTitle, roomName, startTime, cancelledByAdmin)`
+
 ---
 
 ## What Remains to Build
 
-The following phases are **not yet started**. Implement in order.
-
-### Phase 7 — Billing Completion
-
-Implement the empty billing route stubs, cron jobs, and super-admin org panel:
-
-1. `app/api/billing/subscribe/route.ts` — create PayPal subscription, update org `subscription_status`/`paypal_subscription_id`/`paypal_plan_id`
-2. `app/api/billing/cancel/route.ts` — cancel via `cancelSubscription()`, set grace period
-3. `app/api/billing/trial-reminder/route.ts` — cron: send day-7 + day-13 trial nudge emails (use `trial_day7_sent`/`trial_day13_sent` flags), secured by `CRON_SECRET`
-4. `app/api/billing/trial-expire/route.ts` — cron: set `subscription_status='expired'` for trials past `trial_ends_at`, secured by `CRON_SECRET`
-5. `app/api/billing/subscription-reminder/route.ts` — cron: payment reminder emails
-6. `app/api/super-admin/orgs/route.ts` — list all orgs with subscription state (super_admin only)
-7. `app/(user)/settings/billing/page.tsx` — billing tab: plan details, upgrade/downgrade, invoice history with PDF downloads, cancel subscription
-
-### Phase 8 — Calendar & Booking UI
-
-The core product. Plug into the `(user)` layout.
-
-1. `app/(user)/calendar/page.tsx` — weekly calendar view showing available + booked slots per location
-2. Booking creation modal — select location, time range, title/notes; calls `create_reservation_with_locks` RPC
-3. My Reservations list — upcoming + past bookings, cancel button (respects `cancel_notice_hours`)
-4. Admin calendar — org-admin can see all bookings, apply god-mode overrides, flag/release ghost bookings
-5. Location management (`/org-admin/locations`) — CRUD rooms/buildings, set availability rules, blackout dates, maintenance windows
-6. Ghost-buster cron — calls `release_ghost_reservation()` for unchecked-in bookings past `ghost_buster_mins`
-7. Reminder cron — sends 24h and 1h booking reminder emails (use `reminder_sent`/`reminder_1h_sent` flags)
+The following phase is **not yet started**.
 
 ### Phase 9 — Push Notifications & Real-time
 
