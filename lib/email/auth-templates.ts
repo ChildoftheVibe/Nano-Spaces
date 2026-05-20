@@ -293,6 +293,108 @@ export function approvalStatusTemplate(
   `)
 }
 
+export function hibernationNoticeTemplate(userName: string, orgName: string): string {
+  return layout(`
+    <h2>Your account has been hibernated</h2>
+    <p>Hi ${userName},</p>
+    <p>Your Nano Spaces account in <strong>${orgName}</strong> has been automatically hibernated after 30 days of inactivity.</p>
+    <p>Your data and any upcoming reservations are safe. Simply log in to reactivate your account.</p>
+    <p style="text-align:center"><a class="btn" href="${BASE}/login">Log in to reactivate</a></p>
+    <p>If you have questions, contact your organization administrator.</p>
+  `)
+}
+
+export function ghostBusterReleaseTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+): string {
+  return layout(`
+    <h2>Your booking was released</h2>
+    <p>Hi ${userName},</p>
+    <p>Your booking was released because no check-in was detected within the required window after the booking start time.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Booking</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Start</td><td style="padding:8px 0">${startTime}</td></tr>
+    </table>
+    <p>The slot has been released for others to book. If you believe this was an error, please contact your administrator.</p>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
+  `)
+}
+
+export function bookingReminderTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+  endTime: string,
+  window: '24h' | '1h',
+): string {
+  const windowLabel = window === '24h' ? '24 hours' : '1 hour'
+  return layout(`
+    <h2>Reminder: Your booking starts in ${windowLabel}</h2>
+    <p>Hi ${userName},</p>
+    <p>This is a reminder that your upcoming booking begins in <strong>${windowLabel}</strong>.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Title</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Start</td><td style="padding:8px 0">${startTime}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">End</td><td style="padding:8px 0">${endTime}</td></tr>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
+  `)
+}
+
+export function weeklyDigestTemplate(
+  orgName: string,
+  weekLabel: string,
+  stats: {
+    totalBookings: number
+    cancellations: number
+    noShows: number
+    pendingApprovals: number
+    newUsers: number
+  },
+): string {
+  return layout(`
+    <h2>Weekly Digest — ${orgName}</h2>
+    <p>Here's a summary of activity for the week of <strong>${weekLabel}</strong>.</p>
+    <table style="width:100%;border-collapse:collapse;margin:24px 0;font-size:14px">
+      <thead>
+        <tr style="background:#EFF1F5">
+          <th style="padding:10px 12px;text-align:left;font-weight:600;color:#1A1D23">Metric</th>
+          <th style="padding:10px 12px;text-align:right;font-weight:600;color:#1A1D23">Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #E5E7EB">
+          <td style="padding:10px 12px;color:#4B5563">New bookings</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:600">${stats.totalBookings}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #E5E7EB">
+          <td style="padding:10px 12px;color:#4B5563">Cancellations</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:600">${stats.cancellations}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #E5E7EB">
+          <td style="padding:10px 12px;color:#4B5563">No-shows (ghost-released)</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:600">${stats.noShows}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #E5E7EB">
+          <td style="padding:10px 12px;color:#4B5563">Pending approvals</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:600">${stats.pendingApprovals}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:#4B5563">New users joined</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:600">${stats.newUsers}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${BASE}/org-admin/users">Manage your org</a></p>
+  `)
+}
+
 export function recurringSeriesTemplate(
   userName: string,
   bookingTitle: string,
