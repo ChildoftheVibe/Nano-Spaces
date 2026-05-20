@@ -5,6 +5,26 @@ import { updateProfileSchema } from '@/lib/validation/user'
 import { createSessionClient, createAdminClient } from '@/lib/supabase/server'
 import { AuthError, ValidationError } from '@/lib/errors/AppError'
 
+export const GET = withErrorHandling(async (_req: NextRequest) => {
+  const requestId = crypto.randomUUID()
+
+  const sessionClient = await createSessionClient()
+  const {
+    data: { user },
+    error,
+  } = await sessionClient.auth.getUser()
+  if (error || !user) throw new AuthError({ userMessage: 'Not authenticated.', requestId })
+
+  const adminClient = createAdminClient()
+  const { data: profile } = await adminClient
+    .from('profiles')
+    .select('id, full_name, timezone, role, email_reminders, reminder_timing')
+    .eq('id', user.id)
+    .single()
+
+  return success({ profile })
+})
+
 export const PATCH = withErrorHandling(async (req: NextRequest) => {
   const requestId = crypto.randomUUID()
 

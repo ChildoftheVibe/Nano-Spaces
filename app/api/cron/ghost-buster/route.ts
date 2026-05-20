@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/send'
 import { ghostBusterReleaseTemplate } from '@/lib/email/auth-templates'
 import { toZonedTime, format } from 'date-fns-tz'
+import { sendPushToUser } from '@/lib/push/send'
 
 // Releases confirmed reservations where no check-in happened within ghost_buster_mins.
 export const GET = async (req: NextRequest): Promise<Response> => {
@@ -102,6 +103,11 @@ export const GET = async (req: NextRequest): Promise<Response> => {
               (room?.name as string | null) ?? 'Room',
               startFormatted,
             ),
+          })
+          void sendPushToUser(res.booked_by as string, {
+            title: 'Booking released',
+            body: `"${res.title as string}" was released — you didn't check in within the grace window.`,
+            url: '/calendar',
           })
         }
       } catch {

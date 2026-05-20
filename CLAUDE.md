@@ -38,7 +38,7 @@ Nano Spaces is a production-ready **multi-tenant space-booking PWA**. Organizati
 
 ## Build Phase History
 
-Phases are listed in order. All phases through Phase 6 are complete unless marked otherwise. Use this when deciding what to build next.
+Phases are listed in order. All phases through Phase 12 are complete.
 
 ### Phase 1 — Infrastructure (complete)
 
@@ -57,31 +57,34 @@ Phases are listed in order. All phases through Phase 6 are complete unless marke
 
 ### Phase 2 — Database Schema (complete)
 
-21 migration files in `supabase/migrations/`. Applied in order `00001–00021`. Run `npx supabase db reset` to apply all.
+24 migration files in `supabase/migrations/`. Applied in order `00001–00024`. Run `npx supabase db reset` to apply all.
 
-| #     | File                        | What it creates                                                                                           |
-| ----- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
-| 00001 | `create_tos_versions`       | `tos_versions` lookup table                                                                               |
-| 00002 | `create_organizations`      | `organizations` + slug-immutability trigger                                                               |
-| 00003 | `create_profiles`           | `profiles` (1:1 with `auth.users`)                                                                        |
-| 00004 | `create_locations`          | `locations` (bookable rooms/buildings)                                                                    |
-| 00005 | `create_availability_rules` | `availability_rules` (open-hours per location)                                                            |
-| 00006 | `create_blackout_dates`     | `blackout_dates` (org-level blocked periods)                                                              |
-| 00007 | `create_reservations`       | `reservations` (bookings)                                                                                 |
-| 00008 | `create_invitations`        | `invitations` (pending email invites)                                                                     |
-| 00009 | `create_notifications`      | `notifications` (in-app bell)                                                                             |
-| 00010 | `create_push_subscriptions` | `push_subscriptions` (VAPID web-push)                                                                     |
-| 00011 | `create_invoices`           | `invoices` (PayPal billing records)                                                                       |
-| 00012 | `create_activity_log`       | `activity_log` (audit trail)                                                                              |
-| 00013 | `create_processed_webhooks` | `processed_webhooks` (webhook idempotency)                                                                |
-| 00014 | `enable_rls_and_helpers`    | RLS on all tables; `auth_org_id()` + `auth_role()` helpers                                                |
-| 00015 | `create_rls_policies`       | Per-table `org_isolation` + `super_admin_all` policies                                                    |
-| 00016 | `create_indexes`            | Performance indexes across all tables                                                                     |
-| 00017 | `create_rpc_functions`      | `create_reservation_with_locks`, `release_ghost_reservation` RPCs                                         |
-| 00018 | `rls_remaining_tables`      | RLS on `tos_versions` (public read) + `processed_webhooks` (service-role only)                            |
-| 00019 | `auth_additions`            | `totp_secret` column on profiles; `email_otp_codes` table                                                 |
-| 00020 | `phase5`                    | `email_signature` on organizations; `org-logos` storage bucket                                            |
-| 00021 | `phase6`                    | `trial_day7_sent`/`trial_day13_sent` on organizations; `invoices` storage bucket; billing + trial indexes |
+| #     | File                        | What it creates                                                                                            |
+| ----- | --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 00001 | `create_tos_versions`       | `tos_versions` lookup table                                                                                |
+| 00002 | `create_organizations`      | `organizations` + slug-immutability trigger                                                                |
+| 00003 | `create_profiles`           | `profiles` (1:1 with `auth.users`)                                                                         |
+| 00004 | `create_locations`          | `locations` (bookable rooms/buildings)                                                                     |
+| 00005 | `create_availability_rules` | `availability_rules` (open-hours per location)                                                             |
+| 00006 | `create_blackout_dates`     | `blackout_dates` (org-level blocked periods)                                                               |
+| 00007 | `create_reservations`       | `reservations` (bookings)                                                                                  |
+| 00008 | `create_invitations`        | `invitations` (pending email invites)                                                                      |
+| 00009 | `create_notifications`      | `notifications` (in-app bell)                                                                              |
+| 00010 | `create_push_subscriptions` | `push_subscriptions` (VAPID web-push)                                                                      |
+| 00011 | `create_invoices`           | `invoices` (PayPal billing records)                                                                        |
+| 00012 | `create_activity_log`       | `activity_log` (audit trail)                                                                               |
+| 00013 | `create_processed_webhooks` | `processed_webhooks` (webhook idempotency)                                                                 |
+| 00014 | `enable_rls_and_helpers`    | RLS on all tables; `auth_org_id()` + `auth_role()` helpers                                                 |
+| 00015 | `create_rls_policies`       | Per-table `org_isolation` + `super_admin_all` policies                                                     |
+| 00016 | `create_indexes`            | Performance indexes across all tables                                                                      |
+| 00017 | `create_rpc_functions`      | `create_reservation_with_locks`, `release_ghost_reservation` RPCs                                          |
+| 00018 | `rls_remaining_tables`      | RLS on `tos_versions` (public read) + `processed_webhooks` (service-role only)                             |
+| 00019 | `auth_additions`            | `totp_secret` column on profiles; `email_otp_codes` table                                                  |
+| 00020 | `phase5`                    | `email_signature` on organizations; `org-logos` storage bucket                                             |
+| 00021 | `phase6`                    | `trial_day7_sent`/`trial_day13_sent` on organizations; `invoices` storage bucket; billing + trial indexes  |
+| 00022 | `phase7`                    | `reminder_sent`, `reminder_1h_sent` on reservations; `hibernate_status` on profiles; billing indexes       |
+| 00023 | `phase8`                    | Updated `create_reservation_with_locks` RPC to accept `p_status text DEFAULT 'confirmed'`                  |
+| 00024 | `phase9`                    | `waitlisted` status, `waitlist_expires_at` on reservations; `waitlist_enabled` on locations; waitlist RPCs |
 
 **Seed data** (`supabase/seed.sql`): password for all seed users is `NanoSeed2024!`.
 
@@ -187,7 +190,7 @@ Protected prefixes: `/calendar`, `/settings`, `/admin`, `/org-admin`, `/super-ad
 
 **Org-admin pages** (`app/(org-admin)/`):
 
-- `layout.tsx` — sticky header nav: Calendar · Users · Org Settings · My Settings
+- `layout.tsx` — sticky header nav: Calendar · Users · Rooms · Approvals · Org Settings · My Settings
 - `users/page.tsx` — user management table: list users, toggle active/inactive, change role, remove
 - `org-settings/page.tsx` — display name, timezone, email signature, logo upload (2MB, jpg/png/webp to `org-logos` bucket), org-wide announcement email send
 
@@ -246,16 +249,6 @@ PayPal subscription billing with PDF invoices, webhook handling, and trial track
 - `passwordResetTemplate(link)` — reset link with 1-hour expiry
 - `emailChangeTemplate(link)` — email change confirmation
 - Invoice email template built inline in `invoice.ts`
-
-**Scaffolded (empty, to be implemented):**
-
-- `app/api/billing/subscribe/` — POST initiate PayPal subscription
-- `app/api/billing/cancel/` — POST cancel subscription
-- `app/api/billing/subscription-reminder/` — cron endpoint for payment reminders
-- `app/api/billing/trial-reminder/` — cron endpoint for day-7 and day-13 trial emails
-- `app/api/billing/trial-expire/` — cron endpoint to expire trials
-- `app/api/cron/` — general cron job endpoints
-- `app/api/super-admin/orgs/` — super-admin org management API
 
 **DB additions (migration 00021):**
 
@@ -318,7 +311,7 @@ PayPal subscription billing with PDF invoices, webhook handling, and trial track
 
 - `app/api/reservations/route.ts` — GET (all org members, returns reservations + blackouts + maintenanceWindows with `nano_buffer_mins` per reservation); POST (full validation chain: min_notice, max_advance, max_duration, availability rules, blackout overlap, nano-buffer, max-per-day, atomic RPC `create_reservation_with_locks`, confirmation email)
 - `app/api/reservations/[id]/route.ts` — PUT edit title/notes (owner or admin); DELETE cancel with `cancel_notice_hours` check (users only; admins bypass), notifies + emails booker if admin-cancelled
-- `app/api/calendar/rooms/route.ts` — GET active non-maintenance rooms for all org members
+- `app/api/calendar/rooms/route.ts` — GET active non-maintenance rooms for all org members; includes `waitlist_enabled` field
 
 **DB migration (`supabase/migrations/20240101000023_phase8.sql`):**
 
@@ -331,15 +324,184 @@ PayPal subscription billing with PDF invoices, webhook handling, and trial track
 
 ---
 
+### Phase 9 — Recurring Reservations, Waitlist, Approval & Check-in (complete)
+
+**Recurring reservations:**
+
+- `generateRecurringInstances(base, rule)` — produces instance list from a frequency rule (daily / weekly / custom day-of-week with `count` or `until` end)
+- Each instance shares a `recurring_group_id` UUID so the series can be cancelled together
+- DST shift detection (`detectDstShift()`) warns when a recurring series crosses a DST boundary
+- Cancel series: DELETE `?cancel_series=true` cancels all future instances with the same `recurring_group_id`
+
+**Waitlist:**
+
+- Rooms have `waitlist_enabled` boolean (toggle in Booking Settings modal)
+- When a booking conflicts and `waitlist_enabled`, POST `/api/reservations` with `waitlist: true` creates a `status='waitlisted'` reservation
+- `advance_expired_waitlist()` RPC: expires holds past `waitlist_expires_at`, promotes next waiter to a 30-minute hold window
+- `process_waitlist_slot(locationId, startTime, endTime)` RPC: called after every cancellation/release to promote the next waiter
+- `confirm_from_waitlist(reservationId)` RPC: atomically confirms a waitlisted hold; returns `WAITLIST_EXPIRED` or `BOOKING_CONFLICT` on failure
+- `/api/reservations/[id]/confirm-waitlist/route.ts` — POST: calls the RPC, handles error codes
+
+**Approval workflow:**
+
+- Rooms have `approval_required` boolean
+- Bookings on approval-required rooms get `status='pending'` instead of `confirmed`
+- `app/(org-admin)/approvals/page.tsx` — lists all pending reservations; Approve button → `POST /api/reservations/[id]/approve`; Reject button → dialog with reason → `POST /api/reservations/[id]/reject`
+- `/api/reservations/[id]/approve/route.ts` — admin-only; sets `status='confirmed'`, sends in-app notification + `approvalStatusTemplate` email
+- `/api/reservations/[id]/reject/route.ts` — admin-only; sets `status='cancelled'`, sends notification + email with reason
+
+**Check-in:**
+
+- `/api/reservations/[id]/checkin/route.ts` — POST: owner or admin; validates 10-minute pre-start window; sets `checked_in=true`, `checked_in_at=now()`
+- `app/checkin/page.tsx` — public page at `/checkin?reservation_id=xxx`; loads reservation, shows booking details, check-in button (10-min window guard)
+- Calendar `QrModal`: generates QR code via `QRCodeSVG` pointing to `/checkin?reservation_id=...`
+
+**Calendar UI updates** (`calendar-client.tsx`):
+
+- `NewBookingModal`: on 409 + `waitlist_enabled`, shows orange "Join Waitlist" prompt; re-submits with `waitlist: true`
+- `ReservationModal`: check-in button (green, 10 min before start), waitlist hold banner (orange countdown to `waitlist_expires_at`), confirm-waitlist button, cancel-series dialog, QR code button
+- `WaitlistConfirmModal`: shown when URL has `?activate_waitlist=<id>` — calls confirm-waitlist then refreshes calendar
+- `RecurringSection`: frequency picker (daily/weekly/custom), day-of-week toggles, end by count or date, DST warning badge
+- Event classes: `event-pending` / `event-pending-mine` (dashed amber border), `event-waitlisted` / `event-waitlisted-mine` (orange), buffer zones as gray background events with tooltip "N-minute buffer — room resetting"
+
+**DB migration (`supabase/migrations/20240101000024_phase9.sql`):**
+
+- Adds `waitlisted` to reservations status check constraint
+- Adds `waitlist_expires_at timestamptz` to reservations
+- Adds `waitlist_enabled boolean NOT NULL DEFAULT false` to locations
+- Indexes: `idx_reservations_waitlisted`, `idx_reservations_waitlist_expires`, `idx_reservations_recurring_group`, `idx_reservations_pending_org`
+- RPCs: `activate_next_waitlist`, `process_waitlist_slot`, `advance_expired_waitlist`, `confirm_from_waitlist`
+
+**Email templates added** (`lib/email/auth-templates.ts`):
+
+- `waitlistAvailableTemplate(userName, bookingTitle, roomName, startTime, bookNowUrl)`
+- `approvalStatusTemplate(userName, bookingTitle, roomName, startTime, approved, reason?)`
+- `recurringSeriesTemplate(userName, bookingTitle, roomName, instances)`
+
+---
+
+### Phase 10 — Cron Jobs & Scheduled Automation (complete)
+
+All cron routes are in `app/api/cron/`. They use raw `Response.json()` (not `withErrorHandling`) and are authenticated via `verifyCronSecret(req)` from `lib/auth/cron.ts` (checks `Authorization: Bearer <CRON_SECRET>`).
+
+**Cron routes:**
+
+- `nano-pulse/route.ts` — daily: finds profiles inactive >30 days (`last_active_at < now()-30d`, `hibernate_status='active'`); sets `hibernate_status='hibernated'`, flags future reservations, emails `hibernationNoticeTemplate`, logs to `activity_log`
+- `ghost-buster/route.ts` — every 5 min: fetches `ghost_buster_enabled=true` locations; finds confirmed+unchecked-in reservations past the ghost window; calls `release_ghost_reservation()` RPC, emails `ghostBusterReleaseTemplate`, calls `process_waitlist_slot()` to promote next waiter
+- `send-reminders/route.ts` — daily at 9am: 24h reminder window (`start_time` between `now()+23h` and `now()+25h`); respects `email_reminders=true` and `reminder_timing IN ('24h','both')`; sets `reminder_sent=true`
+- `send-reminders-1h/route.ts` — hourly: 1h reminder window (`start_time` between `now()+50min` and `now()+70min`); respects `reminder_timing IN ('1h','both')`; sets `reminder_1h_sent=true`
+- `waitlist-notify/route.ts` — every 15 min: calls `advance_expired_waitlist()` RPC; finds active holds set within last 20 min (`waitlist_expires_at > now()`, recently set); emails `waitlistAvailableTemplate` with `bookNowUrl = /calendar?activate_waitlist=<id>`
+- `trial-reminders/route.ts` — daily at 10am: day-7 reminder (`trial_starts_at <= now()-7d`, `trial_day7_sent=false`); day-13 reminder (`trial_starts_at <= now()-13d`, `trial_day13_sent=false`); expires ended trials → `subscription_status='inactive'`; uses `admin.auth.admin.getUserById()` to get email (NOT profiles table)
+- `subscription-reminders/route.ts` — daily at 10am: expires grace periods (`subscription_status='grace'`, `grace_period_ends_at < now()` → `expired`); sends 7d/3d/1d renewal reminders using ±0.5d windows around `subscription_expires_at`
+- `weekly-digest/route.ts` — Mondays at 8am: orgs with `subscription_status IN ('active','trial')`; compiles 5 stats (new bookings, cancellations, ghost no-shows via `activity_log.action='reservation.ghost_released'`, pending count, new users); sends `weeklyDigestTemplate` to all org_admins
+- `notification-cleanup/route.ts` — daily at 3am: deletes `notifications` older than 30 days
+- `data-retention-purge/route.ts` — weekly Sundays at 4am: deletes cancelled reservations >2 years old (uses `.or()` for null `cancelled_at` fallback to `created_at`); deletes `activity_log` entries >1 year old
+
+**Email templates added** (`lib/email/auth-templates.ts`):
+
+- `hibernationNoticeTemplate(userName, orgName)`
+- `ghostBusterReleaseTemplate(userName, bookingTitle, roomName, startTime)`
+- `bookingReminderTemplate(userName, bookingTitle, roomName, startTime, endTime, window: '24h' | '1h')`
+- `weeklyDigestTemplate(orgName, weekLabel, stats)` — stats table with 5 metrics
+
+**Vercel cron configuration** (`vercel.json`):
+
+```json
+{
+  "crons": [
+    { "path": "/api/cron/nano-pulse", "schedule": "0 2 * * *" },
+    { "path": "/api/cron/ghost-buster", "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/send-reminders", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/send-reminders-1h", "schedule": "0 * * * *" },
+    { "path": "/api/cron/waitlist-notify", "schedule": "*/15 * * * *" },
+    { "path": "/api/cron/trial-reminders", "schedule": "0 10 * * *" },
+    { "path": "/api/cron/subscription-reminders", "schedule": "0 10 * * *" },
+    { "path": "/api/cron/weekly-digest", "schedule": "0 8 * * 1" },
+    { "path": "/api/cron/notification-cleanup", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/data-retention-purge", "schedule": "0 4 * * 0" }
+  ]
+}
+```
+
+---
+
+### Phase 11 — God Mode, Audit Trail & Admin Panels (complete)
+
+#### 1. God Mode Override
+
+- **Calendar UI** (`app/(user)/calendar/calendar-client.tsx`): "God Mode Override" toggle in `NewBookingModal` for `org_admin`/`super_admin` roles. Toggle opens an inline confirmation dialog requiring a typed reason (≥10 chars). When confirmed, submits to `/api/reservations/god-mode` instead of the normal endpoint. Active god-mode turns the Book button red ("Book (God Mode)"). `🛡` shield prefix shown on calendar events with `god_mode_override=true`.
+- **API route** `POST /api/reservations/god-mode`: admin-only; cancels all conflicting `pending`/`confirmed` reservations (`cancellation_reason='Admin priority override'`), auto-waitlists each displaced user for the same slot, emails them via `godModeDisplacedTemplate`, creates the new `god_mode_override=true` booking, logs to `activity_log`.
+- **Email templates** in `lib/email/auth-templates.ts`: `godModeDisplacedTemplate`, `auditTamperAlertTemplate`
+
+#### 2. Super Admin God Mode Audit Report
+
+- **Page** `app/(super-admin)/god-mode-audit/page.tsx` — filterable table across all orgs; columns: Date, Org, Admin, Room, Booking Title, Reason, Users Displaced; CSV export
+- **Layout** `app/(super-admin)/layout.tsx` — sticky header with God Mode Audit and Marketing links
+- **API route** `GET /api/super-admin/god-mode-audit?org_id=&from=&to=`
+
+#### 3. Activity Log Viewer (Org Admin)
+
+- **Page** `app/(org-admin)/activity-log/page.tsx` — filterable table: action type, date range; paginated (50/page); read-only
+- **API route** `GET /api/org/activity-log?page=&action=&actor=&from=&to=`
+- "Activity Log" link added to `app/(org-admin)/layout.tsx` nav
+
+#### 4. Hash Chain Tamper Detection
+
+- **Table** `audit_chain` in migration `20240101000025_phase11.sql`; RLS service-role only
+- **Cron route** `app/api/cron/audit-chain/route.ts` — nightly SHA-256 chain over `activity_log`; sets `tamper_detected=true` and emails Super Admin on mismatch
+- Added to `vercel.json`: `{ "path": "/api/cron/audit-chain", "schedule": "0 1 * * *" }`
+
+#### 5. Org-Wide Announcement
+
+`POST /api/org/announce` + UI in `app/(org-admin)/org-settings/page.tsx` — complete.
+
+#### 6. Super Admin Marketing Panel
+
+- **Page** `app/(super-admin)/marketing/page.tsx` — lists org admins with `master_admin_email_optin=true`; CSV export; No-Sale Policy reminder
+- **API route** `GET /api/super-admin/marketing-opt-ins`
+
+#### DB migration (`supabase/migrations/20240101000025_phase11.sql`)
+
+- `reservations`: `god_mode_override boolean NOT NULL DEFAULT false`, `god_mode_reason text`, `god_mode_by uuid FK → profiles`, `original_booker_id uuid FK → profiles`, `title_fts tsvector GENERATED`
+- `audit_chain` table with RLS (service-role only; super_admin reads via admin client)
+- Indexes: `idx_reservations_god_mode` (partial, `god_mode_override=true`), `idx_audit_chain_org`, `idx_reservations_title_fts` (GIN)
+
+**Profile API:** `GET /api/user/profile` added (returns `id, full_name, timezone, role, email_reminders, reminder_timing`); previously only `PATCH` existed.
+
+---
+
+### Phase 12 — Notifications UI, Push & Global Search (complete)
+
+#### 1. In-App Notification Center
+
+- **Component** `components/features/notifications/notification-bell.tsx` — Bell icon with red unread badge (capped at 99+); click opens slide-out panel; each notification shows icon (by type), title, 2-line body, relative timestamp, unread highlight; click marks read + navigates to `action_url`; "Mark all read" button; load-more pagination (25/page); 30s polling for unread count
+- **API routes** `app/api/notifications/` — `GET` (list + unread count), `PATCH [id]` (mark read), `POST mark-all-read`
+- Wired into all three layouts: user, org-admin, super-admin
+
+#### 2. PWA Push Notifications
+
+- **`lib/push/send.ts`** — `sendPushToUser(userId, payload)`: fetches user's push subscriptions, calls `web-push` for each, auto-deletes stale endpoints (410/404 responses)
+- **`public/sw.js`** — service worker: handles `push` event (shows notification), `notificationclick` (opens action URL)
+- **Service worker registration** in `app/(user)/settings/page.tsx`: permission request → VAPID key fetch → `navigator.serviceWorker.register('/sw.js')` → subscribe → `POST /api/user/push-subscription`; unsubscribe on toggle-off
+- **Payload format**: `{ title, body, icon: '/icon-192.png', url: action_url }`
+
+#### 3. Global Search
+
+- **Component** `components/features/search/global-search.tsx` — Cmd+K / Ctrl+K trigger; 300ms debounce; results grouped by Reservations / Rooms / Users with icons; super admin org filter dropdown (self-fetches org list via `/api/super-admin/orgs`); Esc to close
+- **API route** `app/api/search/route.ts` — FTS via `title_fts` (reservations), `name_fts` (locations), `full_name_fts` (profiles); RLS-scoped by `org_id`; super admin can search across all orgs; users section admin-only; email enriched via `auth.admin.listUsers()`
+- Wired into all three layouts; super-admin layout passes `isSuperAdmin`
+
+#### FTS indexes (from migration 00016)
+
+- `reservations.title_fts` GIN index
+- `locations.name_fts` GIN index
+- `profiles.full_name_fts` GIN index
+
+---
+
 ## What Remains to Build
 
-The following phase is **not yet started**.
-
-### Phase 9 — Push Notifications & Real-time
-
-1. Service worker + push subscription registration (VAPID keys already in env)
-2. Push to users on booking confirmation, cancellation, ghost-buster release
-3. In-app notification bell using `notifications` table (already seeded via RPC)
+All phases 1–12 are complete. The app is feature-complete.
 
 ---
 

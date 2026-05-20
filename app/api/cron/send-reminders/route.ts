@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/send'
 import { bookingReminderTemplate } from '@/lib/email/auth-templates'
 import { toZonedTime, format } from 'date-fns-tz'
+import { sendPushToUser } from '@/lib/push/send'
 
 // Sends 24-hour booking reminders to users with email_reminders enabled.
 export const GET = async (req: NextRequest): Promise<Response> => {
@@ -77,6 +78,12 @@ export const GET = async (req: NextRequest): Promise<Response> => {
           .from('reservations')
           .update({ reminder_sent: true })
           .eq('id', res.id as string)
+
+        void sendPushToUser(res.booked_by as string, {
+          title: `Reminder: "${res.title as string}"`,
+          body: `Your booking starts tomorrow at ${fmt(res.start_time as string)}`,
+          url: '/calendar',
+        })
 
         sent++
       }

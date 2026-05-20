@@ -124,7 +124,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     admin
       .from('reservations')
       .select(
-        'id, title, notes, location_id, booked_by, start_time, end_time, status, recurring_group_id, checked_in, waitlist_expires_at',
+        'id, title, notes, location_id, booked_by, start_time, end_time, status, recurring_group_id, checked_in, waitlist_expires_at, god_mode_override',
       )
       .eq('org_id', profile.org_id)
       .in('status', ['pending', 'confirmed', 'flagged', 'waitlisted'])
@@ -174,6 +174,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     recurring_group_id: r.recurring_group_id as string | null,
     checked_in: r.checked_in as boolean,
     waitlist_expires_at: r.waitlist_expires_at as string | null,
+    god_mode_override: (r.god_mode_override as boolean) ?? false,
   }))
 
   const maintenanceWindows = (allRooms ?? [])

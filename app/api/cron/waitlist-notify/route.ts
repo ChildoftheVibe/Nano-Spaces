@@ -5,6 +5,7 @@ import { sendEmail } from '@/lib/email/send'
 import { waitlistAvailableTemplate } from '@/lib/email/auth-templates'
 import { toZonedTime, format } from 'date-fns-tz'
 import { env } from '@/lib/env'
+import { sendPushToUser } from '@/lib/push/send'
 
 // Expires stale waitlist holds and promotes next waiter. Also emails waitlist users on available holds.
 export const GET = async (req: NextRequest): Promise<Response> => {
@@ -73,6 +74,11 @@ export const GET = async (req: NextRequest): Promise<Response> => {
             startFormatted,
             bookNowUrl,
           ),
+        })
+        void sendPushToUser(hold.booked_by as string, {
+          title: 'Waitlist spot available!',
+          body: `Your slot for "${hold.title as string}" is ready. Confirm now before it expires.`,
+          url: bookNowUrl,
         })
         emailed++
       }

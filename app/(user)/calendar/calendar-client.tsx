@@ -18,6 +18,7 @@ import {
   QrCode,
   CheckCircle,
   AlertTriangle,
+  Shield,
 } from 'lucide-react'
 import { fromZonedTime } from 'date-fns-tz'
 import { createEvent, createEvents } from 'ics'
@@ -60,6 +61,7 @@ interface CalReservation {
   recurring_group_id: string | null
   checked_in: boolean
   waitlist_expires_at: string | null
+  god_mode_override: boolean
 }
 
 interface BlackoutDate {
@@ -391,6 +393,7 @@ function NewBookingModal({
   defaultDate,
   defaultStartTime,
   prefill,
+  isAdmin,
   onClose,
   onBooked,
 }: {
@@ -399,6 +402,7 @@ function NewBookingModal({
   defaultDate?: string
   defaultStartTime?: string
   prefill?: Partial<BookingFormData>
+  isAdmin?: boolean
   onClose: () => void
   onBooked: (msg: string) => void
 }) {
@@ -429,6 +433,11 @@ function NewBookingModal({
   const selectedRoom = rooms.find((r) => r.id === selectedRoomId)
   const [showWaitlistPrompt, setShowWaitlistPrompt] = useState(false)
   const [pendingBody, setPendingBody] = useState<Record<string, unknown> | null>(null)
+  const [godModeActive, setGodModeActive] = useState(false)
+  const [showGodModeDialog, setShowGodModeDialog] = useState(false)
+  const [godModeReason, setGodModeReason] = useState('')
+  const [godModeDialogReason, setGodModeDialogReason] = useState('')
+  const [godModeReasonError, setGodModeReasonError] = useState<string | null>(null)
 
   const submitBooking = async (body: Record<string, unknown>) => {
     const res = await fetch('/api/reservations', {
@@ -486,6 +495,27 @@ function NewBookingModal({
       notes: data.notes || undefined,
       start_time: startIso,
       end_time: endIso,
+    }
+
+    if (godModeActive) {
+      const res = await fetch('/api/reservations/god-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...body, god_mode_reason: godModeReason }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError('root', {
+          message:
+            (json as { error?: { message?: string } }).error?.message ?? 'God Mode booking failed.',
+        })
+        return
+      }
+      const resData = (json as { data?: { displacedCount?: number } }).data
+      onBooked(
+        `God Mode booking created.${resData?.displacedCount ? ` ${resData.displacedCount} existing booking(s) displaced.` : ''}`,
+      )
+      return
     }
 
     if (data.is_recurring && data.recurring) {
@@ -606,6 +636,105 @@ function NewBookingModal({
 
         <RecurringSection control={control} register={register} watch={watch} setValue={setValue} />
 
+        {/* God Mode Override — org_admin / super_admin only */}
+        {isAdmin && (
+          <div
+            className={`rounded-lg border px-4 py-3 ${godModeActive ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'}`}
+          >
+            <div className="flex items-center gap-3">
+              <Switch
+                id="nb-godmode"
+                checked={godModeActive}
+                onCheckedChange={(v) => {
+                  if (v) {
+                    setShowGodModeDialog(true)
+                  } else {
+                    setGodModeActive(false)
+                    setGodModeReason('')
+                    setGodModeDialogReason('')
+                  }
+                }}
+              />
+              <Label
+                htmlFor="nb-godmode"
+                className={`flex cursor-pointer items-center gap-1.5 text-sm font-medium ${godModeActive ? 'text-red-700' : 'text-gray-700'}`}
+              >
+                <Shield className="h-3.5 w-3.5" />
+                God Mode Override
+              </Label>
+              {godModeActive && (
+                <span className="ml-auto rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                  Active
+                </span>
+              )}
+            </div>
+            {godModeActive && godModeReason && (
+              <p className="mt-2 truncate text-xs text-red-600">Reason: {godModeReason}</p>
+            )}
+          </div>
+        )}
+
+        {/* God Mode confirmation dialog */}
+        {showGodModeDialog && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-4">
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-red-800">
+              <Shield className="h-4 w-4" />
+              Confirm God Mode Override
+            </p>
+            <p className="mt-1 text-xs text-red-700">
+              This will displace any conflicting confirmed reservations and bypass all booking
+              rules. All displaced users will be notified and auto-added to the waitlist.
+            </p>
+            <div className="mt-3">
+              <Label className="text-xs text-red-700">
+                Reason <span className="text-red-500">(required, min 10 characters)</span>
+              </Label>
+              <textarea
+                value={godModeDialogReason}
+                onChange={(e) => setGodModeDialogReason(e.target.value)}
+                rows={2}
+                maxLength={500}
+                className="mt-1 w-full resize-none rounded-lg border border-red-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                placeholder="Explain why this override is necessary…"
+              />
+              {godModeReasonError && (
+                <p className="mt-1 text-xs text-red-600">{godModeReasonError}</p>
+              )}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                className="bg-red-600 text-white hover:bg-red-700"
+                onClick={() => {
+                  if (godModeDialogReason.trim().length < 10) {
+                    setGodModeReasonError('Reason must be at least 10 characters.')
+                    return
+                  }
+                  setGodModeActive(true)
+                  setGodModeReason(godModeDialogReason.trim())
+                  setShowGodModeDialog(false)
+                  setGodModeReasonError(null)
+                }}
+              >
+                Confirm Override
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setShowGodModeDialog(false)
+                  setGodModeDialogReason('')
+                  setGodModeReasonError(null)
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
         {showWaitlistPrompt && (
           <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
             <p className="font-semibold">This slot is fully booked.</p>
@@ -648,8 +777,18 @@ function NewBookingModal({
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting || showWaitlistPrompt}>
-            {isSubmitting ? 'Booking…' : isRecurring ? 'Create Series' : 'Book'}
+          <Button
+            type="submit"
+            disabled={isSubmitting || showWaitlistPrompt || showGodModeDialog}
+            className={godModeActive ? 'bg-red-600 hover:bg-red-700' : ''}
+          >
+            {isSubmitting
+              ? 'Booking…'
+              : godModeActive
+                ? 'Book (God Mode)'
+                : isRecurring
+                  ? 'Create Series'
+                  : 'Book'}
           </Button>
         </div>
       </form>
@@ -1056,6 +1195,7 @@ function WaitlistConfirmModal({
 export default function CalendarClient() {
   const calendarRef = useRef<FullCalendar>(null)
   const [userTimezone, setUserTimezone] = useState('UTC')
+  const [userRole, setUserRole] = useState<string>('user')
   const [rooms, setRooms] = useState<Room[]>([])
   const [selectedRoom, setSelectedRoom] = useState('')
   const [currentView, setCurrentView] = useState<View>('dayGridMonth')
@@ -1091,10 +1231,10 @@ export default function CalendarClient() {
       fetch('/api/user/profile').then((r) => r.json()),
       fetch('/api/calendar/rooms').then((r) => r.json()),
     ]).then(([profileJson, roomsJson]) => {
-      const tz =
-        (profileJson as { data?: { profile?: { timezone?: string } } }).data?.profile?.timezone ??
-        Intl.DateTimeFormat().resolvedOptions().timeZone
-      setUserTimezone(tz)
+      const profile = (profileJson as { data?: { profile?: { timezone?: string; role?: string } } })
+        .data?.profile
+      setUserTimezone(profile?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone)
+      setUserRole(profile?.role ?? 'user')
       setRooms((roomsJson as { data?: { rooms?: Room[] } }).data?.rooms ?? [])
     })
   }, [])
@@ -1161,7 +1301,7 @@ export default function CalendarClient() {
             className = r.is_mine ? 'event-mine' : 'event-confirmed'
           }
 
-          const title =
+          const baseTitle =
             r.status === 'waitlisted'
               ? `⏳ ${r.title}`
               : r.status === 'pending'
@@ -1169,6 +1309,7 @@ export default function CalendarClient() {
                 : r.checked_in
                   ? `✓ ${r.title}`
                   : r.title
+          const title = r.god_mode_override ? `🛡 ${baseTitle}` : baseTitle
 
           events.push({
             id: r.id,
@@ -1498,6 +1639,7 @@ export default function CalendarClient() {
         <NewBookingModal
           rooms={rooms}
           userTimezone={userTimezone}
+          isAdmin={['org_admin', 'super_admin'].includes(userRole)}
           {...(modal.date !== undefined ? { defaultDate: modal.date } : {})}
           {...(modal.startTime !== undefined ? { defaultStartTime: modal.startTime } : {})}
           {...(modal.prefill !== undefined ? { prefill: modal.prefill } : {})}

@@ -421,3 +421,39 @@ export function recurringSeriesTemplate(
     <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
   `)
 }
+
+export function godModeDisplacedTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+  adminReason: string,
+  bookNowUrl: string,
+): string {
+  return layout(`
+    <h2>Your booking was cancelled by an administrator</h2>
+    <p>Hi ${userName}, your reservation was cancelled to accommodate a priority booking.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Booking</td><td style="padding:8px 0;font-weight:600">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Room</td><td style="padding:8px 0">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Time</td><td style="padding:8px 0">${startTime}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Reason</td><td style="padding:8px 0">${adminReason}</td></tr>
+    </table>
+    <p>You have been automatically added to the waitlist for this slot. If the priority booking is cancelled, you will be first in line.</p>
+    <p style="text-align:center"><a class="btn" href="${bookNowUrl}">View Waitlist &amp; Rebook</a></p>
+    <p style="font-size:13px;color:#9CA3AF">We apologise for the inconvenience. Please contact your administrator if you have questions.</p>
+  `)
+}
+
+export function auditTamperAlertTemplate(orgName: string, detectedAt: string): string {
+  return layout(`
+    <h2 style="color:#DC2626">&#9888; Audit Log Tampering Detected</h2>
+    <p>The hash chain verification for <strong>${orgName}</strong> has failed, indicating that one or more activity log entries may have been modified or deleted.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:140px">Organisation</td><td style="padding:8px 0;font-weight:600">${orgName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Detected at</td><td style="padding:8px 0">${detectedAt}</td></tr>
+    </table>
+    <p style="font-weight:600;color:#DC2626">Immediate action is recommended. Review the audit log for this organisation and investigate any recent database access.</p>
+    <p style="text-align:center"><a class="btn" href="${BASE}/super-admin/god-mode-audit" style="background:#DC2626">View Audit Report</a></p>
+  `)
+}
