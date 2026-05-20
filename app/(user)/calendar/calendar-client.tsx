@@ -7,16 +7,26 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import type { EventInput, EventClickArg, DatesSetArg } from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ChevronLeft, ChevronRight, Download, Plus } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Plus,
+  QrCode,
+  CheckCircle,
+  AlertTriangle,
+} from 'lucide-react'
 import { fromZonedTime } from 'date-fns-tz'
 import { createEvent, createEvents } from 'ics'
 import type { EventAttributes } from 'ics'
+import { QRCodeSVG } from 'qrcode.react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +41,7 @@ interface Room {
   max_booking_duration_mins: number | null
   nano_buffer_mins: number
   approval_required: boolean
+  waitlist_enabled?: boolean
 }
 
 interface CalReservation {
@@ -46,6 +57,9 @@ interface CalReservation {
   status: string
   is_mine: boolean
   nano_buffer_mins: number
+  recurring_group_id: string | null
+  checked_in: boolean
+  waitlist_expires_at: string | null
 }
 
 interface BlackoutDate {
@@ -70,8 +84,20 @@ type ModalState =
   | { type: 'none' }
   | { type: 'new'; date?: string; startTime?: string; prefill?: Partial<BookingFormData> }
   | { type: 'view'; reservation: CalReservation }
+  | { type: 'qr'; reservation: CalReservation }
+  | { type: 'waitlist_confirm'; reservationId: string }
 
 // ─── Booking form schema ───────────────────────────────────────────────────────
+
+const recurringSchema = z
+  .object({
+    frequency: z.enum(['daily', 'weekly', 'specific_days']),
+    days_of_week: z.array(z.number()).optional(),
+    end_type: z.enum(['date', 'count']),
+    end_date: z.string().optional(),
+    occurrences: z.number().min(1).max(52).optional(),
+  })
+  .optional()
 
 const bookingSchema = z
   .object({
@@ -81,6 +107,8 @@ const bookingSchema = z
     date: z.string().min(1, 'Date is required'),
     start_time_local: z.string().min(1, 'Start time is required'),
     end_time_local: z.string().min(1, 'End time is required'),
+    is_recurring: z.boolean().optional(),
+    recurring: recurringSchema,
   })
   .refine((d) => d.end_time_local > d.start_time_local, {
     message: 'End time must be after start time',
@@ -88,6 +116,25 @@ const bookingSchema = z
   })
 
 type BookingFormData = z.infer<typeof bookingSchema>
+
+const DOW_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+// ─── DST detection ────────────────────────────────────────────────────────────
+
+function detectDstShift(startIso: string, durationDays: number, tz: string): boolean {
+  try {
+    const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'short' })
+    const start = new Date(startIso)
+    const end = new Date(start.getTime() + durationDays * 24 * 60 * 60 * 1000)
+    const startParts = fmt.formatToParts(start)
+    const endParts = fmt.formatToParts(end)
+    const startTz = startParts.find((p) => p.type === 'timeZoneName')?.value ?? ''
+    const endTz = endParts.find((p) => p.type === 'timeZoneName')?.value ?? ''
+    return startTz !== endTz
+  } catch {
+    return false
+  }
+}
 
 // ─── ICS helpers ──────────────────────────────────────────────────────────────
 
@@ -148,10 +195,13 @@ function StatusBadge({ status }: { status: string }) {
     pending: 'bg-yellow-50 text-yellow-700',
     flagged: 'bg-red-50 text-red-700',
     cancelled: 'bg-gray-100 text-gray-500',
+    waitlisted: 'bg-orange-50 text-orange-700',
   }
   const cls = styles[status] ?? 'bg-gray-100 text-gray-500'
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${cls}`}
+    >
       {status}
     </span>
   )
@@ -163,26 +213,172 @@ function ModalShell({
   title,
   onClose,
   children,
+  wide,
 }: {
   title: string
   onClose: () => void
   children: React.ReactNode
+  wide?: boolean
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="font-heading text-lg font-semibold text-[var(--text-primary)]">{title}</h2>
+      <div
+        className={`max-h-[90vh] w-full ${wide ? 'max-w-lg' : 'max-w-md'} overflow-y-auto rounded-2xl bg-white shadow-2xl`}
+      >
+        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <h2 className="font-heading text-lg font-semibold text-gray-900">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
           >
             ✕
           </button>
         </div>
         <div className="p-6">{children}</div>
       </div>
+    </div>
+  )
+}
+
+// ─── Recurring form section ────────────────────────────────────────────────────
+
+function RecurringSection({
+  control,
+  register,
+  watch,
+  setValue,
+}: {
+  control: ReturnType<typeof useForm<BookingFormData>>['control']
+  register: ReturnType<typeof useForm<BookingFormData>>['register']
+  watch: ReturnType<typeof useForm<BookingFormData>>['watch']
+  setValue: ReturnType<typeof useForm<BookingFormData>>['setValue']
+}) {
+  const isRecurring = useWatch({ control, name: 'is_recurring' })
+  const frequency = useWatch({ control, name: 'recurring.frequency' }) ?? 'weekly'
+  const endType = useWatch({ control, name: 'recurring.end_type' }) ?? 'count'
+  const days = (useWatch({ control, name: 'recurring.days_of_week' }) as number[] | undefined) ?? []
+  const startDate = watch('date')
+  const startIso = startDate ? new Date(startDate + 'T12:00:00').toISOString() : ''
+
+  const hasDst =
+    isRecurring && startIso
+      ? detectDstShift(
+          startIso,
+          endType === 'count' ? 84 : 365,
+          Intl.DateTimeFormat().resolvedOptions().timeZone,
+        )
+      : false
+
+  const toggleDay = (d: number) => {
+    const next = days.includes(d) ? days.filter((x) => x !== d) : [...days, d]
+    setValue('recurring.days_of_week', next)
+  }
+
+  if (!isRecurring) return null
+
+  return (
+    <div className="mt-1 space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 p-4">
+      {hasDst && (
+        <div className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2.5 text-xs text-amber-700">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>
+            This series may cross a DST transition. Booking times will shift by ±1 hour on the
+            transition date.
+          </span>
+        </div>
+      )}
+
+      <div>
+        <Label className="text-xs font-medium text-gray-700">Repeat</Label>
+        <div className="mt-1.5 flex gap-1">
+          {(['daily', 'weekly', 'specific_days'] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setValue('recurring.frequency', f)}
+              className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
+                frequency === f
+                  ? 'border-[#4F7EFA] bg-[#4F7EFA] text-white'
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#4F7EFA]/50'
+              }`}
+            >
+              {f === 'specific_days' ? 'Custom' : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {frequency === 'specific_days' && (
+        <div>
+          <Label className="text-xs font-medium text-gray-700">Days of week</Label>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {DOW_LABELS.map((label, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => toggleDay(i)}
+                className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  days.includes(i)
+                    ? 'border-[#4F7EFA] bg-[#4F7EFA] text-white'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-[#4F7EFA]/50'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <Label className="text-xs font-medium text-gray-700">Ends</Label>
+        <div className="mt-1.5 flex gap-1">
+          {(['count', 'date'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setValue('recurring.end_type', t)}
+              className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
+                endType === t
+                  ? 'border-[#4F7EFA] bg-[#4F7EFA] text-white'
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#4F7EFA]/50'
+              }`}
+            >
+              {t === 'count' ? 'After N times' : 'On date'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {endType === 'count' ? (
+        <div>
+          <Label htmlFor="rec-count" className="text-xs font-medium text-gray-700">
+            Occurrences (max 52)
+          </Label>
+          <Input
+            id="rec-count"
+            type="number"
+            min={1}
+            max={52}
+            defaultValue={4}
+            {...register('recurring.occurrences', { valueAsNumber: true })}
+            className="mt-1"
+          />
+        </div>
+      ) : (
+        <div>
+          <Label htmlFor="rec-end-date" className="text-xs font-medium text-gray-700">
+            End date
+          </Label>
+          <Input
+            id="rec-end-date"
+            type="date"
+            {...register('recurring.end_date')}
+            className="mt-1"
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -204,12 +400,14 @@ function NewBookingModal({
   defaultStartTime?: string
   prefill?: Partial<BookingFormData>
   onClose: () => void
-  onBooked: () => void
+  onBooked: (msg: string) => void
 }) {
   const {
     register,
     handleSubmit,
     watch,
+    control,
+    setValue,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<BookingFormData>({
@@ -221,11 +419,56 @@ function NewBookingModal({
       date: prefill?.date ?? defaultDate ?? new Date().toISOString().slice(0, 10),
       start_time_local: prefill?.start_time_local ?? defaultStartTime ?? '09:00',
       end_time_local: prefill?.end_time_local ?? '10:00',
+      is_recurring: false,
+      recurring: { frequency: 'weekly', end_type: 'count', occurrences: 4 },
     },
   })
 
   const selectedRoomId = watch('location_id')
+  const isRecurring = watch('is_recurring')
   const selectedRoom = rooms.find((r) => r.id === selectedRoomId)
+  const [showWaitlistPrompt, setShowWaitlistPrompt] = useState(false)
+  const [pendingBody, setPendingBody] = useState<Record<string, unknown> | null>(null)
+
+  const submitBooking = async (body: Record<string, unknown>) => {
+    const res = await fetch('/api/reservations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    const json = await res.json().catch(() => ({}))
+
+    if (!res.ok) {
+      if (res.status === 409 && selectedRoom?.waitlist_enabled && !body['waitlist']) {
+        setShowWaitlistPrompt(true)
+        setPendingBody(body)
+        return
+      }
+      const msg = (json as { error?: { message?: string } }).error?.message ?? 'Booking failed.'
+      setError('root', { message: msg })
+      return
+    }
+
+    setShowWaitlistPrompt(false)
+    setPendingBody(null)
+    const resData = (
+      json as { data?: { reservationIds?: string[]; skipped?: number; status?: string } }
+    ).data
+    if (resData?.reservationIds) {
+      const created = resData.reservationIds.length
+      const skipped = resData.skipped ?? 0
+      onBooked(
+        `${created} recurring booking${created !== 1 ? 's' : ''} created${skipped > 0 ? ` (${skipped} skipped due to conflicts)` : ''}.`,
+      )
+    } else if (resData?.status === 'waitlisted') {
+      onBooked('Added to waitlist. You will be notified when a slot opens.')
+    } else {
+      onBooked(
+        resData?.status === 'pending' ? 'Booking submitted for approval.' : 'Booking created.',
+      )
+    }
+  }
 
   const onSubmit = async (data: BookingFormData) => {
     const startIso = fromZonedTime(
@@ -237,122 +480,176 @@ function NewBookingModal({
       userTimezone,
     ).toISOString()
 
-    const res = await fetch('/api/reservations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location_id: data.location_id,
-        title: data.title,
-        notes: data.notes || undefined,
-        start_time: startIso,
-        end_time: endIso,
-      }),
-    })
-
-    const json = await res.json().catch(() => ({}))
-
-    if (!res.ok) {
-      const msg = (json as { error?: { message?: string } }).error?.message ?? 'Booking failed.'
-      setError('root', { message: msg })
-      return
+    const body: Record<string, unknown> = {
+      location_id: data.location_id,
+      title: data.title,
+      notes: data.notes || undefined,
+      start_time: startIso,
+      end_time: endIso,
     }
 
-    onBooked()
+    if (data.is_recurring && data.recurring) {
+      body.recurring = data.recurring
+    }
+
+    await submitBooking(body)
   }
 
   return (
-    <ModalShell title="New Booking" onClose={onClose}>
+    <ModalShell title="New Booking" onClose={onClose} wide>
       <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-4">
-        {selectedRoom?.min_notice_hours && (
+        {selectedRoom?.min_notice_hours ? (
           <div className="rounded-lg bg-blue-50 px-4 py-2.5 text-xs text-blue-700">
-            Bookings require {selectedRoom.min_notice_hours}h advance notice. Cancellations also
-            require {selectedRoom.cancel_notice_hours}h.
+            Requires {selectedRoom.min_notice_hours}h advance notice · Cancellations need{' '}
+            {selectedRoom.cancel_notice_hours}h notice
+            {selectedRoom.approval_required && ' · Requires admin approval'}
           </div>
-        )}
-        {!selectedRoomId && (
-          <div className="rounded-lg bg-blue-50 px-4 py-2.5 text-xs text-blue-700">
+        ) : !selectedRoomId ? (
+          <div className="rounded-lg bg-gray-50 px-4 py-2.5 text-xs text-gray-500">
             Select a room to see booking requirements.
           </div>
-        )}
+        ) : null}
 
         <div>
-          <Label htmlFor="nb-room">Room *</Label>
+          <Label htmlFor="nb-room" className="text-sm font-medium text-gray-700">
+            Room *
+          </Label>
           <select
             id="nb-room"
             {...register('location_id')}
-            className="mt-1 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            className="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
           >
             <option value="">Select a room…</option>
             {rooms.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.name}
                 {r.capacity ? ` (cap. ${r.capacity})` : ''}
-                {r.approval_required ? ' — requires approval' : ''}
+                {r.approval_required ? ' — approval required' : ''}
               </option>
             ))}
           </select>
           {errors.location_id && (
-            <p className="mt-1 text-xs text-[var(--color-danger)]">{errors.location_id.message}</p>
+            <p className="mt-1 text-xs text-red-500">{errors.location_id.message}</p>
           )}
         </div>
 
         <div>
-          <Label htmlFor="nb-title">Title *</Label>
-          <Input id="nb-title" {...register('title')} placeholder="Team meeting" />
-          {errors.title && (
-            <p className="mt-1 text-xs text-[var(--color-danger)]">{errors.title.message}</p>
-          )}
+          <Label htmlFor="nb-title" className="text-sm font-medium text-gray-700">
+            Title *
+          </Label>
+          <Input
+            id="nb-title"
+            {...register('title')}
+            placeholder="Team meeting"
+            className="mt-1.5"
+          />
+          {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>}
         </div>
 
         <div>
-          <Label htmlFor="nb-notes">Notes</Label>
+          <Label htmlFor="nb-notes" className="text-sm font-medium text-gray-700">
+            Notes
+          </Label>
           <textarea
             id="nb-notes"
             {...register('notes')}
             rows={2}
             maxLength={1000}
-            className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            className="mt-1.5 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
             placeholder="Optional notes…"
           />
         </div>
 
         <div>
-          <Label htmlFor="nb-date">Date *</Label>
-          <Input id="nb-date" type="date" {...register('date')} />
-          {errors.date && (
-            <p className="mt-1 text-xs text-[var(--color-danger)]">{errors.date.message}</p>
-          )}
+          <Label htmlFor="nb-date" className="text-sm font-medium text-gray-700">
+            Date *
+          </Label>
+          <Input id="nb-date" type="date" {...register('date')} className="mt-1.5" />
+          {errors.date && <p className="mt-1 text-xs text-red-500">{errors.date.message}</p>}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="nb-start">Start *</Label>
-            <Input id="nb-start" type="time" {...register('start_time_local')} />
+            <Label htmlFor="nb-start" className="text-sm font-medium text-gray-700">
+              Start *
+            </Label>
+            <Input id="nb-start" type="time" {...register('start_time_local')} className="mt-1.5" />
             {errors.start_time_local && (
-              <p className="mt-1 text-xs text-[var(--color-danger)]">
-                {errors.start_time_local.message}
-              </p>
+              <p className="mt-1 text-xs text-red-500">{errors.start_time_local.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="nb-end">End *</Label>
-            <Input id="nb-end" type="time" {...register('end_time_local')} />
+            <Label htmlFor="nb-end" className="text-sm font-medium text-gray-700">
+              End *
+            </Label>
+            <Input id="nb-end" type="time" {...register('end_time_local')} className="mt-1.5" />
             {errors.end_time_local && (
-              <p className="mt-1 text-xs text-[var(--color-danger)]">
-                {errors.end_time_local.message}
-              </p>
+              <p className="mt-1 text-xs text-red-500">{errors.end_time_local.message}</p>
             )}
           </div>
         </div>
 
-        {errors.root && <p className="text-sm text-[var(--color-danger)]">{errors.root.message}</p>}
+        {/* Recurring toggle */}
+        <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+          <Switch
+            id="nb-recurring"
+            checked={isRecurring ?? false}
+            onCheckedChange={(v) => setValue('is_recurring', v)}
+          />
+          <Label
+            htmlFor="nb-recurring"
+            className="cursor-pointer text-sm font-medium text-gray-700"
+          >
+            Repeat this booking
+          </Label>
+        </div>
+
+        <RecurringSection control={control} register={register} watch={watch} setValue={setValue} />
+
+        {showWaitlistPrompt && (
+          <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+            <p className="font-semibold">This slot is fully booked.</p>
+            <p className="mt-0.5 text-xs">
+              Waitlist is available for this room. Join the queue and you will be notified if a spot
+              opens.
+            </p>
+            <div className="mt-2.5 flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+                disabled={isSubmitting}
+                onClick={() => void submitBooking({ ...pendingBody!, waitlist: true })}
+              >
+                Join Waitlist
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setShowWaitlistPrompt(false)
+                  setPendingBody(null)
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {!showWaitlistPrompt && errors.root && (
+          <p className="rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-600">
+            {errors.root.message}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Booking…' : 'Book'}
+          <Button type="submit" disabled={isSubmitting || showWaitlistPrompt}>
+            {isSubmitting ? 'Booking…' : isRecurring ? 'Create Series' : 'Book'}
           </Button>
         </div>
       </form>
@@ -368,18 +665,39 @@ function ReservationModal({
   onCancelled,
   onEdited,
   onCopy,
+  onShowQr,
+  onCheckedIn,
 }: {
   reservation: CalReservation
   onClose: () => void
   onCancelled: () => void
   onEdited: () => void
   onCopy: (r: CalReservation) => void
+  onShowQr: (r: CalReservation) => void
+  onCheckedIn: () => void
 }) {
   const [editing, setEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(reservation.title)
   const [editNotes, setEditNotes] = useState(reservation.notes ?? '')
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [showCancelSeries, setShowCancelSeries] = useState(false)
+
+  const now = new Date()
+  const startTime = new Date(reservation.start_time)
+  const tenMinBefore = new Date(startTime.getTime() - 10 * 60 * 1000)
+  const endTime = new Date(reservation.end_time)
+  const canCheckIn =
+    reservation.is_mine &&
+    reservation.status === 'confirmed' &&
+    !reservation.checked_in &&
+    now >= tenMinBefore &&
+    now <= endTime
+
+  const waitlistHoldActive =
+    reservation.status === 'waitlisted' &&
+    reservation.waitlist_expires_at != null &&
+    new Date(reservation.waitlist_expires_at) > now
 
   const formatTime = (iso: string) =>
     new Date(iso).toLocaleString('en-US', {
@@ -409,11 +727,14 @@ function ReservationModal({
     onEdited()
   }
 
-  const cancel = async () => {
-    if (!confirm('Cancel this booking?')) return
+  const doCancel = async (cancelSeries = false) => {
     setBusy(true)
     setError(null)
-    const res = await fetch(`/api/reservations/${reservation.id}`, { method: 'DELETE' })
+    const res = await fetch(`/api/reservations/${reservation.id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cancel_series: cancelSeries }),
+    })
     const json = await res.json().catch(() => ({}))
     if (!res.ok) {
       setError((json as { error?: { message?: string } }).error?.message ?? 'Cancellation failed.')
@@ -421,6 +742,35 @@ function ReservationModal({
       return
     }
     onCancelled()
+  }
+
+  const doCheckIn = async () => {
+    setBusy(true)
+    setError(null)
+    const res = await fetch(`/api/reservations/${reservation.id}/checkin`, { method: 'POST' })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      setError((json as { error?: { message?: string } }).error?.message ?? 'Check-in failed.')
+      setBusy(false)
+      return
+    }
+    onCheckedIn()
+  }
+
+  const doConfirmWaitlist = async () => {
+    setBusy(true)
+    setError(null)
+    const res = await fetch(`/api/reservations/${reservation.id}/confirm-waitlist`, {
+      method: 'POST',
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      setError((json as { error?: { message?: string } }).error?.message ?? 'Confirmation failed.')
+      setBusy(false)
+      return
+    }
+    onEdited()
+    onClose()
   }
 
   const canEdit = reservation.is_mine && ['pending', 'confirmed'].includes(reservation.status)
@@ -432,19 +782,23 @@ function ReservationModal({
         {editing ? (
           <div className="space-y-3">
             <div>
-              <Label>Title</Label>
-              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+              <Label className="text-sm font-medium text-gray-700">Title</Label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="mt-1.5"
+              />
             </div>
             <div>
-              <Label>Notes</Label>
+              <Label className="text-sm font-medium text-gray-700">Notes</Label>
               <textarea
                 value={editNotes}
                 onChange={(e) => setEditNotes(e.target.value)}
                 rows={3}
-                className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                className="mt-1.5 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
               />
             </div>
-            {error && <p className="text-xs text-[var(--color-danger)]">{error}</p>}
+            {error && <p className="text-xs text-red-500">{error}</p>}
             <div className="flex gap-2">
               <Button size="sm" onClick={() => void saveEdit()} disabled={busy}>
                 {busy ? 'Saving…' : 'Save'}
@@ -456,12 +810,44 @@ function ReservationModal({
           </div>
         ) : (
           <>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <h3 className="font-heading font-semibold text-[var(--text-primary)]">
-                  {reservation.title}
-                </h3>
+            {/* Waitlist hold banner */}
+            {waitlistHoldActive && (
+              <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                <p className="font-semibold">Your waitlist spot is available!</p>
+                <p className="mt-0.5 text-xs">
+                  Hold expires{' '}
+                  {new Date(reservation.waitlist_expires_at!).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                  })}
+                  . Confirm within 30 minutes.
+                </p>
+                <Button
+                  size="sm"
+                  className="mt-2 bg-orange-600 hover:bg-orange-700 text-white"
+                  disabled={busy}
+                  onClick={() => void doConfirmWaitlist()}
+                >
+                  {busy ? 'Confirming…' : 'Confirm Booking'}
+                </Button>
+              </div>
+            )}
+
+            <div className="space-y-2.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="font-heading font-semibold text-gray-900">{reservation.title}</h3>
                 <StatusBadge status={reservation.status} />
+                {reservation.recurring_group_id && (
+                  <span className="rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                    Recurring
+                  </span>
+                )}
+                {reservation.checked_in && (
+                  <span className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                    <CheckCircle className="h-3 w-3" />
+                    Checked in
+                  </span>
+                )}
               </div>
               <p className="text-sm text-gray-600">🚪 {reservation.room_name}</p>
               <p className="text-sm text-gray-600">
@@ -469,35 +855,98 @@ function ReservationModal({
               </p>
               <p className="text-sm text-gray-600">👤 {reservation.booker_name}</p>
               {reservation.notes && (
-                <p className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                <p className="rounded-lg bg-gray-50 px-3 py-2.5 text-sm text-gray-600">
                   {reservation.notes}
                 </p>
               )}
             </div>
 
-            {error && <p className="text-xs text-[var(--color-danger)]">{error}</p>}
+            {/* Check-in button */}
+            {canCheckIn && (
+              <Button
+                className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+                disabled={busy}
+                onClick={() => void doCheckIn()}
+              >
+                <CheckCircle className="h-4 w-4" />
+                {busy ? 'Checking in…' : 'Check In Now'}
+              </Button>
+            )}
 
-            <div className="flex flex-wrap gap-2 pt-2">
+            {error && (
+              <p className="rounded-lg bg-red-50 px-3 py-2.5 text-xs text-red-600">{error}</p>
+            )}
+
+            <div className="flex flex-wrap gap-2 pt-1">
               {canEdit && (
                 <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
                   Edit
                 </Button>
               )}
-              {canCancel && (
+              {canCancel && !showCancelSeries && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-[var(--color-danger)]"
+                  className="text-red-500 hover:bg-red-50 hover:text-red-600"
                   disabled={busy}
-                  onClick={() => void cancel()}
+                  onClick={() => {
+                    if (reservation.recurring_group_id) {
+                      setShowCancelSeries(true)
+                    } else {
+                      if (confirm('Cancel this booking?')) void doCancel(false)
+                    }
+                  }}
                 >
                   {busy ? 'Cancelling…' : 'Cancel Booking'}
                 </Button>
               )}
-              <Button size="sm" variant="outline" onClick={() => downloadSingleIcs(reservation)}>
-                <Download className="mr-1 h-3 w-3" />
-                Add to Calendar
-              </Button>
+              {showCancelSeries && (
+                <div className="w-full rounded-xl border border-red-100 bg-red-50 p-3">
+                  <p className="mb-2.5 text-xs text-red-700 font-medium">
+                    Cancel just this instance or the entire series?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-red-200 text-red-600 hover:bg-red-100"
+                      disabled={busy}
+                      onClick={() => void doCancel(false)}
+                    >
+                      This only
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                      disabled={busy}
+                      onClick={() => void doCancel(true)}
+                    >
+                      Entire series
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setShowCancelSeries(false)}>
+                      Keep
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {['pending', 'confirmed'].includes(reservation.status) && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadSingleIcs(reservation)}
+                  >
+                    <Download className="mr-1.5 h-3.5 w-3.5" />
+                    Add to Calendar
+                  </Button>
+                  {reservation.is_mine && reservation.status === 'confirmed' && (
+                    <Button size="sm" variant="outline" onClick={() => onShowQr(reservation)}>
+                      <QrCode className="mr-1.5 h-3.5 w-3.5" />
+                      Check-in QR
+                    </Button>
+                  )}
+                </>
+              )}
               {reservation.is_mine && (
                 <Button size="sm" variant="ghost" onClick={() => onCopy(reservation)}>
                   Copy Booking
@@ -506,6 +955,97 @@ function ReservationModal({
             </div>
           </>
         )}
+      </div>
+    </ModalShell>
+  )
+}
+
+// ─── QR Code Modal ────────────────────────────────────────────────────────────
+
+function QrModal({ reservation, onClose }: { reservation: CalReservation; onClose: () => void }) {
+  const checkinUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/checkin?reservation_id=${reservation.id}`
+      : `/checkin?reservation_id=${reservation.id}`
+
+  return (
+    <ModalShell title="Check-in QR Code" onClose={onClose}>
+      <div className="flex flex-col items-center gap-5">
+        <p className="text-center text-sm text-gray-500">Scan this code to check in at the room.</p>
+        <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <QRCodeSVG value={checkinUrl} size={200} includeMargin />
+        </div>
+        <div className="w-full rounded-xl bg-gray-50 p-3 text-center">
+          <p className="font-heading text-sm font-semibold text-gray-800">{reservation.title}</p>
+          <p className="mt-0.5 text-xs text-gray-500">{reservation.room_name}</p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            {new Date(reservation.start_time).toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            })}
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onClose} className="w-full">
+          Close
+        </Button>
+      </div>
+    </ModalShell>
+  )
+}
+
+// ─── Waitlist Confirm Modal ────────────────────────────────────────────────────
+
+function WaitlistConfirmModal({
+  reservationId,
+  onClose,
+  onConfirmed,
+}: {
+  reservationId: string
+  onClose: () => void
+  onConfirmed: () => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const confirm = async () => {
+    setBusy(true)
+    setError(null)
+    const res = await fetch(`/api/reservations/${reservationId}/confirm-waitlist`, {
+      method: 'POST',
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      setError((json as { error?: { message?: string } }).error?.message ?? 'Confirmation failed.')
+      setBusy(false)
+      return
+    }
+    onConfirmed()
+  }
+
+  return (
+    <ModalShell title="Confirm Waitlist Booking" onClose={onClose}>
+      <div className="space-y-4">
+        <div className="rounded-xl bg-orange-50 px-4 py-3 text-sm text-orange-800">
+          <p className="font-semibold">Your waitlist spot is available!</p>
+          <p className="mt-1 text-xs">
+            Click below to confirm your booking. You have a 30-minute window.
+          </p>
+        </div>
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2.5 text-xs text-red-600">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            className="bg-orange-600 hover:bg-orange-700 text-white"
+            disabled={busy}
+            onClick={() => void confirm()}
+          >
+            {busy ? 'Confirming…' : 'Confirm Booking'}
+          </Button>
+        </div>
       </div>
     </ModalShell>
   )
@@ -526,8 +1066,21 @@ export default function CalendarClient() {
 
   const showToast = (msg: string) => {
     setToast(msg)
-    setTimeout(() => setToast(null), 4000)
+    setTimeout(() => setToast(null), 5000)
   }
+
+  // Handle activate_waitlist URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const waitlistId = params.get('activate_waitlist')
+    if (waitlistId) {
+      setModal({ type: 'waitlist_confirm', reservationId: waitlistId })
+      // Clean up URL
+      const url = new URL(window.location.href)
+      url.searchParams.delete('activate_waitlist')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [])
 
   // Initial data load
   useEffect(() => {
@@ -546,7 +1099,7 @@ export default function CalendarClient() {
     })
   }, [])
 
-  // Fetch upcoming reservations (for bulk ICS export)
+  // Fetch upcoming reservations for bulk ICS export
   const fetchUpcoming = useCallback(async () => {
     const start = new Date().toISOString()
     const end = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
@@ -554,7 +1107,7 @@ export default function CalendarClient() {
     const json = await res.json().catch(() => ({}))
     if (res.ok) {
       const all = (json as { data?: { reservations?: CalReservation[] } }).data?.reservations ?? []
-      setUpcomingReservations(all.filter((r) => r.is_mine))
+      setUpcomingReservations(all.filter((r) => r.is_mine && r.status !== 'waitlisted'))
     }
   }, [])
 
@@ -597,22 +1150,37 @@ export default function CalendarClient() {
         for (const r of data?.reservations ?? []) {
           if (selectedRoom && r.location_id !== selectedRoom) continue
 
-          const isMine = r.is_mine
-          const isBlocked = r.status === 'flagged'
-          let className = isMine ? 'event-mine' : 'event-confirmed'
-          if (isBlocked) className = 'event-blocked'
+          let className: string
+          if (r.status === 'flagged') {
+            className = 'event-blocked'
+          } else if (r.status === 'waitlisted') {
+            className = r.is_mine ? 'event-waitlisted-mine' : 'event-waitlisted'
+          } else if (r.status === 'pending') {
+            className = r.is_mine ? 'event-pending-mine' : 'event-pending'
+          } else {
+            className = r.is_mine ? 'event-mine' : 'event-confirmed'
+          }
+
+          const title =
+            r.status === 'waitlisted'
+              ? `⏳ ${r.title}`
+              : r.status === 'pending'
+                ? `⌛ ${r.title}`
+                : r.checked_in
+                  ? `✓ ${r.title}`
+                  : r.title
 
           events.push({
             id: r.id,
-            title: r.title,
+            title,
             start: r.start_time,
             end: r.end_time,
             classNames: [className],
             extendedProps: { type: 'reservation', reservation: r },
           })
 
-          // Buffer zone after reservation
-          if (r.nano_buffer_mins > 0) {
+          // Buffer zone after reservation (exclude waitlisted)
+          if (r.nano_buffer_mins > 0 && r.status !== 'waitlisted') {
             const bufEnd = new Date(
               new Date(r.end_time).getTime() + r.nano_buffer_mins * 60 * 1000,
             ).toISOString()
@@ -625,7 +1193,7 @@ export default function CalendarClient() {
               classNames: ['event-buffer'],
               overlap: false,
               editable: false,
-              extendedProps: { type: 'buffer' },
+              extendedProps: { type: 'buffer', buffer_mins: r.nano_buffer_mins },
             })
           }
         }
@@ -669,7 +1237,6 @@ export default function CalendarClient() {
 
   const handleDateClick = (info: DateClickArg) => {
     if (info.view.type === 'dayGridMonth') {
-      // Clicked a day in month view — switch to week view on that day
       calendarRef.current?.getApi().gotoDate(info.date)
       calendarRef.current?.getApi().changeView('timeGridWeek')
       setCurrentView('timeGridWeek')
@@ -706,9 +1273,9 @@ export default function CalendarClient() {
     setCurrentView(v)
   }
 
-  const handleBooked = () => {
+  const handleBooked = (msg: string) => {
     setModal({ type: 'none' })
-    showToast('Booking created.')
+    showToast(msg)
     calendarRef.current?.getApi().refetchEvents()
     void fetchUpcoming()
   }
@@ -724,6 +1291,12 @@ export default function CalendarClient() {
     showToast('Booking updated.')
     calendarRef.current?.getApi().refetchEvents()
     void fetchUpcoming()
+  }
+
+  const handleCheckedIn = () => {
+    setModal({ type: 'none' })
+    showToast('Checked in successfully!')
+    calendarRef.current?.getApi().refetchEvents()
   }
 
   const handleCopy = (r: CalReservation) => {
@@ -748,37 +1321,45 @@ export default function CalendarClient() {
       <style>{`
         .fc { font-family: Inter, sans-serif; font-size: 14px; }
         .fc-toolbar-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; font-weight: 700; }
-        .fc-col-header-cell { background: #EFF1F5; text-transform: uppercase; font-size: 12px; letter-spacing: 0.04em; }
+        .fc-col-header-cell { background: #EFF1F5; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; font-weight: 600; padding: 8px 0; }
         .fc-day-today { background: #EEF3FF !important; }
         .fc-day-today .fc-daygrid-day-number { background: #4F7EFA; color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
-        .fc-event { border-radius: 6px; border: none; padding: 3px 7px; font-size: 12px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.06); cursor: pointer; }
+        .fc-event { border-radius: 6px; border: none !important; padding: 3px 8px; font-size: 12px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); cursor: pointer; }
         .event-confirmed { background: #EEF3FF !important; color: #2D5DD6 !important; }
         .event-mine { background: #4F7EFA !important; color: #fff !important; }
+        .event-pending { background: #FEFCE8 !important; color: #A16207 !important; border: 1.5px dashed #D97706 !important; }
+        .event-pending-mine { background: #FEF3C7 !important; color: #92400E !important; border: 1.5px dashed #D97706 !important; }
+        .event-waitlisted { background: #FFF7ED !important; color: #C2410C !important; opacity: 0.7; }
+        .event-waitlisted-mine { background: #FFEDD5 !important; color: #9A3412 !important; }
         .event-blocked { background: #FEF2F2 !important; color: #F0544F !important; cursor: not-allowed !important; }
-        .event-buffer { opacity: 0.5; }
-        .fc-timegrid-slot { cursor: pointer; }
-        .fc-daygrid-day:hover { background: #F5F7FF; }
+        .event-buffer { opacity: 0.4; cursor: default; }
+        .event-buffer:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1F2937; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; pointer-events: none; z-index: 100; }
+        .fc-timegrid-slot { cursor: pointer; height: 24px; }
+        .fc-daygrid-day:hover { background: #F5F7FF; transition: background 0.1s; }
+        .fc-timegrid-now-indicator-line { border-color: #4F7EFA; }
+        .fc-button { display: none !important; }
+        .fc-scrollgrid { border-radius: 8px; overflow: hidden; }
       `}</style>
 
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Toolbar */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => calendarRef.current?.getApi().prev()}
-              className="rounded-lg border p-2 text-gray-500 transition-colors hover:bg-gray-50 hover:text-[var(--text-primary)]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
               aria-label="Previous"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <h2 className="min-w-[200px] text-center font-heading text-lg font-bold text-[var(--text-primary)]">
+            <h2 className="min-w-[180px] text-center font-heading text-lg font-bold text-gray-900">
               {viewTitle}
             </h2>
             <button
               type="button"
               onClick={() => calendarRef.current?.getApi().next()}
-              className="rounded-lg border p-2 text-gray-500 transition-colors hover:bg-gray-50 hover:text-[var(--text-primary)]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
               aria-label="Next"
             >
               <ChevronRight className="h-4 w-4" />
@@ -786,24 +1367,22 @@ export default function CalendarClient() {
             <button
               type="button"
               onClick={() => calendarRef.current?.getApi().today()}
-              className="rounded-lg border px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+              className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
             >
               Today
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* View switcher */}
-            <div className="flex rounded-lg border bg-white overflow-hidden">
+            <div className="flex overflow-hidden rounded-lg border border-gray-200 bg-white">
               {(['dayGridMonth', 'timeGridWeek', 'timeGridDay'] as View[]).map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => changeView(v)}
                   className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                    currentView === v
-                      ? 'bg-[var(--brand-primary)] text-white'
-                      : 'text-gray-600 hover:bg-gray-50'
+                    currentView === v ? 'bg-[#4F7EFA] text-white' : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   {VIEW_LABELS[v]}
@@ -818,7 +1397,7 @@ export default function CalendarClient() {
                 setSelectedRoom(e.target.value)
                 setTimeout(() => calendarRef.current?.getApi().refetchEvents(), 0)
               }}
-              className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
             >
               <option value="">All rooms</option>
               {rooms.map((r) => (
@@ -828,12 +1407,12 @@ export default function CalendarClient() {
               ))}
             </select>
 
-            {/* Export upcoming */}
+            {/* Export */}
             {upcomingReservations.length > 0 && (
               <button
                 type="button"
                 onClick={() => downloadBulkIcs(upcomingReservations)}
-                className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
                 title="Export all upcoming bookings"
               >
                 <Download className="h-3.5 w-3.5" />
@@ -841,9 +1420,15 @@ export default function CalendarClient() {
               </button>
             )}
 
-            {/* New booking */}
-            {toast && <p className="text-sm text-gray-600">{toast}</p>}
-            <Button onClick={() => setModal({ type: 'new' })} className="flex items-center gap-1">
+            {/* Toast */}
+            {toast && (
+              <span className="rounded-lg bg-gray-800/90 px-3 py-1.5 text-sm font-medium text-white">
+                {toast}
+              </span>
+            )}
+
+            {/* Book button */}
+            <Button onClick={() => setModal({ type: 'new' })} className="flex items-center gap-1.5">
               <Plus className="h-4 w-4" />
               Book
             </Button>
@@ -851,7 +1436,7 @@ export default function CalendarClient() {
         </div>
 
         {/* FullCalendar */}
-        <div className="rounded-xl border bg-white p-2 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -859,7 +1444,7 @@ export default function CalendarClient() {
             timeZone={userTimezone}
             headerToolbar={false}
             height="auto"
-            contentHeight={620}
+            contentHeight={640}
             events={fetchCalendarEvents}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
@@ -869,23 +1454,41 @@ export default function CalendarClient() {
             slotMaxTime="22:00:00"
             slotDuration="00:30:00"
             eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
-            dayMaxEvents={3}
+            dayMaxEvents={4}
+            eventDidMount={(info) => {
+              if (info.event.extendedProps['type'] === 'buffer') {
+                const mins = info.event.extendedProps['buffer_mins'] as number
+                info.el.setAttribute('title', `${mins}-minute buffer — room resetting`)
+              }
+            }}
           />
         </div>
 
         {/* Legend */}
-        <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+        <div className="mt-4 flex flex-wrap items-center gap-5 text-xs text-gray-500">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#4F7EFA]" /> My booking
+            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#4F7EFA]" />
+            My booking
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#EEF3FF]" /> Others
+            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#EEF3FF]" />
+            Others
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#FEF2F2]" /> Blocked
+            <span className="inline-block h-2.5 w-2.5 rounded-sm border border-dashed border-amber-500 bg-amber-50" />
+            Pending approval
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#E5E7EB]" /> Buffer
+            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-orange-100" />
+            Waitlisted
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#FEF2F2]" />
+            Blocked
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#E5E7EB]" />
+            Buffer
           </span>
         </div>
       </div>
@@ -909,6 +1512,23 @@ export default function CalendarClient() {
           onCancelled={handleCancelled}
           onEdited={handleEdited}
           onCopy={handleCopy}
+          onShowQr={(r) => setModal({ type: 'qr', reservation: r })}
+          onCheckedIn={handleCheckedIn}
+        />
+      )}
+      {modal.type === 'qr' && (
+        <QrModal reservation={modal.reservation} onClose={() => setModal({ type: 'none' })} />
+      )}
+      {modal.type === 'waitlist_confirm' && (
+        <WaitlistConfirmModal
+          reservationId={modal.reservationId}
+          onClose={() => setModal({ type: 'none' })}
+          onConfirmed={() => {
+            setModal({ type: 'none' })
+            showToast('Booking confirmed from waitlist!')
+            calendarRef.current?.getApi().refetchEvents()
+            void fetchUpcoming()
+          }}
         />
       )}
     </>

@@ -52,7 +52,7 @@ export const GET = withErrorHandling(async (_req: NextRequest) => {
     admin
       .from('locations')
       .select(
-        'id, name, type, description, notes, capacity, photo_url, is_active, in_maintenance, maintenance_from, maintenance_to, maintenance_note, max_booking_duration_mins, max_bookings_per_user_per_day, min_notice_hours, cancel_notice_hours, max_advance_days, approval_required, nano_buffer_mins, ghost_buster_enabled, ghost_buster_mins, created_at',
+        'id, name, type, description, notes, capacity, photo_url, is_active, in_maintenance, maintenance_from, maintenance_to, maintenance_note, max_booking_duration_mins, max_bookings_per_user_per_day, min_notice_hours, cancel_notice_hours, max_advance_days, approval_required, nano_buffer_mins, ghost_buster_enabled, ghost_buster_mins, waitlist_enabled, created_at',
       )
       .eq('org_id', profile.org_id)
       .order('created_at', { ascending: true }),

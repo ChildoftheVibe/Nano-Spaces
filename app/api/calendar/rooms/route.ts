@@ -27,7 +27,7 @@ export const GET = withErrorHandling(async (_req: NextRequest) => {
   const { data: rooms } = await admin
     .from('locations')
     .select(
-      'id, name, type, capacity, photo_url, description, min_notice_hours, cancel_notice_hours, max_advance_days, max_booking_duration_mins, nano_buffer_mins, approval_required',
+      'id, name, type, capacity, photo_url, description, min_notice_hours, cancel_notice_hours, max_advance_days, max_booking_duration_mins, nano_buffer_mins, approval_required, waitlist_enabled',
     )
     .eq('org_id', profile.org_id)
     .eq('is_active', true)

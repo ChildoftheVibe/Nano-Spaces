@@ -19,6 +19,7 @@ const patchSchema = z.object({
   nano_buffer_mins: z.number().int().min(0).max(60).optional(),
   ghost_buster_enabled: z.boolean().optional(),
   ghost_buster_mins: z.number().int().min(5).max(120).optional(),
+  waitlist_enabled: z.boolean().optional(),
 })
 
 async function requireOrgAdminAndRoom(

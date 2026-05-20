@@ -244,3 +244,78 @@ export function accountLockoutAdminTemplate(
     <p>The account will automatically unlock after 24 hours, or an administrator can manually unlock it from the user management panel.</p>
   `)
 }
+
+export function waitlistAvailableTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+  bookNowUrl: string,
+): string {
+  return layout(`
+    <h2>Your Waitlist Spot is Available!</h2>
+    <p>Hi ${userName},</p>
+    <p>A slot has opened up for your waitlisted booking. You have <strong>30 minutes</strong> to confirm before it moves to the next person in line.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Booking</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Time</td><td style="padding:8px 0">${startTime}</td></tr>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${bookNowUrl}">Confirm Booking Now</a></p>
+    <p style="color:#9CA3AF;font-size:13px">This offer expires in 30 minutes. If you do not confirm, your waitlist entry will be cancelled.</p>
+  `)
+}
+
+export function approvalStatusTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  startTime: string,
+  approved: boolean,
+  reason?: string,
+): string {
+  const statusColor = approved ? '#059669' : '#DC2626'
+  const statusText = approved ? 'Approved' : 'Rejected'
+  const msg = approved
+    ? '<p>Your booking has been <strong>approved</strong> and is now confirmed.</p>'
+    : `<p>Your booking has been <strong>declined</strong>.${reason ? ` Reason: ${reason}` : ''}</p>`
+  return layout(`
+    <h2>Booking ${statusText}</h2>
+    <p>Hi ${userName},</p>
+    ${msg}
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Status</td><td style="padding:8px 0;font-weight:600;color:${statusColor}">${statusText}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Booking</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Time</td><td style="padding:8px 0">${startTime}</td></tr>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
+  `)
+}
+
+export function recurringSeriesTemplate(
+  userName: string,
+  bookingTitle: string,
+  roomName: string,
+  created: number,
+  skipped: number,
+  firstStart: string,
+): string {
+  const skipNote =
+    skipped > 0
+      ? `<p><strong>${skipped} instance${skipped !== 1 ? 's' : ''}</strong> were skipped due to conflicts or unavailability.</p>`
+      : ''
+  return layout(`
+    <h2>Recurring Booking Created</h2>
+    <p>Hi ${userName},</p>
+    <p>Your recurring booking series has been created with <strong>${created} instance${created !== 1 ? 's' : ''}</strong>.</p>
+    ${skipNote}
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
+      <tr><td style="padding:8px 0;color:#6B7280;width:120px">Room</td><td style="padding:8px 0;font-weight:600">${roomName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Booking</td><td style="padding:8px 0">${bookingTitle}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">First date</td><td style="padding:8px 0">${firstStart}</td></tr>
+      <tr><td style="padding:8px 0;color:#6B7280">Total</td><td style="padding:8px 0">${created} booking${created !== 1 ? 's' : ''}</td></tr>
+    </table>
+    <p style="text-align:center"><a class="btn" href="${BASE}/calendar">View Calendar</a></p>
+  `)
+}

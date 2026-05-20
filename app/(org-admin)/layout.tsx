@@ -25,6 +25,12 @@ export default function OrgAdminLayout({ children }: { children: React.ReactNode
               Rooms
             </Link>
             <Link
+              href="/org-admin/approvals"
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
+            >
+              Approvals
+            </Link>
+            <Link
               href="/org-admin/users"
               className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
             >

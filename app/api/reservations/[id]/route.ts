@@ -15,6 +15,7 @@ const editSchema = z.object({
 
 const cancelSchema = z.object({
   cancellation_reason: z.string().max(500).optional(),
+  cancel_series: z.boolean().optional(),
 })
 
 async function requireAuth(_req: NextRequest, requestId: string) {
@@ -113,12 +114,15 @@ export const DELETE = withErrorHandling(
     const body = await req.json().catch(() => ({}))
     const parsed = cancelSchema.safeParse(body)
     const reason = parsed.success ? (parsed.data.cancellation_reason ?? null) : null
+    const cancelSeries = parsed.success ? (parsed.data.cancel_series ?? false) : false
 
     const admin = createAdminClient()
 
     const { data: reservation } = await admin
       .from('reservations')
-      .select('id, booked_by, org_id, title, start_time, end_time, status, location_id')
+      .select(
+        'id, booked_by, org_id, title, start_time, end_time, status, location_id, recurring_group_id',
+      )
       .eq('id', reservationId)
       .single()
 
@@ -159,15 +163,32 @@ export const DELETE = withErrorHandling(
       }
     }
 
-    await admin
-      .from('reservations')
-      .update({
-        status: 'cancelled',
-        cancelled_by: user.id,
-        cancelled_at: new Date().toISOString(),
-        cancellation_reason: reason,
-      })
-      .eq('id', reservationId)
+    const cancelledAt = new Date().toISOString()
+    const cancelUpdate = {
+      status: 'cancelled',
+      cancelled_by: user.id,
+      cancelled_at: cancelledAt,
+      cancellation_reason: reason,
+    }
+
+    // Cancel entire series if requested and reservation is part of a series
+    if (cancelSeries && reservation.recurring_group_id) {
+      await admin
+        .from('reservations')
+        .update(cancelUpdate)
+        .eq('recurring_group_id', reservation.recurring_group_id as string)
+        .in('status', ['pending', 'confirmed'])
+        .gte('start_time', new Date().toISOString())
+    } else {
+      await admin.from('reservations').update(cancelUpdate).eq('id', reservationId)
+    }
+
+    // Trigger waitlist promotion after cancellation
+    await admin.rpc('process_waitlist_slot', {
+      p_location_id: reservation.location_id as string,
+      p_start_time: reservation.start_time as string,
+      p_end_time: reservation.end_time as string,
+    })
 
     // Notify booker if an admin cancelled their booking
     if (isAdmin && !isOwner && reservation.booked_by) {
@@ -231,7 +252,11 @@ export const DELETE = withErrorHandling(
       action: 'reservation.cancelled',
       target_type: 'reservation',
       target_id: reservationId,
-      details: { reason, cancelled_for: reservation.booked_by as string | null },
+      details: {
+        reason,
+        cancelled_for: reservation.booked_by as string | null,
+        cancel_series: cancelSeries,
+      },
     })
 
     return success({ cancelled: true })

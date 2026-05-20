@@ -30,6 +30,7 @@ interface RoomSummary {
   nano_buffer_mins: number | null
   ghost_buster_enabled: boolean
   ghost_buster_mins: number | null
+  waitlist_enabled: boolean
   upcomingCount: number
 }
 
@@ -345,6 +346,7 @@ function SettingsModal({
   const [bufferMins, setBufferMins] = useState(room.nano_buffer_mins?.toString() ?? '0')
   const [ghostBusterEnabled, setGhostBusterEnabled] = useState(room.ghost_buster_enabled)
   const [ghostBusterMins, setGhostBusterMins] = useState(room.ghost_buster_mins?.toString() ?? '15')
+  const [waitlistEnabled, setWaitlistEnabled] = useState(room.waitlist_enabled)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -359,6 +361,7 @@ function SettingsModal({
       min_notice_hours: Number(minNotice) || 0,
       cancel_notice_hours: Number(cancelNotice) || 0,
       max_advance_days: Number(maxAdvance) || 60,
+      waitlist_enabled: waitlistEnabled,
     }
     if (maxDuration) body.max_booking_duration_mins = Number(maxDuration)
     if (maxPerDay) body.max_bookings_per_user_per_day = Number(maxPerDay)
@@ -490,6 +493,16 @@ function SettingsModal({
             </div>
           )}
         </fieldset>
+
+        <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-[var(--text-primary)]">Waitlist</p>
+            <p className="text-xs text-gray-500">
+              Allow users to join a waitlist when a slot is fully booked
+            </p>
+          </div>
+          <Switch checked={waitlistEnabled} onCheckedChange={setWaitlistEnabled} />
+        </div>
 
         {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
         <div className="flex justify-end gap-2 pt-2">

@@ -349,6 +349,7 @@ export type Database = {
           org_id: string
           photo_url: string | null
           type: string
+          waitlist_enabled: boolean
         }
         Insert: {
           approval_required?: boolean
@@ -375,6 +376,7 @@ export type Database = {
           org_id: string
           photo_url?: string | null
           type: string
+          waitlist_enabled?: boolean
         }
         Update: {
           approval_required?: boolean
@@ -401,6 +403,7 @@ export type Database = {
           org_id?: string
           photo_url?: string | null
           type?: string
+          waitlist_enabled?: boolean
         }
         Relationships: [
           {
@@ -748,6 +751,7 @@ export type Database = {
           status: string
           title: string
           title_fts: unknown
+          waitlist_expires_at: string | null
         }
         Insert: {
           booked_by?: string | null
@@ -773,6 +777,7 @@ export type Database = {
           status?: string
           title: string
           title_fts?: unknown
+          waitlist_expires_at?: string | null
         }
         Update: {
           booked_by?: string | null
@@ -798,6 +803,7 @@ export type Database = {
           status?: string
           title?: string
           title_fts?: unknown
+          waitlist_expires_at?: string | null
         }
         Relationships: [
           {
@@ -872,6 +878,11 @@ export type Database = {
     Functions: {
       auth_org_id: { Args: never; Returns: string }
       auth_role: { Args: never; Returns: string }
+      advance_expired_waitlist: { Args: Record<never, never>; Returns: number }
+      confirm_from_waitlist: {
+        Args: { p_reservation_id: string }
+        Returns: string
+      }
       create_reservation_with_locks: {
         Args: {
           p_booked_by: string
@@ -880,9 +891,18 @@ export type Database = {
           p_notes: string
           p_org_id: string
           p_start_time: string
+          p_status?: string
           p_title: string
         }
         Returns: string
+      }
+      process_waitlist_slot: {
+        Args: {
+          p_end_time: string
+          p_location_id: string
+          p_start_time: string
+        }
+        Returns: undefined
       }
       release_ghost_reservation: {
         Args: { p_reservation_id: string }

@@ -5,8 +5,18 @@ import { success } from '@/lib/api-response/helpers'
 import { createSessionClient, createAdminClient } from '@/lib/supabase/server'
 import { AuthError, ValidationError, BookingConflictError } from '@/lib/errors/AppError'
 import { sendEmail } from '@/lib/email/send'
-import { bookingConfirmationTemplate } from '@/lib/email/auth-templates'
+import { bookingConfirmationTemplate, recurringSeriesTemplate } from '@/lib/email/auth-templates'
 import { toZonedTime, format } from 'date-fns-tz'
+
+const recurringSchema = z
+  .object({
+    frequency: z.enum(['daily', 'weekly', 'specific_days']),
+    days_of_week: z.array(z.number().min(0).max(6)).optional(),
+    end_type: z.enum(['date', 'count']),
+    end_date: z.string().optional(),
+    occurrences: z.number().min(1).max(52).optional(),
+  })
+  .optional()
 
 const createSchema = z.object({
   location_id: z.string().uuid(),
@@ -14,7 +24,11 @@ const createSchema = z.object({
   notes: z.string().max(1000).optional(),
   start_time: z.string().datetime(),
   end_time: z.string().datetime(),
+  recurring: recurringSchema,
+  waitlist: z.boolean().optional(),
 })
+
+type RecurringConfig = NonNullable<z.infer<typeof recurringSchema>>
 
 function timeStr(date: Date, tz: string): string {
   return format(toZonedTime(date, tz), 'HH:mm:ss')
@@ -22,6 +36,56 @@ function timeStr(date: Date, tz: string): string {
 
 function formatForEmail(iso: string, tz: string): string {
   return format(toZonedTime(new Date(iso), tz), "EEE, MMM d yyyy 'at' h:mm a zzz", { timeZone: tz })
+}
+
+function generateRecurringInstances(
+  startIso: string,
+  endIso: string,
+  cfg: RecurringConfig,
+): { start_time: string; end_time: string }[] {
+  const start = new Date(startIso)
+  const durationMs = new Date(endIso).getTime() - start.getTime()
+  const maxCount = cfg.end_type === 'count' ? Math.min(cfg.occurrences ?? 52, 52) : 52
+  const maxDate =
+    cfg.end_type === 'date' && cfg.end_date
+      ? new Date(cfg.end_date)
+      : new Date(start.getTime() + 366 * 24 * 60 * 60 * 1000)
+
+  const instances: { start_time: string; end_time: string }[] = []
+
+  if (cfg.frequency === 'daily') {
+    let cur = new Date(start)
+    while (instances.length < maxCount && cur <= maxDate) {
+      instances.push({
+        start_time: cur.toISOString(),
+        end_time: new Date(cur.getTime() + durationMs).toISOString(),
+      })
+      cur = new Date(cur.getTime() + 24 * 60 * 60 * 1000)
+    }
+  } else if (cfg.frequency === 'weekly') {
+    let cur = new Date(start)
+    while (instances.length < maxCount && cur <= maxDate) {
+      instances.push({
+        start_time: cur.toISOString(),
+        end_time: new Date(cur.getTime() + durationMs).toISOString(),
+      })
+      cur = new Date(cur.getTime() + 7 * 24 * 60 * 60 * 1000)
+    }
+  } else {
+    const days = cfg.days_of_week ?? []
+    let cur = new Date(start)
+    while (instances.length < maxCount && cur <= maxDate) {
+      if (days.includes(cur.getUTCDay())) {
+        instances.push({
+          start_time: cur.toISOString(),
+          end_time: new Date(cur.getTime() + durationMs).toISOString(),
+        })
+      }
+      cur = new Date(cur.getTime() + 24 * 60 * 60 * 1000)
+    }
+  }
+
+  return instances
 }
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
@@ -59,9 +123,11 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
   ] = await Promise.all([
     admin
       .from('reservations')
-      .select('id, title, notes, location_id, booked_by, start_time, end_time, status')
+      .select(
+        'id, title, notes, location_id, booked_by, start_time, end_time, status, recurring_group_id, checked_in, waitlist_expires_at',
+      )
       .eq('org_id', profile.org_id)
-      .in('status', ['pending', 'confirmed', 'flagged'])
+      .in('status', ['pending', 'confirmed', 'flagged', 'waitlisted'])
       .gte('end_time', start)
       .lte('start_time', end),
     admin
@@ -105,6 +171,9 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     status: r.status as string,
     is_mine: r.booked_by === user.id,
     nano_buffer_mins: roomMap[r.location_id as string]?.nano_buffer_mins ?? 5,
+    recurring_group_id: r.recurring_group_id as string | null,
+    checked_in: r.checked_in as boolean,
+    waitlist_expires_at: r.waitlist_expires_at as string | null,
   }))
 
   const maintenanceWindows = (allRooms ?? [])
@@ -148,7 +217,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     })
   }
 
-  const { location_id, title, notes, start_time, end_time } = parsed.data
+  const { location_id, title, notes, start_time, end_time, recurring, waitlist } = parsed.data
   const startDate = new Date(start_time)
   const endDate = new Date(end_time)
   const now = new Date()
@@ -159,12 +228,11 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
   const admin = createAdminClient()
 
-  // Fetch room + org timezone
   const [{ data: room }, { data: org }] = await Promise.all([
     admin
       .from('locations')
       .select(
-        'id, org_id, name, is_active, in_maintenance, maintenance_from, maintenance_to, min_notice_hours, cancel_notice_hours, max_advance_days, max_booking_duration_mins, max_bookings_per_user_per_day, approval_required, nano_buffer_mins',
+        'id, org_id, name, is_active, in_maintenance, maintenance_from, maintenance_to, min_notice_hours, cancel_notice_hours, max_advance_days, max_booking_duration_mins, max_bookings_per_user_per_day, approval_required, nano_buffer_mins, waitlist_enabled',
       )
       .eq('id', location_id)
       .single(),
@@ -184,7 +252,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   const minNotice = (room.min_notice_hours as number) ?? 24
   const maxAdvance = (room.max_advance_days as number) ?? 60
 
-  // Min notice
   const minStart = new Date(now.getTime() + minNotice * 60 * 60 * 1000)
   if (startDate < minStart) {
     throw new ValidationError({
@@ -193,7 +260,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     })
   }
 
-  // Max advance
   const maxStart = new Date(now.getTime() + maxAdvance * 24 * 60 * 60 * 1000)
   if (startDate > maxStart) {
     throw new ValidationError({
@@ -202,7 +268,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     })
   }
 
-  // Max duration
   if (room.max_booking_duration_mins) {
     const durationMins = (endDate.getTime() - startDate.getTime()) / 60000
     if (durationMins > (room.max_booking_duration_mins as number)) {
@@ -213,7 +278,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     }
   }
 
-  // Availability rules
   const { data: rules } = await admin
     .from('availability_rules')
     .select('day_of_week, open_time, close_time, block_holidays')
@@ -226,7 +290,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     const startT = timeStr(startDate, tz)
     const endT = timeStr(endDate, tz)
 
-    // Check that start and end are on the same day (in org tz)
     if (startZoned.toDateString() !== endZoned.toDateString()) {
       throw new ValidationError({
         userMessage: 'Booking must start and end on the same day.',
@@ -249,7 +312,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     }
   }
 
-  // Blackout check
   const { data: conflictingBlackouts } = await admin
     .from('blackout_dates')
     .select('id, title')
@@ -267,73 +329,177 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     })
   }
 
-  // Nano-buffer check: is there a booking ending within buffer mins before our start?
-  if (room.nano_buffer_mins && (room.nano_buffer_mins as number) > 0) {
-    const bufferMs = (room.nano_buffer_mins as number) * 60 * 1000
-    const bufferStart = new Date(startDate.getTime() - bufferMs)
+  // Nano-buffer and daily max checks (skipped for waitlist — user already knows slot is taken)
+  if (!waitlist) {
+    if (room.nano_buffer_mins && (room.nano_buffer_mins as number) > 0) {
+      const bufferMs = (room.nano_buffer_mins as number) * 60 * 1000
+      const bufferStart = new Date(startDate.getTime() - bufferMs)
+      const bufferEnd = new Date(endDate.getTime() + bufferMs)
 
-    const { data: bufferConflicts } = await admin
-      .from('reservations')
-      .select('id')
-      .eq('location_id', location_id)
-      .in('status', ['pending', 'confirmed'])
-      .gt('end_time', bufferStart.toISOString())
-      .lte('end_time', start_time)
-      .limit(1)
+      const [{ data: bufBefore }, { data: bufAfter }] = await Promise.all([
+        admin
+          .from('reservations')
+          .select('id')
+          .eq('location_id', location_id)
+          .in('status', ['pending', 'confirmed'])
+          .gt('end_time', bufferStart.toISOString())
+          .lte('end_time', start_time)
+          .limit(1),
+        admin
+          .from('reservations')
+          .select('id')
+          .eq('location_id', location_id)
+          .in('status', ['pending', 'confirmed'])
+          .gte('start_time', end_time)
+          .lt('start_time', bufferEnd.toISOString())
+          .limit(1),
+      ])
 
-    if (bufferConflicts && bufferConflicts.length > 0) {
-      throw new ValidationError({
-        userMessage: `A ${room.nano_buffer_mins}-minute buffer is required between bookings.`,
-        requestId,
-      })
+      if ((bufBefore && bufBefore.length > 0) || (bufAfter && bufAfter.length > 0)) {
+        throw new ValidationError({
+          userMessage: `A ${room.nano_buffer_mins}-minute buffer is required between bookings.`,
+          requestId,
+        })
+      }
     }
 
-    // Also check: does a booking start within buffer mins after our end?
-    const bufferEnd = new Date(endDate.getTime() + bufferMs)
-    const { data: bufferConflictsAfter } = await admin
-      .from('reservations')
-      .select('id')
-      .eq('location_id', location_id)
-      .in('status', ['pending', 'confirmed'])
-      .gte('start_time', end_time)
-      .lt('start_time', bufferEnd.toISOString())
-      .limit(1)
+    if (room.max_bookings_per_user_per_day) {
+      const dayStart = toZonedTime(startDate, tz)
+      dayStart.setHours(0, 0, 0, 0)
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000)
 
-    if (bufferConflictsAfter && bufferConflictsAfter.length > 0) {
-      throw new ValidationError({
-        userMessage: `A ${room.nano_buffer_mins}-minute buffer is required between bookings.`,
-        requestId,
-      })
-    }
-  }
+      const { count: dayCount } = await admin
+        .from('reservations')
+        .select('id', { count: 'exact', head: true })
+        .eq('location_id', location_id)
+        .eq('booked_by', user.id)
+        .in('status', ['pending', 'confirmed'])
+        .gte('start_time', dayStart.toISOString())
+        .lt('start_time', dayEnd.toISOString())
 
-  // Max bookings per user per day
-  if (room.max_bookings_per_user_per_day) {
-    const dayStart = toZonedTime(startDate, tz)
-    dayStart.setHours(0, 0, 0, 0)
-    const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000)
-
-    const { count: dayCount } = await admin
-      .from('reservations')
-      .select('id', { count: 'exact', head: true })
-      .eq('location_id', location_id)
-      .eq('booked_by', user.id)
-      .in('status', ['pending', 'confirmed'])
-      .gte('start_time', dayStart.toISOString())
-      .lt('start_time', dayEnd.toISOString())
-
-    if ((dayCount ?? 0) >= (room.max_bookings_per_user_per_day as number)) {
-      throw new ValidationError({
-        userMessage: `You have reached the maximum bookings per day for this room (${room.max_bookings_per_user_per_day}).`,
-        requestId,
-      })
+      if ((dayCount ?? 0) >= (room.max_bookings_per_user_per_day as number)) {
+        throw new ValidationError({
+          userMessage: `You have reached the maximum bookings per day for this room (${room.max_bookings_per_user_per_day}).`,
+          requestId,
+        })
+      }
     }
   }
 
-  // Determine status
+  // ─── Waitlist join ───────────────────────────────────────────────────────────
+  if (waitlist) {
+    if (!(room.waitlist_enabled as boolean)) {
+      throw new ValidationError({
+        userMessage: 'Waitlist is not enabled for this room.',
+        requestId,
+      })
+    }
+
+    const insertData: Record<string, unknown> = {
+      location_id,
+      booked_by: user.id,
+      org_id: profile.org_id,
+      title,
+      notes: notes ?? null,
+      start_time,
+      end_time,
+      status: 'waitlisted',
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: waitlistEntry, error: insertErr } = await (admin.from('reservations') as any)
+      .insert(insertData)
+      .select('id')
+      .single()
+
+    if (insertErr) throw new Error('Failed to join waitlist.')
+
+    return success(
+      { waitlistId: (waitlistEntry as { id: string }).id, status: 'waitlisted' },
+      { status: 201 },
+    )
+  }
+
+  // ─── Recurring series ────────────────────────────────────────────────────────
+  if (recurring) {
+    const instances = generateRecurringInstances(start_time, end_time, recurring)
+    if (instances.length === 0) {
+      throw new ValidationError({
+        userMessage: 'No valid dates generated for recurring series.',
+        requestId,
+      })
+    }
+
+    const bookingStatus = (room.approval_required as boolean) ? 'pending' : 'confirmed'
+    const groupId = crypto.randomUUID()
+
+    const results = await Promise.allSettled(
+      instances.map(async (inst) => {
+        const { data: reservationId, error: rpcError } = await admin.rpc(
+          'create_reservation_with_locks',
+          {
+            p_location_id: location_id,
+            p_booked_by: user.id,
+            p_org_id: profile.org_id as string,
+            p_title: title,
+            p_notes: notes ?? '',
+            p_start_time: inst.start_time,
+            p_end_time: inst.end_time,
+            p_status: bookingStatus,
+          },
+        )
+
+        if (rpcError) throw new Error(rpcError.message)
+
+        await admin
+          .from('reservations')
+          .update({ recurring_group_id: groupId })
+          .eq('id', reservationId as string)
+
+        return reservationId as string
+      }),
+    )
+
+    const created = results
+      .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled')
+      .map((r) => r.value)
+    const skipped = results.filter((r) => r.status === 'rejected').length
+
+    try {
+      const { data: authUser } = await admin.auth.admin.getUserById(user.id)
+      const { data: userProfile } = await admin
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single()
+      const userEmail = authUser.user?.email
+      if (userEmail && created.length > 0) {
+        await sendEmail({
+          to: userEmail,
+          subject: 'Recurring Booking Created — Nano Spaces',
+          html: recurringSeriesTemplate(
+            (userProfile?.full_name as string | null) ?? 'there',
+            title,
+            room.name as string,
+            created.length,
+            skipped,
+            formatForEmail(instances[0]?.start_time ?? start_time, tz),
+          ),
+          requestId,
+        })
+      }
+    } catch {
+      // email failure doesn't fail the booking
+    }
+
+    return success(
+      { reservationIds: created, skipped, groupId, status: bookingStatus },
+      { status: 201 },
+    )
+  }
+
+  // ─── Single booking ──────────────────────────────────────────────────────────
   const bookingStatus = (room.approval_required as boolean) ? 'pending' : 'confirmed'
 
-  // Call RPC — atomic conflict check + insert
   const { data: reservationId, error: rpcError } = await admin.rpc(
     'create_reservation_with_locks',
     {
@@ -358,16 +524,13 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     throw new Error('Failed to create reservation.')
   }
 
-  // Send confirmation email (best-effort)
   try {
     const { data: userProfile } = await admin
       .from('profiles')
-      .select('full_name, email:id')
+      .select('full_name')
       .eq('id', user.id)
       .single()
-
     const { data: authUser } = await admin.auth.admin.getUserById(user.id)
-
     const userEmail = authUser.user?.email
     const userName = (userProfile?.full_name as string | null) ?? 'there'
 
