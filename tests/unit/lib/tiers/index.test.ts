@@ -43,7 +43,7 @@ beforeEach(() => {
 describe('checkRoomLimit', () => {
   it('allows when under the limit', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_room_limit: 5 }, 3) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_room_limit: 5 }, 3) as unknown as ReturnType<typeof createAdminClient>,
     )
     const result = await checkRoomLimit('org-1')
     expect(result.allowed).toBe(true)
@@ -53,7 +53,7 @@ describe('checkRoomLimit', () => {
 
   it('blocks when at the limit', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_room_limit: 3 }, 3) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_room_limit: 3 }, 3) as unknown as ReturnType<typeof createAdminClient>,
     )
     const result = await checkRoomLimit('org-1')
     expect(result.allowed).toBe(false)
@@ -63,7 +63,9 @@ describe('checkRoomLimit', () => {
 
   it('allows unlimited when tier_room_limit is null', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_room_limit: null }, 100) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_room_limit: null }, 100) as unknown as ReturnType<
+        typeof createAdminClient
+      >,
     )
     const result = await checkRoomLimit('org-1')
     expect(result.allowed).toBe(true)
@@ -74,7 +76,7 @@ describe('checkRoomLimit', () => {
 describe('checkAdminLimit', () => {
   it('allows when under the admin limit', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_admin_limit: 3 }, 1) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_admin_limit: 3 }, 1) as unknown as ReturnType<typeof createAdminClient>,
     )
     const result = await checkAdminLimit('org-1')
     expect(result.allowed).toBe(true)
@@ -83,7 +85,7 @@ describe('checkAdminLimit', () => {
 
   it('blocks when at the admin limit', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_admin_limit: 2 }, 2) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_admin_limit: 2 }, 2) as unknown as ReturnType<typeof createAdminClient>,
     )
     const result = await checkAdminLimit('org-1')
     expect(result.allowed).toBe(false)
@@ -91,7 +93,9 @@ describe('checkAdminLimit', () => {
 
   it('allows unlimited admins when limit is null', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_admin_limit: null }, 50) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_admin_limit: null }, 50) as unknown as ReturnType<
+        typeof createAdminClient
+      >,
     )
     const result = await checkAdminLimit('org-1')
     expect(result.allowed).toBe(true)
@@ -101,7 +105,7 @@ describe('checkAdminLimit', () => {
 describe('checkUserLimit', () => {
   it('allows when under the user limit', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_user_limit: 50 }, 20) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_user_limit: 50 }, 20) as unknown as ReturnType<typeof createAdminClient>,
     )
     const result = await checkUserLimit('org-1')
     expect(result.allowed).toBe(true)
@@ -111,7 +115,7 @@ describe('checkUserLimit', () => {
 
   it('blocks when at the user limit', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_user_limit: 10 }, 10) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_user_limit: 10 }, 10) as unknown as ReturnType<typeof createAdminClient>,
     )
     const result = await checkUserLimit('org-1')
     expect(result.allowed).toBe(false)
@@ -119,7 +123,9 @@ describe('checkUserLimit', () => {
 
   it('allows unlimited users when limit is null', async () => {
     mockedCreateAdmin.mockReturnValue(
-      makeAdminMock({ tier_user_limit: null }, 999) as ReturnType<typeof createAdminClient>,
+      makeAdminMock({ tier_user_limit: null }, 999) as unknown as ReturnType<
+        typeof createAdminClient
+      >,
     )
     const result = await checkUserLimit('org-1')
     expect(result.allowed).toBe(true)

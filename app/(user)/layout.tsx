@@ -13,8 +13,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
           >
             Nano Spaces
           </Link>
-          <div className="flex items-center gap-2 flex-1 justify-end">
-            <GlobalSearch />
+          <div className="flex items-center gap-2 flex-1 justify-end" data-tour="nav">
+            <div data-tour="search">
+              <GlobalSearch />
+            </div>
             <nav className="flex items-center gap-1">
               <Link
                 href="/calendar"
@@ -35,7 +37,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 Billing
               </Link>
             </nav>
-            <NotificationBell />
+            <div data-tour="notifications">
+              <NotificationBell />
+            </div>
           </div>
         </div>
       </header>

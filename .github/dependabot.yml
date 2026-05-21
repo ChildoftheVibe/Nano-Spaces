@@ -1,0 +1,46 @@
+version: 2
+updates:
+  # npm dependencies — weekly on Mondays
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '07:00'
+      timezone: UTC
+    open-pull-requests-limit: 10
+    reviewers:
+      - ChildoftheVibe
+    labels:
+      - dependencies
+      - automated
+    # Group minor + patch updates into a single PR to reduce noise
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # next and react are major updates — handle manually
+      - dependency-name: next
+        update-types: ['version-update:semver-major']
+      - dependency-name: react
+        update-types: ['version-update:semver-major']
+      - dependency-name: react-dom
+        update-types: ['version-update:semver-major']
+
+  # GitHub Actions — weekly on Mondays
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '07:00'
+      timezone: UTC
+    open-pull-requests-limit: 5
+    reviewers:
+      - ChildoftheVibe
+    labels:
+      - dependencies
+      - github-actions
+      - automated

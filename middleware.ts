@@ -3,6 +3,37 @@ import { createServerClient } from '@supabase/ssr'
 import { verify2faCookieValue, TWO_FA_COOKIE_NAME } from '@/lib/auth/2fa-token'
 import { CURRENT_TOS_VERSION } from '@/lib/tos'
 
+function generateNonce(): string {
+  return Buffer.from(crypto.randomUUID()).toString('base64')
+}
+
+function buildCsp(nonce: string): string {
+  const directives = [
+    "default-src 'self'",
+    // strict-dynamic: scripts loaded by the trusted nonce-bearing script are also trusted
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://challenges.cloudflare.com https://www.paypal.com https://www.paypalobjects.com`,
+    // unsafe-inline needed for Tailwind + Next.js inline styles
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' https://fonts.gstatic.com",
+    // Supabase REST + realtime WebSocket, Sentry, Turnstile
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://challenges.cloudflare.com",
+    // Turnstile + PayPal render inside iframes
+    "frame-src 'self' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    'upgrade-insecure-requests',
+  ]
+  return directives.join('; ')
+}
+
+function applySecurityHeaders(response: NextResponse, nonce: string): NextResponse {
+  response.headers.set('Content-Security-Policy', buildCsp(nonce))
+  return response
+}
+
 const PROTECTED_PREFIXES = [
   '/calendar',
   '/settings',
@@ -35,7 +66,13 @@ function isTosExempt(pathname: string): boolean {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
-  let response = NextResponse.next({ request: req })
+
+  // Generate a per-request nonce for the Content-Security-Policy
+  const nonce = generateNonce()
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set('x-nonce', nonce)
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,7 +84,8 @@ export async function middleware(req: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
-          response = NextResponse.next({ request: req })
+          // Preserve the nonce request header when rebuilding the response
+          response = NextResponse.next({ request: { headers: requestHeaders } })
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           )
@@ -64,19 +102,19 @@ export async function middleware(req: NextRequest) {
 
   // Redirect logged-in users away from auth pages
   if (isAuthRoute(pathname) && isAuthenticated) {
-    return NextResponse.redirect(new URL('/calendar', req.url))
+    return applySecurityHeaders(NextResponse.redirect(new URL('/calendar', req.url)), nonce)
   }
 
   // Public routes — no auth required
   if (!isProtected(pathname)) {
-    return response
+    return applySecurityHeaders(response, nonce)
   }
 
   // Not logged in — send to login
   if (!isAuthenticated) {
     const loginUrl = new URL('/login', req.url)
     loginUrl.searchParams.set('next', pathname)
-    return NextResponse.redirect(loginUrl)
+    return applySecurityHeaders(NextResponse.redirect(loginUrl), nonce)
   }
 
   // Fetch profile once for all subsequent checks
@@ -89,27 +127,30 @@ export async function middleware(req: NextRequest) {
     .single()
 
   if (!profile) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    return applySecurityHeaders(NextResponse.redirect(new URL('/login', req.url)), nonce)
   }
 
   // Suspended accounts
   if (!profile.is_active) {
-    return NextResponse.redirect(new URL('/unauthorized?reason=suspended', req.url))
+    return applySecurityHeaders(
+      NextResponse.redirect(new URL('/unauthorized?reason=suspended', req.url)),
+      nonce,
+    )
   }
 
   // 2FA not enrolled — send to onboarding to set it up
   if (!profile.totp_enabled) {
     if (!pathname.startsWith('/onboarding')) {
-      return NextResponse.redirect(new URL('/onboarding', req.url))
+      return applySecurityHeaders(NextResponse.redirect(new URL('/onboarding', req.url)), nonce)
     }
-    return response
+    return applySecurityHeaders(response, nonce)
   }
 
   // 2FA enrolled — verify the session cookie
   const twoFaCookie = req.cookies.get(TWO_FA_COOKIE_NAME)?.value
   const secret = process.env.NEXTAUTH_SECRET
   if (!secret) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    return applySecurityHeaders(NextResponse.redirect(new URL('/login', req.url)), nonce)
   }
 
   const verifiedUserId = twoFaCookie ? await verify2faCookieValue(twoFaCookie, secret) : null
@@ -119,12 +160,12 @@ export async function middleware(req: NextRequest) {
     verifyUrl.searchParams.set('userId', user.id)
     verifyUrl.searchParams.set('method', profile.two_fa_method ?? 'totp')
     verifyUrl.searchParams.set('next', pathname)
-    return NextResponse.redirect(verifyUrl)
+    return applySecurityHeaders(NextResponse.redirect(verifyUrl), nonce)
   }
 
   // TOS: first-time acceptance — send to onboarding (step 3)
   if (!profile.tos_accepted_at && !isTosExempt(pathname)) {
-    return NextResponse.redirect(new URL('/onboarding', req.url))
+    return applySecurityHeaders(NextResponse.redirect(new URL('/onboarding', req.url)), nonce)
   }
 
   // TOS: version outdated — send to re-acceptance page
@@ -133,15 +174,21 @@ export async function middleware(req: NextRequest) {
     profile.tos_version_accepted !== CURRENT_TOS_VERSION &&
     !isTosExempt(pathname)
   ) {
-    return NextResponse.redirect(new URL('/accept-tos', req.url))
+    return applySecurityHeaders(NextResponse.redirect(new URL('/accept-tos', req.url)), nonce)
   }
 
   // Role checks
   if (isSuperAdminRoute(pathname) && profile.role !== 'super_admin') {
-    return NextResponse.redirect(new URL('/unauthorized?reason=role', req.url))
+    return applySecurityHeaders(
+      NextResponse.redirect(new URL('/unauthorized?reason=role', req.url)),
+      nonce,
+    )
   }
   if (isOrgAdminRoute(pathname) && profile.role !== 'org_admin' && profile.role !== 'super_admin') {
-    return NextResponse.redirect(new URL('/unauthorized?reason=role', req.url))
+    return applySecurityHeaders(
+      NextResponse.redirect(new URL('/unauthorized?reason=role', req.url)),
+      nonce,
+    )
   }
 
   // Subscription check
@@ -165,11 +212,11 @@ export async function middleware(req: NextRequest) {
       !pathname.startsWith('/paywall') &&
       !pathname.startsWith('/settings/billing')
     ) {
-      return NextResponse.redirect(new URL('/paywall', req.url))
+      return applySecurityHeaders(NextResponse.redirect(new URL('/paywall', req.url)), nonce)
     }
   }
 
-  return response
+  return applySecurityHeaders(response, nonce)
 }
 
 export const config = {

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { EmptyState } from '@/components/ui/empty-state'
+import { SkeletonTable } from '@/components/ui/skeleton'
 
 interface OrgUser {
   id: string
@@ -341,7 +343,12 @@ export default function UsersPage() {
   const hibernatedUsers = users.filter((u) => u.hibernate_status === 'hibernated')
 
   if (loading) {
-    return <div className="mx-auto max-w-4xl px-6 py-12 text-sm text-gray-500">Loading…</div>
+    return (
+      <div className="mx-auto max-w-4xl px-6 py-10">
+        <div className="mb-8 h-8 w-32 animate-pulse rounded-lg bg-gray-100" />
+        <SkeletonTable rows={6} />
+      </div>
+    )
   }
 
   return (
@@ -466,8 +473,18 @@ export default function UsersPage() {
             <tbody className="divide-y">
               {(tab === 'active' ? activeUsers : hibernatedUsers).length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-sm text-gray-400">
-                    No users.
+                  <td colSpan={4} className="py-8">
+                    <EmptyState
+                      title={tab === 'active' ? 'No active users' : 'No hibernated users'}
+                      description={
+                        tab === 'active'
+                          ? 'Invite your first team member to get started.'
+                          : 'Hibernated users will appear here after 30 days of inactivity.'
+                      }
+                      {...(tab === 'active'
+                        ? { action: { label: 'Invite member', href: '/org-admin/users' } }
+                        : {})}
+                    />
                   </td>
                 </tr>
               ) : (

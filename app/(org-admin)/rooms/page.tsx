@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { SkeletonCard } from '@/components/ui/skeleton'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
 
@@ -1178,7 +1179,16 @@ export default function RoomsPage() {
   const activeCount = rooms.filter((r) => r.is_active).length
 
   if (loading) {
-    return <div className="mx-auto max-w-5xl px-6 py-12 text-sm text-gray-500">Loading…</div>
+    return (
+      <div className="mx-auto max-w-5xl px-6 py-10">
+        <div className="mb-8 h-8 w-24 animate-pulse rounded-lg bg-gray-100" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
