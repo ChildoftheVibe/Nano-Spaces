@@ -67,7 +67,7 @@ jobs:
         run: k6 run --env BASE_URL=$BASE_URL tests/load/webhook-burst.js || true
 
       - name: Upload load test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: load-test-results-${{ github.run_number }}
