@@ -38,7 +38,7 @@ Nano Spaces is a production-ready **multi-tenant space-booking PWA**. Organizati
 
 ## Build Phase History
 
-Phases are listed in order. All phases through Phase 12 are complete.
+Phases are listed in order. All phases through Phase 13 are complete.
 
 ### Phase 1 — Infrastructure (complete)
 
@@ -499,9 +499,38 @@ All cron routes are in `app/api/cron/`. They use raw `Response.json()` (not `wit
 
 ---
 
+### Phase 13 — Reporting Suite (complete)
+
+All reports live at `app/(org-admin)/reports/page.tsx` — a single tabbed client page accessible to both `org_admin` and `super_admin`. Super admins get an org selector dropdown on every tab (auto-detected via `/api/super-admin/orgs`). All Excel exports use SheetJS (`xlsx` package) with formatted headers (blue fill, bold white text), frozen header rows, and explicit column widths. "Reports" link added to both `app/(org-admin)/layout.tsx` and `app/(super-admin)/layout.tsx`.
+
+**API routes** (`app/api/reports/`):
+
+- `monthly-reservations/route.ts` — `GET ?month=YYYY-MM&org_id=`: all reservations in the month with booker name, canceller name, room name, god-mode flag
+- `user-history/route.ts` — `GET ?user_id=&org_id=`: all reservations for a specific user (up to 500); also returns org user list for the selector dropdown
+- `utilization/route.ts` — `GET ?org_id=`: per-room booked vs available hours over the next 30 days, derived from `availability_rules` and confirmed/pending reservations
+- `peak-hours/route.ts` — `GET ?org_id=`: 24×7 grid (hour-of-day × Mon–Sun) of booking counts from the last 90 days
+- `ghost-buster/route.ts` — `GET ?month=YYYY-MM&org_id=`: ghost-released reservations from `activity_log` where `action='reservation.ghost_released'`, grouped by room
+
+**Org data export** (`app/api/org/export/route.ts`):
+
+- `GET`: org admin only; rate-limited 1 per 24h per org (key `org:<orgId>`); returns a ZIP (built with the existing `lib/zip.ts` helper) containing `reservations.csv`, `users.csv`, `rooms.csv`, `blackouts.csv`, `README.txt`
+
+**Tab details:**
+
+| Tab          | Visualisation                                                                         | Excel export    |
+| ------------ | ------------------------------------------------------------------------------------- | --------------- |
+| Monthly      | Table: Date, Time, Room, Booked By, Title, Status, Cancelled By, Reason, God Mode     | ✓ formatted     |
+| User History | Table: same columns per-user; user selector dropdown                                  | ✓ formatted     |
+| Utilization  | CSS bar chart, colour-coded by threshold (<25% gray, <50% blue, <75% amber, ≥75% red) | ✓ formatted     |
+| Peak Hours   | 24×7 heatmap grid with 5-shade blue intensity + legend                                | ✓ formatted     |
+| Ghost Buster | Expandable accordion per room showing individual no-shows                             | ✓ formatted     |
+| Data Export  | One-click ZIP download with rate-limit feedback                                       | ZIP (CSV files) |
+
+---
+
 ## What Remains to Build
 
-All phases 1–12 are complete. The app is feature-complete.
+All phases 1–13 are complete. The app is feature-complete.
 
 ---
 
