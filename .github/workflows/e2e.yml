@@ -1,0 +1,90 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Target URL for E2E tests'
+        required: false
+        default: 'http://localhost:3000'
+
+jobs:
+  e2e:
+    name: Playwright E2E (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase with seed data
+        run: |
+          npx supabase start
+          npx supabase db reset
+
+      - name: Start Next.js dev server
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRFA0NiK7W9fDQAanvgAfJ_4lZMziPWFyMZCZUlaTmg
+          SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hj04zWl196z2-SBc0
+          NEXTAUTH_SECRET: test-secret-at-least-32-chars-long-ok
+          RESEND_API_KEY: re_placeholder
+          PAYPAL_CLIENT_ID: placeholder
+          PAYPAL_CLIENT_SECRET: placeholder
+          PAYPAL_WEBHOOK_ID: placeholder
+          PAYPAL_STARTER_PLAN_ID: placeholder
+          PAYPAL_GROWTH_PLAN_ID: placeholder
+          PAYPAL_ENVIRONMENT: sandbox
+          UPSTASH_REDIS_REST_URL: https://placeholder.upstash.io
+          UPSTASH_REDIS_REST_TOKEN: placeholder
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+          TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+          WEB_PUSH_PUBLIC_KEY: placeholder
+          WEB_PUSH_PRIVATE_KEY: placeholder
+          WEB_PUSH_EMAIL: mailto:test@example.com
+          SENTRY_DSN: https://placeholder@sentry.io/123
+          SENTRY_AUTH_TOKEN: placeholder
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          CRON_SECRET: test-cron-secret
+        run: npm run dev &
+        shell: bash
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Playwright tests (${{ matrix.browser }})
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost:3000' }}
+        run: npx playwright test --project=${{ matrix.browser }}
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Stop Supabase
+        if: always()
+        run: npx supabase stop

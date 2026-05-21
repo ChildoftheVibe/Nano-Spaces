@@ -1,0 +1,75 @@
+name: Load Tests
+
+on:
+  # Weekly scheduled run every Monday at 06:00 UTC
+  schedule:
+    - cron: '0 6 * * 1'
+  # Manual trigger with custom target
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target URL'
+        required: false
+        default: 'https://nano-spaces.vercel.app'
+      test_script:
+        description: 'Load test script to run'
+        required: false
+        default: 'calendar-views'
+        type: choice
+        options:
+          - calendar-views
+          - login-rate-limit
+          - webhook-burst
+
+jobs:
+  load-test:
+    name: k6 Load Test (${{ github.event.inputs.test_script || 'all' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6 -y
+
+      - name: Create results directory
+        run: mkdir -p tests/load/results
+
+      - name: Run calendar-views load test
+        if: >
+          github.event_name == 'schedule' ||
+          github.event.inputs.test_script == 'calendar-views'
+        env:
+          BASE_URL: ${{ github.event.inputs.target_url || 'https://nano-spaces.vercel.app' }}
+        run: k6 run --env BASE_URL=$BASE_URL tests/load/calendar-views.js || true
+
+      - name: Run login-rate-limit load test
+        if: >
+          github.event_name == 'schedule' ||
+          github.event.inputs.test_script == 'login-rate-limit'
+        env:
+          BASE_URL: ${{ github.event.inputs.target_url || 'https://nano-spaces.vercel.app' }}
+        run: k6 run --env BASE_URL=$BASE_URL tests/load/login-rate-limit.js || true
+
+      - name: Run webhook-burst load test
+        if: >
+          github.event_name == 'schedule' ||
+          github.event.inputs.test_script == 'webhook-burst'
+        env:
+          BASE_URL: ${{ github.event.inputs.target_url || 'https://nano-spaces.vercel.app' }}
+        run: k6 run --env BASE_URL=$BASE_URL tests/load/webhook-burst.js || true
+
+      - name: Upload load test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-results-${{ github.run_number }}
+          path: tests/load/results/
+          retention-days: 90
