@@ -38,7 +38,7 @@ Nano Spaces is a production-ready **multi-tenant space-booking PWA**. Organizati
 
 ## Build Phase History
 
-Phases are listed in order. All phases through Phase 13 are complete.
+Phases are listed in order. All phases through Phase 14 are complete.
 
 ### Phase 1 — Infrastructure (complete)
 
@@ -528,9 +528,78 @@ All reports live at `app/(org-admin)/reports/page.tsx` — a single tabbed clien
 
 ---
 
+### Phase 14 — Testing Infrastructure (complete)
+
+**Vitest unit tests** (`tests/unit/`) — 92 tests, all passing. Coverage scoped to pure lib modules (`lib/validation/**`, `lib/errors/**`, `lib/api-response/**`, `lib/retry.ts`, `lib/tiers/**`); thresholds: 80% lines/functions/statements, 70% branches.
+
+| File                               | What it covers                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `lib/validation/auth.test.ts`      | loginSchema, twoFaCodeSchema, forgotPasswordSchema, resetPasswordSchema, changeEmailSchema, totpEnrollVerifySchema |
+| `lib/validation/user.test.ts`      | updateProfileSchema, changePasswordSchema, pushSubscriptionSchema                                                  |
+| `lib/errors/AppError.test.ts`      | All 9 AppError subclasses — code, httpStatus, name, instanceof chain                                               |
+| `lib/api-response/helpers.test.ts` | success() and failure() shape, status codes, optional details field                                                |
+| `lib/retry.test.ts`                | withRetry: success, transient retry, maxAttempts exhaust, 4xx no-retry; uses `vi.useFakeTimers()`                  |
+| `lib/tiers/index.test.ts`          | checkRoomLimit, checkAdminLimit, checkUserLimit — under/at/null limits; mocks `createAdminClient`                  |
+| `lib/timezone/conversions.test.ts` | fromZonedTime/toZonedTime for EST/EDT/PST/PDT, DST spring-forward + fall-back 2024, formatInTimeZone               |
+
+**Vitest config** (`vitest.config.ts`): `vite-tsconfig-paths` plugin resolves `@/` aliases; `tests/setup.ts` mocks `@sentry/nextjs` and `next/headers`.
+
+**Integration tests** (`tests/integration/`) — skipped unless `INTEGRATION=true`:
+
+- `rls/isolation.test.ts` — org A user cannot see org B reservations or rooms
+- `api/reservations.test.ts` — happy path, 409 conflict, 401 unauthenticated
+- `api/auth.test.ts` — login success (cookie returned), wrong password, non-existent email (same 200 to prevent enumeration)
+- `api/invitations.test.ts` — invite creation, 401 unauthenticated, 400 invalid email
+- `api/paypal-webhook.test.ts` — 401 on invalid signature, no 5xx on well-formed payload
+
+**Test factories** (`tests/factories/index.ts`): `createOrg()`, `createUser()` (auth user + profile), `createRoom()` (with Mon–Fri 08:00–18:00 availability rule), `createReservation()`, `cleanup()` (cascading delete in safe order). Uses local Supabase service-role key.
+
+**Playwright E2E** (`tests/e2e/`) — 5 browser projects: `chromium`, `firefox`, `webkit`, `mobile-iphone` (iPhone 14 Pro 393×852), `mobile-pixel` (Pixel 7 412×915). Config in `playwright.config.ts`.
+
+- `helpers.ts` — `checkA11y()` via `@axe-core/playwright` with wcag2a/wcag2aa/wcag21aa tags; `loginAs()`, `logout()`, `SEED` credentials
+- `login.spec.ts` — form render, wrong credentials error, WCAG 2.1 AA, post-login redirect
+- `booking.spec.ts` — calendar redirect when unauthenticated, check-in page load, accessibility on public pages
+- `navigation.spec.ts` — middleware redirects (/, /settings, /org-admin, /super-admin → /login), public page render, mobile viewport a11y
+- `search.spec.ts` — global search not visible on public pages, Cmd+K no-op on login page
+
+**k6 load tests** (`tests/load/`):
+
+| Script                   | Scenario                             | Thresholds                            |
+| ------------------------ | ------------------------------------ | ------------------------------------- |
+| `calendar-views.js`      | 100 VUs × 5 min hitting calendar API | P95 < 500ms, error rate < 1%          |
+| `reservation-creates.js` | Ramping arrival rate to ~500/min     | Tracks conflicts vs successes         |
+| `login-rate-limit.js`    | ~1000 attempts/min                   | Asserts `rate_limited_responses > 10` |
+| `webhook-burst.js`       | 100 events / 10 sec                  | No 5xx threshold                      |
+
+Baseline performance numbers documented in `tests/load/results/baseline.md`.
+
+**Smoke tests** (`tests/smoke/health.test.ts`) — 8 post-deploy health checks via `SMOKE_URL` env var: login 200, push-key 200, terms/privacy 200, forgot-password 200, join 200, login endpoint returns 401 not 500, `Content-Type: application/json` on API responses.
+
+**GitHub Actions workflows:**
+
+- `ci.yml` (updated) — added `unit-tests` job (runs `npm run test:unit -- --coverage`, uploads coverage artifact); added `migration-test` job (runs on PRs touching `supabase/migrations/`, uses `supabase/setup-cli@v1`)
+- `e2e.yml` — matrix over `[chromium, firefox, webkit]`; starts local Supabase with `supabase db reset`, starts Next.js dev server, runs `playwright test --project=${{ matrix.browser }}`, uploads `playwright-report` artifact
+- `smoke.yml` — triggered by `workflow_run` after CI completes on main, or manual dispatch; creates GitHub issue on failure
+- `load.yml` — weekly cron Monday 06:00 UTC + manual dispatch with test script selection (calendar-views / login-rate-limit / webhook-burst); uploads results as 90-day artifacts
+
+**npm scripts added:**
+
+```bash
+npm run test              # vitest run tests/unit
+npm run test:unit         # vitest run tests/unit
+npm run test:unit:watch   # vitest tests/unit (watch mode)
+npm run test:integration  # INTEGRATION=true vitest run tests/integration
+npm run test:smoke        # vitest run tests/smoke
+npm run test:e2e          # playwright test
+npm run test:e2e:ui       # playwright test --ui
+npm run coverage          # vitest run tests/unit --coverage
+```
+
+---
+
 ## What Remains to Build
 
-All phases 1–13 are complete. The app is feature-complete.
+All phases 1–14 are complete. The app is feature-complete with comprehensive testing infrastructure.
 
 ---
 
