@@ -38,7 +38,7 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "@sentry/nextjs": "10.53.1",
     "@supabase/ssr": "0.10.3",
-    "@supabase/supabase-js": "2.47.2",
+    "@supabase/supabase-js": "2.106.1",
     "@types/web-push": "3.6.4",
     "@upstash/ratelimit": "2.0.8",
     "@upstash/redis": "1.38.0",
