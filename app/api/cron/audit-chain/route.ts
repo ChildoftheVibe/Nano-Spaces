@@ -28,7 +28,8 @@ export const GET = async (req: NextRequest): Promise<Response> => {
 
       // Fetch the previous audit chain entry for this org
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: prevChain } = await (admin.from('audit_chain') as any)
+      const { data: prevChain } = await (admin as any)
+        .from('audit_chain')
         .select('chain_head_hash, row_count, last_entry_id')
         .eq('org_id', orgId)
         .order('computed_at', { ascending: false })
@@ -93,7 +94,7 @@ export const GET = async (req: NextRequest): Promise<Response> => {
 
       // Insert new chain record
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (admin.from('audit_chain') as any).insert({
+      await (admin as any).from('audit_chain').insert({
         org_id: orgId,
         chain_head_hash: runningHash,
         row_count: totalCount,

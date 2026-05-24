@@ -221,7 +221,7 @@ export default function SettingsPage() {
     handleSubmit: submitName,
     formState: { errors: nameErrors, isSubmitting: nameSaving },
     setError: setNameError,
-  } = useForm({
+  } = useForm<z.infer<typeof nameSchema>>({
     resolver: zodResolver(nameSchema),
     values: { full_name: profile?.full_name ?? '' },
   })
@@ -251,7 +251,7 @@ export default function SettingsPage() {
     formState: { errors: emailErrors, isSubmitting: emailSaving },
     setError: setEmailError,
     reset: resetEmail,
-  } = useForm({ resolver: zodResolver(emailSchema) })
+  } = useForm<z.infer<typeof emailSchema>>({ resolver: zodResolver(emailSchema) })
 
   const [emailMsg, setEmailMsg] = useState<{ ok: boolean; msg: string } | null>(null)
 
@@ -281,7 +281,7 @@ export default function SettingsPage() {
     formState: { errors: pwErrors, isSubmitting: pwSaving },
     setError: setPwError,
     reset: resetPw,
-  } = useForm({ resolver: zodResolver(passwordSchema) })
+  } = useForm<z.infer<typeof passwordSchema>>({ resolver: zodResolver(passwordSchema) })
 
   const [pwMsg, setPwMsg] = useState<{ ok: boolean; msg: string } | null>(null)
 
