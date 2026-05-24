@@ -34,16 +34,24 @@ function applySecurityHeaders(response: NextResponse, nonce: string): NextRespon
   return response
 }
 
+// Route groups like (org-admin)/(super-admin) do not appear in the URL,
+// so these prefixes must match the real page paths.
+const ORG_ADMIN_PREFIXES = [
+  '/activity-log',
+  '/approvals',
+  '/org-settings',
+  '/reports',
+  '/rooms',
+  '/users',
+]
+const SUPER_ADMIN_PREFIXES = ['/god-mode-audit', '/marketing', '/orgs']
 const PROTECTED_PREFIXES = [
   '/calendar',
   '/settings',
-  '/admin',
-  '/org-admin',
-  '/super-admin',
   '/onboarding',
+  ...ORG_ADMIN_PREFIXES,
+  ...SUPER_ADMIN_PREFIXES,
 ]
-const ORG_ADMIN_PREFIXES = ['/org-admin']
-const SUPER_ADMIN_PREFIXES = ['/super-admin']
 const AUTH_ROUTES = ['/login', '/forgot-password', '/reset-password']
 // Routes exempt from TOS/onboarding redirects (they ARE the TOS/onboarding pages)
 const TOS_EXEMPT = ['/onboarding', '/accept-tos']
