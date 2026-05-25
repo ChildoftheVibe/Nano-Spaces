@@ -199,6 +199,16 @@ export default function LoginPage() {
           Create one free
         </Link>
       </p>
+
+      <p className="mt-4 text-center text-xs text-gray-400">
+        <Link href="/terms" className="hover:text-gray-600 hover:underline">
+          Terms of Service
+        </Link>
+        <span className="mx-1.5">·</span>
+        <Link href="/privacy" className="hover:text-gray-600 hover:underline">
+          Privacy Policy
+        </Link>
+      </p>
     </AuthCard>
   )
 }
