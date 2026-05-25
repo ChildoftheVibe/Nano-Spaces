@@ -174,17 +174,17 @@ export default function LoginPage() {
   const showTurnstile = failCount >= 3
 
   return (
-    <AuthCard>
+    <AuthCard dark>
       <div ref={formRef}>
         {/* Eyebrow tag + heading */}
         <div className="form-el mb-7">
-          <span className="inline-flex rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+          <span className="inline-flex rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">
             {hasVisited ? 'Welcome back' : 'Get started'}
           </span>
           <h1 className="mt-3 text-[1.75rem] font-bold tracking-tight text-white leading-[1.15]">
             {hasVisited ? 'Sign back in.' : 'Sign in to Nano Spaces.'}
           </h1>
-          <p className="mt-1.5 text-sm text-white/35">
+          <p className="mt-1.5 text-sm text-white/55">
             Access your team&apos;s spaces and reservations.
           </p>
         </div>
@@ -235,7 +235,7 @@ export default function LoginPage() {
         {/* Divider */}
         <div className="form-el relative my-5 flex items-center gap-3">
           <div className="h-px flex-1 bg-white/[0.08]" />
-          <span className="text-[11px] font-medium text-white/25 uppercase tracking-widest">
+          <span className="text-[11px] font-medium text-white/50 uppercase tracking-widest">
             or
           </span>
           <div className="h-px flex-1 bg-white/[0.08]" />
@@ -266,7 +266,7 @@ export default function LoginPage() {
               right={
                 <Link
                   href="/forgot-password"
-                  className="text-[11px] text-[#4F7EFA]/70 hover:text-[#4F7EFA] transition-colors duration-300"
+                  className="text-[11px] text-[#4F7EFA] hover:text-[#6B95FB] transition-colors duration-300"
                   style={{ transition: 'color 0.3s cubic-bezier(0.32,0.72,0,1)' }}
                 >
                   Forgot password?
@@ -330,23 +330,23 @@ export default function LoginPage() {
         </form>
 
         {/* Sign up + legal */}
-        <p className="form-el mt-6 text-center text-sm text-white/30">
+        <p className="form-el mt-6 text-center text-sm text-white/55">
           No account?{' '}
           <Link
             href="/signup"
-            className="font-medium text-[#4F7EFA]/80 hover:text-[#4F7EFA]"
+            className="font-medium text-[#4F7EFA] hover:text-[#6B95FB]"
             style={{ transition: 'color 0.3s cubic-bezier(0.32,0.72,0,1)' }}
           >
             Create one free
           </Link>
         </p>
 
-        <p className="form-el mt-3.5 text-center text-[11px] text-white/20">
-          <Link href="/terms" className="hover:text-white/40 transition-colors duration-300">
+        <p className="form-el mt-3.5 text-center text-[11px] text-white/50">
+          <Link href="/terms" className="hover:text-white/70 transition-colors duration-300">
             Terms of Service
           </Link>
           <span className="mx-1.5 opacity-50">·</span>
-          <Link href="/privacy" className="hover:text-white/40 transition-colors duration-300">
+          <Link href="/privacy" className="hover:text-white/70 transition-colors duration-300">
             Privacy Policy
           </Link>
         </p>

@@ -23,37 +23,37 @@ export default function OrgAdminLayout({ children }: { children: React.ReactNode
                 Calendar
               </Link>
               <Link
-                href="/org-admin/rooms"
+                href="/rooms"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Rooms
               </Link>
               <Link
-                href="/org-admin/approvals"
+                href="/approvals"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Approvals
               </Link>
               <Link
-                href="/org-admin/users"
+                href="/users"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Users
               </Link>
               <Link
-                href="/org-admin/reports"
+                href="/reports"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Reports
               </Link>
               <Link
-                href="/org-admin/activity-log"
+                href="/activity-log"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Activity
               </Link>
               <Link
-                href="/org-admin/org-settings"
+                href="/org-settings"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Org Settings

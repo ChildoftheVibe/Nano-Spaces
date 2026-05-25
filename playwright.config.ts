@@ -21,13 +21,15 @@ export default defineConfig({
     { name: 'mobile-iphone', use: { ...devices['iPhone 14 Pro'] } },
     { name: 'mobile-pixel', use: { ...devices['Pixel 7'] } },
   ],
-  ...(!isCI && {
-    workers: 1,
-    webServer: {
-      command: 'npm run dev',
-      url: 'http://localhost:3000',
-      reuseExistingServer: true,
-      timeout: 120000,
-    },
-  }),
+  workers: 1,
+  webServer: {
+    // Build + serve a production bundle so pages are pre-compiled and
+    // tests never hit Next.js on-demand compilation timeouts.
+    // reuseExistingServer skips the build when a server is already running
+    // (e.g. `npm run dev` in a local terminal).
+    command: 'npm run build && npm run start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
+    timeout: 300000,
+  },
 })

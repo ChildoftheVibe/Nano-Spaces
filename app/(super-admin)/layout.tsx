@@ -29,7 +29,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                 God Mode Audit
               </Link>
               <Link
-                href="/org-admin/reports"
+                href="/reports"
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
               >
                 Reports

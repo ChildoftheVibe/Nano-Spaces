@@ -482,7 +482,7 @@ export default function UsersPage() {
                           : 'Hibernated users will appear here after 30 days of inactivity.'
                       }
                       {...(tab === 'active'
-                        ? { action: { label: 'Invite member', href: '/org-admin/users' } }
+                        ? { action: { label: 'Invite member', href: '/users' } }
                         : {})}
                     />
                   </td>

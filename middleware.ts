@@ -123,6 +123,22 @@ export async function middleware(req: NextRequest) {
     return applySecurityHeaders(NextResponse.redirect(new URL('/calendar', req.url)), nonce)
   }
 
+  // Authenticated user lands on /verify-2fa via back button or direct navigation:
+  // if they already have a valid 2FA cookie, skip the form and send them forward.
+  if (pathname.startsWith('/verify-2fa') && isAuthenticated) {
+    const twoFaCookie = req.cookies.get(TWO_FA_COOKIE_NAME)?.value
+    const secret = process.env.NEXTAUTH_SECRET
+    if (secret && twoFaCookie) {
+      const verifiedUserId = await verify2faCookieValue(twoFaCookie, secret)
+      if (verifiedUserId === user.id) {
+        const next = req.nextUrl.searchParams.get('next') ?? '/calendar'
+        return applySecurityHeaders(NextResponse.redirect(new URL(next, req.url)), nonce)
+      }
+    }
+    // Cookie absent or invalid — they genuinely need to verify; let the page render.
+    return applySecurityHeaders(response, nonce)
+  }
+
   // Public routes — no auth required
   if (!isProtected(pathname)) {
     return applySecurityHeaders(response, nonce)

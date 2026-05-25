@@ -391,7 +391,7 @@ export function weeklyDigestTemplate(
         </tr>
       </tbody>
     </table>
-    <p style="text-align:center"><a class="btn" href="${BASE}/org-admin/users">Manage your org</a></p>
+    <p style="text-align:center"><a class="btn" href="${BASE}/users">Manage your org</a></p>
   `)
 }
 

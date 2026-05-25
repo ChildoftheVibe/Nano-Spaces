@@ -14,9 +14,10 @@ const FEATURES = [
 interface AuthCardProps {
   children: React.ReactNode
   className?: string
+  dark?: boolean
 }
 
-export function AuthCard({ children, className }: AuthCardProps) {
+export function AuthCard({ children, className, dark = false }: AuthCardProps) {
   const leftRef = useRef<HTMLDivElement>(null)
   const rightRef = useRef<HTMLDivElement>(null)
 
@@ -136,7 +137,7 @@ export function AuthCard({ children, className }: AuthCardProps) {
               Space management built for teams that move fast.
             </h2>
             <p
-              className="mt-4 text-[0.875rem] leading-relaxed text-white/40"
+              className="mt-4 text-[0.875rem] leading-relaxed text-white/55"
               style={{ maxWidth: '20rem' }}
             >
               One platform to find, book, and manage every shared space in your organization.
@@ -163,26 +164,63 @@ export function AuthCard({ children, className }: AuthCardProps) {
           </ul>
         </div>
 
-        <p className="anim-in relative z-10 text-xs text-white/20">
+        <p className="anim-in relative z-10 text-xs text-white/45">
           &copy; {new Date().getFullYear()} Nano Spaces. All rights reserved.
         </p>
       </div>
 
       {/* ── Right form panel ─────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col items-center justify-center bg-[#07070c] px-6 py-16 lg:border-l lg:border-white/[0.06]">
+      <div
+        className={cn(
+          'flex flex-1 flex-col items-center justify-center px-6 py-16 lg:border-l',
+          dark ? 'bg-[#07070c] lg:border-white/[0.06]' : 'bg-white lg:border-gray-100',
+        )}
+      >
         {/* Mobile logo */}
         <div className="mb-10 flex items-center gap-2 lg:hidden">
-          <div className="rounded-xl bg-white/[0.06] ring-1 ring-white/10 p-[4px]">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#4F7EFA]">
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
-                <rect x="11" y="2" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
-                <rect x="2" y="11" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
-                <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
-              </svg>
-            </div>
-          </div>
-          <span className="text-sm font-semibold text-white/75">Nano Spaces</span>
+          {dark ? (
+            <>
+              <div className="rounded-xl bg-white/[0.06] ring-1 ring-white/10 p-[4px]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#4F7EFA]">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
+                    <rect
+                      x="11"
+                      y="2"
+                      width="7"
+                      height="7"
+                      rx="1.5"
+                      fill="white"
+                      fillOpacity="0.6"
+                    />
+                    <rect
+                      x="2"
+                      y="11"
+                      width="7"
+                      height="7"
+                      rx="1.5"
+                      fill="white"
+                      fillOpacity="0.6"
+                    />
+                    <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
+                  </svg>
+                </div>
+              </div>
+              <span className="text-sm font-semibold text-white/75">Nano Spaces</span>
+            </>
+          ) : (
+            <>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7EFA]">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
+                  <rect x="11" y="2" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
+                  <rect x="2" y="11" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
+                  <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
+                </svg>
+              </div>
+              <span className="text-base font-bold text-gray-900">Nano Spaces</span>
+            </>
+          )}
         </div>
 
         <div ref={rightRef} className={cn('w-full max-w-[400px]', className)}>
