@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,6 +21,14 @@ export default function LoginPage() {
   const emailChanged = searchParams.get('emailChanged') === '1'
   const passwordReset = searchParams.get('passwordReset') === '1'
   const oauthFailed = searchParams.get('error') === 'oauth_failed'
+
+  const [hasVisited, setHasVisited] = useState(false)
+
+  useEffect(() => {
+    const visited = localStorage.getItem('ns_has_visited') === '1'
+    setHasVisited(visited)
+    localStorage.setItem('ns_has_visited', '1')
+  }, [])
 
   const [serverError, setServerError] = useState<string | null>(null)
   const [lockedUntil, setLockedUntil] = useState<string | null>(null)
@@ -89,7 +97,7 @@ export default function LoginPage() {
   return (
     <AuthCard>
       <h1 className="font-heading mb-1 text-2xl font-bold text-[var(--text-primary)]">
-        Welcome back
+        {hasVisited ? 'Welcome back' : 'Sign in to Nano Spaces'}
       </h1>
       <p className="mb-6 text-sm text-gray-500">Sign in to your Nano Spaces account.</p>
 
