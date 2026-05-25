@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import { headers } from 'next/headers'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 import './globals.css'
 
 const jakarta = Plus_Jakarta_Sans({
@@ -42,11 +43,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${jakarta.variable} ${inter.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        {/* Apply stored theme before paint to prevent flash */}
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('ns-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.toggle('dark',t==='dark')}catch(e){}})()`,
+          }}
+        />
       </head>
       <body>
         {/* Expose nonce to the page so Script components can use it */}
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: '' }} />
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

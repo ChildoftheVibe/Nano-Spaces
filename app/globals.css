@@ -36,9 +36,43 @@
     --color-success: #34c97b;
     --color-danger: #f0544f;
     --color-warning: #f5a623;
+
+    /* FullCalendar theme vars — light */
+    --fc-cal-border: rgba(0, 0, 0, 0.07);
+    --fc-cal-header-bg: rgba(0, 0, 0, 0.02);
+    --fc-cal-header-color: rgba(0, 0, 0, 0.38);
+    --fc-cal-day-hover: rgba(0, 0, 0, 0.02);
+    --fc-cal-today-bg: rgba(79, 126, 250, 0.07);
+    --fc-cal-day-number: rgba(0, 0, 0, 0.55);
+    --fc-cal-other-day: rgba(0, 0, 0, 0.25);
+    --fc-cal-slot-label: rgba(0, 0, 0, 0.32);
+    --fc-cal-slot-hover: rgba(0, 0, 0, 0.015);
+    --fc-cal-more-link: rgba(0, 0, 0, 0.38);
+    --fc-cal-popover-bg: #ffffff;
+    --fc-cal-popover-border: rgba(0, 0, 0, 0.09);
+    --fc-cal-popover-header-bg: rgba(0, 0, 0, 0.025);
+    --fc-cal-popover-header-color: rgba(0, 0, 0, 0.65);
+    --fc-cal-popover-close: rgba(0, 0, 0, 0.35);
+    /* Event colors — light */
+    --fc-ev-confirmed-bg: rgba(79, 126, 250, 0.1);
+    --fc-ev-confirmed-color: #2a5fd1;
+    --fc-ev-pending-bg: rgba(217, 119, 6, 0.09);
+    --fc-ev-pending-color: #b45309;
+    --fc-ev-pending-border: rgba(217, 119, 6, 0.38);
+    --fc-ev-pending-mine-bg: rgba(217, 119, 6, 0.16);
+    --fc-ev-pending-mine-color: #92400e;
+    --fc-ev-pending-mine-border: rgba(217, 119, 6, 0.48);
+    --fc-ev-waitlisted-bg: rgba(194, 65, 12, 0.07);
+    --fc-ev-waitlisted-color: rgba(124, 45, 18, 0.8);
+    --fc-ev-waitlisted-mine-bg: rgba(194, 65, 12, 0.14);
+    --fc-ev-waitlisted-mine-color: #9a3412;
+    --fc-ev-blocked-bg: rgba(239, 68, 68, 0.07);
+    --fc-ev-blocked-color: rgba(153, 27, 27, 0.8);
+    --fc-ev-buffer-bg: rgba(0, 0, 0, 0.03);
   }
 
   .dark {
+    /* shadcn/ui dark */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -58,6 +92,44 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Brand tokens — dark override */
+    --bg-base: #0b0c11;
+    --bg-surface: #12131a;
+    --text-primary: rgba(255, 255, 255, 0.88);
+
+    /* FullCalendar theme vars — dark */
+    --fc-cal-border: rgba(255, 255, 255, 0.06);
+    --fc-cal-header-bg: rgba(255, 255, 255, 0.025);
+    --fc-cal-header-color: rgba(255, 255, 255, 0.35);
+    --fc-cal-day-hover: rgba(255, 255, 255, 0.03);
+    --fc-cal-today-bg: rgba(79, 126, 250, 0.09);
+    --fc-cal-day-number: rgba(255, 255, 255, 0.45);
+    --fc-cal-other-day: rgba(255, 255, 255, 0.18);
+    --fc-cal-slot-label: rgba(255, 255, 255, 0.22);
+    --fc-cal-slot-hover: rgba(255, 255, 255, 0.02);
+    --fc-cal-more-link: rgba(255, 255, 255, 0.35);
+    --fc-cal-popover-bg: #1c1e2c;
+    --fc-cal-popover-border: rgba(255, 255, 255, 0.09);
+    --fc-cal-popover-header-bg: rgba(255, 255, 255, 0.04);
+    --fc-cal-popover-header-color: rgba(255, 255, 255, 0.7);
+    --fc-cal-popover-close: rgba(255, 255, 255, 0.4);
+    /* Event colors — dark */
+    --fc-ev-confirmed-bg: rgba(79, 126, 250, 0.18);
+    --fc-ev-confirmed-color: rgba(147, 181, 255, 0.95);
+    --fc-ev-pending-bg: rgba(217, 119, 6, 0.14);
+    --fc-ev-pending-color: rgba(251, 191, 36, 0.95);
+    --fc-ev-pending-border: rgba(217, 119, 6, 0.5);
+    --fc-ev-pending-mine-bg: rgba(217, 119, 6, 0.22);
+    --fc-ev-pending-mine-color: #fcd34d;
+    --fc-ev-pending-mine-border: rgba(217, 119, 6, 0.6);
+    --fc-ev-waitlisted-bg: rgba(194, 65, 12, 0.1);
+    --fc-ev-waitlisted-color: rgba(251, 146, 60, 0.75);
+    --fc-ev-waitlisted-mine-bg: rgba(194, 65, 12, 0.2);
+    --fc-ev-waitlisted-mine-color: #fb923c;
+    --fc-ev-blocked-bg: rgba(239, 68, 68, 0.12);
+    --fc-ev-blocked-color: rgba(252, 165, 165, 0.85);
+    --fc-ev-buffer-bg: rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -80,6 +152,28 @@
     font-family: var(--font-jakarta), system-ui, sans-serif;
     font-weight: 600;
   }
+}
+
+/* ── Calendar utility helpers ── */
+.cal-toolbar-shadow {
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+.dark .cal-toolbar-shadow {
+  box-shadow:
+    0 4px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+.cal-container-shadow {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+}
+.dark .cal-container-shadow {
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.35);
 }
 
 @layer components {

@@ -225,23 +225,23 @@ function ModalShell({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(16px)' }}
+      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)' }}
     >
-      {/* Double-Bezel modal */}
+      {/* Double-Bezel modal — light/dark aware */}
       <div
-        className={`max-h-[90vh] w-full ${wide ? 'max-w-lg' : 'max-w-md'} overflow-y-auto rounded-2xl ring-1 ring-white/[0.09]`}
+        className={`max-h-[90vh] w-full ${wide ? 'max-w-lg' : 'max-w-md'} overflow-y-auto rounded-2xl ring-1 ring-black/[0.07] dark:ring-white/[0.09] bg-white dark:bg-[#181A24]`}
         style={{
-          background: '#181A24',
-          boxShadow:
-            '0 40px_100px_rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
+          boxShadow: '0 40px 100px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.08)',
         }}
       >
-        <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-4">
-          <h2 className="font-heading text-base font-semibold text-white/90">{title}</h2>
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/[0.07] px-6 py-4">
+          <h2 className="font-heading text-base font-semibold text-[var(--text-primary)] dark:text-white/90">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-white/30 transition-colors hover:bg-white/[0.08] hover:text-white/70"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-400 dark:text-white/30 hover:bg-gray-100 dark:hover:bg-white/[0.08] hover:text-gray-600 dark:hover:text-white/70"
             style={{ transition: 'all 0.3s cubic-bezier(0.32,0.72,0,1)' }}
           >
             ✕
@@ -1475,110 +1475,103 @@ export default function CalendarClient() {
         .cal-orb-a { animation: orb-drift-a 20s ease-in-out infinite; }
         .cal-orb-b { animation: orb-drift-b 26s ease-in-out infinite; }
 
-        /* ── Dark FullCalendar overrides ── */
+        /* ── FullCalendar overrides — CSS vars switch per theme ── */
         .fc { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; }
-        .fc-theme-standard td, .fc-theme-standard th { border-color: rgba(255,255,255,0.06) !important; }
-        .fc-theme-standard .fc-scrollgrid { border-color: rgba(255,255,255,0.06) !important; }
-        .fc-col-header-cell { background: rgba(255,255,255,0.025) !important; color: rgba(255,255,255,0.35) !important; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; font-weight: 700; padding: 10px 0; }
+        .fc-theme-standard td, .fc-theme-standard th { border-color: var(--fc-cal-border) !important; }
+        .fc-theme-standard .fc-scrollgrid { border-color: var(--fc-cal-border) !important; }
+        .fc-col-header-cell { background: var(--fc-cal-header-bg) !important; color: var(--fc-cal-header-color) !important; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; font-weight: 700; padding: 10px 0; }
         .fc-col-header-cell a { color: inherit !important; text-decoration: none !important; }
         .fc-daygrid-day { background: transparent !important; cursor: pointer; }
-        .fc-daygrid-day:hover { background: rgba(255,255,255,0.03) !important; transition: background 0.15s; }
-        .fc-day-today { background: rgba(79,126,250,0.09) !important; }
+        .fc-daygrid-day:hover { background: var(--fc-cal-day-hover) !important; transition: background 0.15s; }
+        .fc-day-today { background: var(--fc-cal-today-bg) !important; }
         .fc-day-today .fc-daygrid-day-number { background: #4F7EFA !important; color: #fff !important; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; margin: 3px; }
-        .fc-daygrid-day-number { color: rgba(255,255,255,0.45) !important; font-size: 12px !important; font-weight: 500; }
-        .fc-day-other .fc-daygrid-day-number { color: rgba(255,255,255,0.18) !important; }
+        .fc-daygrid-day-number { color: var(--fc-cal-day-number) !important; font-size: 12px !important; font-weight: 500; }
+        .fc-day-other .fc-daygrid-day-number { color: var(--fc-cal-other-day) !important; }
         .fc-timegrid-slot { cursor: pointer; height: 22px; }
-        .fc-timegrid-slot:hover { background: rgba(255,255,255,0.02) !important; }
-        .fc-timegrid-slot-label { color: rgba(255,255,255,0.22) !important; font-size: 10.5px !important; font-weight: 500; }
-        .fc-timegrid-axis { border-color: rgba(255,255,255,0.06) !important; }
+        .fc-timegrid-slot:hover { background: var(--fc-cal-slot-hover) !important; }
+        .fc-timegrid-slot-label { color: var(--fc-cal-slot-label) !important; font-size: 10.5px !important; font-weight: 500; }
+        .fc-timegrid-axis { border-color: var(--fc-cal-border) !important; }
         .fc-timegrid-now-indicator-line { border-color: #4F7EFA !important; border-width: 2px !important; }
         .fc-timegrid-now-indicator-arrow { border-top-color: transparent !important; border-bottom-color: transparent !important; border-left-color: #4F7EFA !important; }
-        .fc-scrollgrid-section > * { border-color: rgba(255,255,255,0.06) !important; }
+        .fc-scrollgrid-section > * { border-color: var(--fc-cal-border) !important; }
         .fc-button { display: none !important; }
         .fc-scrollgrid { border: none !important; overflow: hidden; }
         .fc-scrollgrid-section-header th { border-top: none !important; }
         .fc-event { border-radius: 5px; padding: 2px 7px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none !important; }
-        .event-confirmed { background: rgba(79,126,250,0.18) !important; color: rgba(147,181,255,0.95) !important; }
+        .event-confirmed { background: var(--fc-ev-confirmed-bg) !important; color: var(--fc-ev-confirmed-color) !important; }
         .event-mine { background: #4F7EFA !important; color: #fff !important; box-shadow: 0 2px 10px rgba(79,126,250,0.4) !important; }
-        .event-pending { background: rgba(217,119,6,0.14) !important; color: rgba(251,191,36,0.95) !important; border: 1.5px dashed rgba(217,119,6,0.5) !important; }
-        .event-pending-mine { background: rgba(217,119,6,0.22) !important; color: #FCD34D !important; border: 1.5px dashed rgba(217,119,6,0.6) !important; }
-        .event-waitlisted { background: rgba(194,65,12,0.10) !important; color: rgba(251,146,60,0.75) !important; opacity: 0.75; }
-        .event-waitlisted-mine { background: rgba(194,65,12,0.20) !important; color: #FB923C !important; }
-        .event-blocked { background: rgba(239,68,68,0.12) !important; color: rgba(252,165,165,0.85) !important; cursor: not-allowed !important; }
-        .event-buffer { opacity: 0.22; cursor: default; background: rgba(255,255,255,0.05) !important; }
+        .event-pending { background: var(--fc-ev-pending-bg) !important; color: var(--fc-ev-pending-color) !important; border: 1.5px dashed var(--fc-ev-pending-border) !important; }
+        .event-pending-mine { background: var(--fc-ev-pending-mine-bg) !important; color: var(--fc-ev-pending-mine-color) !important; border: 1.5px dashed var(--fc-ev-pending-mine-border) !important; }
+        .event-waitlisted { background: var(--fc-ev-waitlisted-bg) !important; color: var(--fc-ev-waitlisted-color) !important; opacity: 0.75; }
+        .event-waitlisted-mine { background: var(--fc-ev-waitlisted-mine-bg) !important; color: var(--fc-ev-waitlisted-mine-color) !important; }
+        .event-blocked { background: var(--fc-ev-blocked-bg) !important; color: var(--fc-ev-blocked-color) !important; cursor: not-allowed !important; }
+        .event-buffer { opacity: 0.22; cursor: default; background: var(--fc-ev-buffer-bg) !important; }
         .event-god-mode { box-shadow: 0 0 0 1.5px rgba(139,92,246,0.6), 0 2px 8px rgba(139,92,246,0.3) !important; }
-        .fc-more-link { color: rgba(255,255,255,0.35) !important; font-size: 11px !important; }
-        .fc-popover { background: #1C1E2C !important; border: 1px solid rgba(255,255,255,0.09) !important; border-radius: 14px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important; }
-        .fc-popover-header { background: rgba(255,255,255,0.04) !important; color: rgba(255,255,255,0.7) !important; border-radius: 14px 14px 0 0 !important; padding: 8px 14px !important; }
-        .fc-popover-close { color: rgba(255,255,255,0.4) !important; }
-        .fc-daygrid-more-link { color: rgba(255,255,255,0.35) !important; font-size: 11px !important; }
+        .fc-more-link { color: var(--fc-cal-more-link) !important; font-size: 11px !important; }
+        .fc-popover { background: var(--fc-cal-popover-bg) !important; border: 1px solid var(--fc-cal-popover-border) !important; border-radius: 14px !important; box-shadow: 0 8px 40px rgba(0,0,0,0.18) !important; }
+        .fc-popover-header { background: var(--fc-cal-popover-header-bg) !important; color: var(--fc-cal-popover-header-color) !important; border-radius: 14px 14px 0 0 !important; padding: 8px 14px !important; }
+        .fc-popover-close { color: var(--fc-cal-popover-close) !important; }
+        .fc-daygrid-more-link { color: var(--fc-cal-more-link) !important; font-size: 11px !important; }
       `}</style>
 
-      {/* Page canvas — Ethereal Glass dark */}
+      {/* Page canvas — Ethereal Glass dark / clean light */}
       <div
-        className="relative min-h-[calc(100dvh-57px)] overflow-hidden bg-[#0B0C11]"
+        className="relative min-h-[calc(100dvh-57px)] overflow-hidden bg-[#F7F8FA] dark:bg-[#0B0C11]"
         style={{ fontFamily: 'var(--font-jakarta), system-ui, sans-serif' }}
       >
-        {/* Fixed grain */}
+        {/* Fixed grain overlay */}
         <div
-          className="pointer-events-none fixed inset-0 z-0 select-none"
+          className="pointer-events-none fixed inset-0 z-0 select-none opacity-[0.012] dark:opacity-[0.025]"
           style={{
-            opacity: 0.025,
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")`,
           }}
         />
 
-        {/* Ambient orbs — GPU-safe: transform + opacity only */}
+        {/* Ambient orbs — dark mode only */}
         <div className="pointer-events-none fixed inset-0 z-0 select-none overflow-hidden">
           <div
-            className="cal-orb-a absolute -top-[20%] -left-[10%] h-[60%] w-[60%] rounded-full opacity-[0.13]"
+            className="cal-orb-a absolute -top-[20%] -left-[10%] h-[60%] w-[60%] rounded-full opacity-0 dark:opacity-[0.13]"
             style={{
               background: 'radial-gradient(circle, rgba(79,126,250,0.7) 0%, transparent 65%)',
             }}
           />
           <div
-            className="cal-orb-b absolute -bottom-[15%] -right-[12%] h-[55%] w-[55%] rounded-full opacity-[0.09]"
+            className="cal-orb-b absolute -bottom-[15%] -right-[12%] h-[55%] w-[55%] rounded-full opacity-0 dark:opacity-[0.09]"
             style={{
               background: 'radial-gradient(circle, rgba(139,92,246,0.7) 0%, transparent 65%)',
             }}
           />
           <div
-            className="absolute top-[45%] left-[42%] h-[35%] w-[35%] rounded-full opacity-[0.05]"
+            className="absolute top-[45%] left-[42%] h-[35%] w-[35%] rounded-full opacity-0 dark:opacity-[0.05]"
             style={{
               background: 'radial-gradient(circle, rgba(16,185,129,0.6) 0%, transparent 65%)',
             }}
           />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-          {/* Toolbar — floating glass island */}
-          <div
-            className="mb-4 rounded-2xl bg-white/[0.045] ring-1 ring-white/[0.08] px-4 py-3"
-            style={{
-              backdropFilter: 'blur(24px)',
-              boxShadow: '0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
-            }}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="relative z-10 mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-5">
+          {/* Toolbar — glass island (dark) / elevated card (light) */}
+          <div className="mb-4 rounded-2xl bg-white dark:bg-white/[0.045] ring-1 ring-black/[0.05] dark:ring-white/[0.08] px-3 py-2.5 sm:px-4 sm:py-3 cal-toolbar-shadow">
+            <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
               {/* Left: nav arrows + title */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => calendarRef.current?.getApi().prev()}
                   aria-label="Previous"
-                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.06] ring-1 ring-white/[0.08] text-white/40 hover:bg-white/[0.12] hover:text-white/80"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-black/[0.04] dark:bg-white/[0.06] ring-1 ring-black/[0.06] dark:ring-white/[0.08] text-gray-500 dark:text-white/40 hover:bg-black/[0.08] dark:hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white/80"
                   style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
-                <h2 className="min-w-[160px] text-center text-sm font-bold text-white/85">
+                <h2 className="min-w-[100px] sm:min-w-[160px] text-center text-xs sm:text-sm font-bold text-[var(--text-primary)] dark:text-white/85">
                   {viewTitle}
                 </h2>
                 <button
                   type="button"
                   onClick={() => calendarRef.current?.getApi().next()}
                   aria-label="Next"
-                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.06] ring-1 ring-white/[0.08] text-white/40 hover:bg-white/[0.12] hover:text-white/80"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-black/[0.04] dark:bg-white/[0.06] ring-1 ring-black/[0.06] dark:ring-white/[0.08] text-gray-500 dark:text-white/40 hover:bg-black/[0.08] dark:hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white/80"
                   style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -1586,7 +1579,7 @@ export default function CalendarClient() {
                 <button
                   type="button"
                   onClick={() => calendarRef.current?.getApi().today()}
-                  className="rounded-xl bg-white/[0.05] ring-1 ring-white/[0.07] px-3 py-1.5 text-xs font-medium text-white/45 hover:bg-white/[0.10] hover:text-white/75"
+                  className="rounded-xl bg-black/[0.04] dark:bg-white/[0.05] ring-1 ring-black/[0.05] dark:ring-white/[0.07] px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-white/45 hover:bg-black/[0.08] dark:hover:bg-white/[0.10] hover:text-gray-800 dark:hover:text-white/75"
                   style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
                 >
                   Today
@@ -1594,18 +1587,18 @@ export default function CalendarClient() {
               </div>
 
               {/* Right: controls */}
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 {/* View switcher — Double-Bezel pill */}
-                <div className="flex rounded-xl bg-white/[0.04] ring-1 ring-white/[0.07] p-[3px]">
+                <div className="flex rounded-xl bg-black/[0.04] dark:bg-white/[0.04] ring-1 ring-black/[0.05] dark:ring-white/[0.07] p-[3px]">
                   {(['dayGridMonth', 'timeGridWeek', 'timeGridDay'] as View[]).map((v) => (
                     <button
                       key={v}
                       type="button"
                       onClick={() => changeView(v)}
-                      className={`rounded-[calc(0.75rem-3px)] px-3 py-1.5 text-xs font-semibold ${
+                      className={`rounded-[calc(0.75rem-3px)] px-2 sm:px-3 py-1.5 text-xs font-semibold ${
                         currentView === v
-                          ? 'bg-[#4F7EFA] text-white shadow-[0_2px_10px_rgba(79,126,250,0.45)]'
-                          : 'text-white/35 hover:text-white/65 hover:bg-white/[0.05]'
+                          ? 'bg-[#4F7EFA] text-white shadow-[0_2px_10px_rgba(79,126,250,0.35)]'
+                          : 'text-gray-500 dark:text-white/35 hover:text-gray-700 dark:hover:text-white/65 hover:bg-black/[0.04] dark:hover:bg-white/[0.05]'
                       }`}
                       style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
                     >
@@ -1615,24 +1608,24 @@ export default function CalendarClient() {
                 </div>
 
                 {/* Room filter — Double-Bezel */}
-                <div className="rounded-xl bg-white/[0.04] ring-1 ring-white/[0.07] p-[3px]">
+                <div className="rounded-xl bg-black/[0.04] dark:bg-white/[0.04] ring-1 ring-black/[0.05] dark:ring-white/[0.07] p-[3px]">
                   <select
                     value={selectedRoom}
                     onChange={(e) => {
                       setSelectedRoom(e.target.value)
                       setTimeout(() => calendarRef.current?.getApi().refetchEvents(), 0)
                     }}
-                    className="rounded-[calc(0.75rem-3px)] bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/55 focus:outline-none focus:text-white/80 cursor-pointer"
+                    className="rounded-[calc(0.75rem-3px)] bg-transparent px-2 sm:px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-white/55 focus:outline-none focus:text-gray-900 dark:focus:text-white/80 cursor-pointer"
                     style={{
                       appearance: 'none',
                       transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)',
                     }}
                   >
-                    <option value="" style={{ background: '#1C1E2C' }}>
+                    <option value="" style={{ background: 'var(--bg-surface)' }}>
                       All rooms
                     </option>
                     {rooms.map((r) => (
-                      <option key={r.id} value={r.id} style={{ background: '#1C1E2C' }}>
+                      <option key={r.id} value={r.id} style={{ background: 'var(--bg-surface)' }}>
                         {r.name}
                       </option>
                     ))}
@@ -1645,7 +1638,7 @@ export default function CalendarClient() {
                     type="button"
                     onClick={() => downloadBulkIcs(upcomingReservations)}
                     title="Export all upcoming bookings"
-                    className="flex items-center gap-1.5 rounded-xl bg-white/[0.05] ring-1 ring-white/[0.07] px-3 py-1.5 text-xs font-medium text-white/45 hover:bg-white/[0.10] hover:text-white/75"
+                    className="hidden sm:flex items-center gap-1.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.05] ring-1 ring-black/[0.05] dark:ring-white/[0.07] px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-white/45 hover:bg-black/[0.08] dark:hover:bg-white/[0.10] hover:text-gray-800 dark:hover:text-white/75"
                     style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
                   >
                     <Download className="h-3.5 w-3.5" />
@@ -1655,7 +1648,7 @@ export default function CalendarClient() {
 
                 {/* Toast */}
                 {toast && (
-                  <span className="rounded-xl bg-white/[0.08] ring-1 ring-white/[0.10] px-3 py-1.5 text-xs font-medium text-white/75">
+                  <span className="rounded-xl bg-black/[0.04] dark:bg-white/[0.08] ring-1 ring-black/[0.05] dark:ring-white/[0.10] px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-white/75">
                     {toast}
                   </span>
                 )}
@@ -1679,12 +1672,9 @@ export default function CalendarClient() {
             </div>
           </div>
 
-          {/* Calendar — Double-Bezel dark container */}
-          <div
-            className="rounded-2xl bg-white/[0.03] ring-1 ring-white/[0.07] p-[3px]"
-            style={{ boxShadow: '0 24px_80px_rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.35)' }}
-          >
-            <div className="overflow-hidden rounded-[calc(1rem-3px)] bg-[#12131A]">
+          {/* Calendar — Double-Bezel container */}
+          <div className="rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] ring-1 ring-black/[0.05] dark:ring-white/[0.07] p-[3px] cal-container-shadow">
+            <div className="overflow-hidden rounded-[calc(1rem-3px)] bg-white dark:bg-[#12131A]">
               <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -1714,18 +1704,18 @@ export default function CalendarClient() {
           </div>
 
           {/* Legend — micro-chip badges */}
-          <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             {[
               { dot: 'bg-[#4F7EFA]', label: 'My booking' },
-              { dot: 'bg-[rgba(79,126,250,0.25)]', label: 'Others' },
+              { dot: 'bg-[rgba(79,126,250,0.3)]', label: 'Others' },
               { dot: 'border border-dashed border-amber-500/60 bg-amber-500/10', label: 'Pending' },
               { dot: 'bg-orange-500/25', label: 'Waitlisted' },
               { dot: 'bg-red-500/20', label: 'Blocked' },
-              { dot: 'bg-white/10', label: 'Buffer' },
+              { dot: 'bg-black/[0.07] dark:bg-white/10', label: 'Buffer' },
             ].map(({ dot, label }) => (
               <span
                 key={label}
-                className="flex items-center gap-1.5 rounded-full bg-white/[0.04] ring-1 ring-white/[0.07] px-2.5 py-1 text-[10.5px] font-medium text-white/35"
+                className="flex items-center gap-1.5 rounded-full bg-black/[0.04] dark:bg-white/[0.04] ring-1 ring-black/[0.05] dark:ring-white/[0.07] px-2.5 py-1 text-[10.5px] font-medium text-gray-500 dark:text-white/35"
               >
                 <span className={`inline-block h-2 w-2 rounded-sm ${dot}`} />
                 {label}
