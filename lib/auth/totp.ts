@@ -18,9 +18,10 @@ export function verifyTotpCode(code: string, secret: string): boolean {
   try {
     const result = verifySync({ token: code, secret })
     if (typeof result === 'boolean') return result
-    // VerifyResult can also be { isValid: boolean } with guardrails enabled
-    if (result !== null && typeof result === 'object' && 'isValid' in result) {
-      return (result as { isValid: boolean }).isValid
+    if (result !== null && typeof result === 'object') {
+      // otplib v13 returns { valid: boolean, ... }; older versions returned { isValid: boolean }
+      if ('valid' in result) return !!(result as { valid: boolean }).valid
+      if ('isValid' in result) return !!(result as { isValid: boolean }).isValid
     }
     return false
   } catch {
