@@ -52,9 +52,11 @@ const PROTECTED_PREFIXES = [
   ...ORG_ADMIN_PREFIXES,
   ...SUPER_ADMIN_PREFIXES,
 ]
-const AUTH_ROUTES = ['/login', '/forgot-password', '/reset-password']
+const AUTH_ROUTES = ['/login', '/forgot-password', '/reset-password', '/signup']
 // Routes exempt from TOS/onboarding redirects (they ARE the TOS/onboarding pages)
 const TOS_EXEMPT = ['/onboarding', '/accept-tos']
+// Public routes that bypass the entire middleware pipeline
+const PUBLIC_BYPASS = ['/auth/callback', '/auth/oauth-signup']
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
@@ -70,6 +72,9 @@ function isAuthRoute(pathname: string): boolean {
 }
 function isTosExempt(pathname: string): boolean {
   return TOS_EXEMPT.some((p) => pathname.startsWith(p))
+}
+function isPublicBypass(pathname: string): boolean {
+  return PUBLIC_BYPASS.some((p) => pathname.startsWith(p))
 }
 
 export async function middleware(req: NextRequest) {
@@ -108,6 +113,11 @@ export async function middleware(req: NextRequest) {
 
   const isAuthenticated = !!user
 
+  // OAuth callback and oauth-signup bypass the full pipeline
+  if (isPublicBypass(pathname)) {
+    return applySecurityHeaders(response, nonce)
+  }
+
   // Redirect logged-in users away from auth pages
   if (isAuthRoute(pathname) && isAuthenticated) {
     return applySecurityHeaders(NextResponse.redirect(new URL('/calendar', req.url)), nonce)
@@ -135,6 +145,14 @@ export async function middleware(req: NextRequest) {
     .single()
 
   if (!profile) {
+    // OAuth users without a profile still need to complete org setup
+    const provider = user.app_metadata?.['provider'] as string | undefined
+    if (provider && provider !== 'email') {
+      return applySecurityHeaders(
+        NextResponse.redirect(new URL('/auth/oauth-signup', req.url)),
+        nonce,
+      )
+    }
     return applySecurityHeaders(NextResponse.redirect(new URL('/login', req.url)), nonce)
   }
 

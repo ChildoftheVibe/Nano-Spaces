@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -284,10 +285,13 @@ function RoomFormModal({
           <Label>Photo</Label>
           <div className="mt-1 flex items-center gap-3">
             {displayPhoto && (
-              <img
+              <Image
                 src={displayPhoto}
                 alt="Room preview"
-                className="h-16 w-24 rounded-md object-cover"
+                width={96}
+                height={64}
+                unoptimized
+                className="rounded-md object-cover"
               />
             )}
             <Button variant="outline" size="sm" onClick={() => photoRef.current?.click()}>
@@ -1026,7 +1030,7 @@ function RoomCard({
     <div className="relative flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="relative h-36 bg-gray-100">
         {room.photo_url ? (
-          <img src={room.photo_url} alt={room.name} className="h-full w-full object-cover" />
+          <Image src={room.photo_url} alt={room.name} fill className="object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-5xl text-gray-200">
             {room.type === 'building' ? '🏢' : '🚪'}

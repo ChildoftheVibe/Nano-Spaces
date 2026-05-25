@@ -8,6 +8,7 @@ import { loginSchema, type LoginFormData } from '@/lib/validation/auth'
 import { createBrowserClient } from '@/lib/supabase/browser'
 import { AuthCard } from '@/components/layout/auth-card'
 import { TurnstileWidget } from '@/components/features/auth/turnstile-widget'
+import { OAuthButtons } from '@/components/features/auth/oauth-buttons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const next = searchParams.get('next') ?? '/calendar'
   const emailChanged = searchParams.get('emailChanged') === '1'
   const passwordReset = searchParams.get('passwordReset') === '1'
+  const oauthFailed = searchParams.get('error') === 'oauth_failed'
 
   const [serverError, setServerError] = useState<string | null>(null)
   const [lockedUntil, setLockedUntil] = useState<string | null>(null)
@@ -58,7 +60,6 @@ export default function LoginPage() {
       return
     }
 
-    // Set session via Supabase browser client
     const supabase = createBrowserClient()
     await supabase.auth.setSession({
       access_token: json.data.session.access_token,
@@ -87,29 +88,43 @@ export default function LoginPage() {
 
   return (
     <AuthCard>
-      <h1 className="font-heading mb-2 text-2xl font-bold text-[var(--text-primary)]">
-        Sign in to Nano Spaces
+      <h1 className="font-heading mb-1 text-2xl font-bold text-[var(--text-primary)]">
+        Welcome back
       </h1>
-      <p className="mb-6 text-sm text-gray-500">Welcome back! Enter your credentials below.</p>
+      <p className="mb-6 text-sm text-gray-500">Sign in to your Nano Spaces account.</p>
 
       {emailChanged && (
-        <div className="mb-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
           Your email address has been updated successfully.
         </div>
       )}
-
       {passwordReset && (
-        <div className="mb-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
           Password reset successfully. Please sign in with your new password.
         </div>
       )}
-
-      {lockedUntil && (
-        <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          Your account is locked until <strong>{new Date(lockedUntil).toLocaleTimeString()}</strong>
-          . Please try again later.
+      {oauthFailed && (
+        <div className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          Social sign-in failed. Please try again or use email and password.
         </div>
       )}
+      {lockedUntil && (
+        <div className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          Account locked until <strong>{new Date(lockedUntil).toLocaleTimeString()}</strong>. Please
+          try again later.
+        </div>
+      )}
+
+      <OAuthButtons />
+
+      <div className="relative my-5">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-white px-3 text-gray-400">or continue with email</span>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
         <div className="space-y-1.5">
@@ -169,6 +184,13 @@ export default function LoginPage() {
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </Button>
       </form>
+
+      <p className="mt-6 text-center text-sm text-gray-500">
+        Don&apos;t have an account?{' '}
+        <Link href="/signup" className="font-medium text-[var(--brand-primary)] hover:underline">
+          Create one free
+        </Link>
+      </p>
     </AuthCard>
   )
 }
