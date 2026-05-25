@@ -34,8 +34,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['org_admin', 'super_admin'].includes(profile.role as string)) {
-    throw new AuthError({ userMessage: 'Admin access required.', requestId })
+  if (!profile || profile.role !== 'super_admin') {
+    throw new AuthError({ userMessage: 'Super admin access required.', requestId })
   }
   if (!profile.org_id) throw new AuthError({ userMessage: 'Not authenticated.', requestId })
 

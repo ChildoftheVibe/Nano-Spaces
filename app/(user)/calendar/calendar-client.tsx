@@ -1639,7 +1639,7 @@ export default function CalendarClient() {
         <NewBookingModal
           rooms={rooms}
           userTimezone={userTimezone}
-          isAdmin={['org_admin', 'super_admin'].includes(userRole)}
+          isAdmin={userRole === 'super_admin'}
           {...(modal.date !== undefined ? { defaultDate: modal.date } : {})}
           {...(modal.startTime !== undefined ? { defaultStartTime: modal.startTime } : {})}
           {...(modal.prefill !== undefined ? { prefill: modal.prefill } : {})}
