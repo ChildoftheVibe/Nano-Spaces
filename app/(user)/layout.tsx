@@ -1,8 +1,29 @@
 import Link from 'next/link'
 import NotificationBell from '@/components/features/notifications/notification-bell'
 import GlobalSearch from '@/components/features/search/global-search'
+import { createSessionClient } from '@/lib/supabase/server'
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+const navLink =
+  'rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors'
+
+export default async function UserLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createSessionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  let role: string | null = null
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    role = profile?.role ?? null
+  }
+
+  const isOrgAdmin = role === 'org_admin' || role === 'super_admin'
+
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <header className="sticky top-0 z-10 border-b bg-white px-6 py-3">
@@ -18,24 +39,39 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
               <GlobalSearch />
             </div>
             <nav className="flex items-center gap-1">
-              <Link
-                href="/calendar"
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
-              >
+              <Link href="/calendar" className={navLink}>
                 Calendar
               </Link>
-              <Link
-                href="/settings"
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
-              >
+              {isOrgAdmin && (
+                <>
+                  <Link href="/rooms" className={navLink}>
+                    Rooms
+                  </Link>
+                  <Link href="/users" className={navLink}>
+                    Users
+                  </Link>
+                  <Link href="/approvals" className={navLink}>
+                    Approvals
+                  </Link>
+                  <Link href="/reports" className={navLink}>
+                    Reports
+                  </Link>
+                  <Link href="/activity-log" className={navLink}>
+                    Activity
+                  </Link>
+                  <Link href="/org-settings" className={navLink}>
+                    Org Settings
+                  </Link>
+                </>
+              )}
+              <Link href="/settings" className={navLink}>
                 Settings
               </Link>
-              <Link
-                href="/settings/billing"
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] transition-colors"
-              >
-                Billing
-              </Link>
+              {!isOrgAdmin && (
+                <Link href="/settings/billing" className={navLink}>
+                  Billing
+                </Link>
+              )}
             </nav>
             <div data-tour="notifications">
               <NotificationBell />
