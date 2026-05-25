@@ -96,6 +96,45 @@ All 15 phases complete. Key non-obvious facts per phase:
 
 ---
 
+## Production State (post-launch changes)
+
+### Bug fixes shipped to production
+
+**TOTP verification always returned false (`lib/auth/totp.ts`):** otplib v13 changed `verifySync` return shape from `{ isValid: boolean }` to `{ valid: boolean }`. The original code checked `'isValid' in result` which was never true, making 2FA enrollment impossible for every user. Fixed to check `'valid'` first, then fall back to `'isValid'` for forward compatibility.
+
+### Login page UX
+
+- Heading shows **"Welcome back"** only for returning visitors; first-time visitors see **"Sign in to Nano Spaces"**. Tracked via `localStorage` key `ns_has_visited` set on first render (`app/(auth)/login/page.tsx`).
+- **Terms of Service** and **Privacy Policy** links added as a subdued footer row below the sign-up prompt.
+
+### Design skills
+
+Taste Skill installed (`npx skills add https://github.com/Leonxlnx/taste-skill`). 12 skills available in `.agents/skills/` — use them when building or redesigning UI components. Key skills: `design-taste-frontend` (default), `redesign-existing-projects`, `high-end-visual-design`, `soft-skill`, `minimalist-ui`.
+
+### Production database bootstrap
+
+The seed file only populates the **local** Supabase instance. For a fresh production project the following must be done manually (or via a migration):
+
+1. Insert `tos_versions` v1.0 row — required for `profiles.tos_version_accepted` FK.
+2. Create the super admin `auth.users` row **and** a matching `auth.identities` row for the `email` provider. GoTrue requires identities; inserting only into `auth.users` will cause `"Scan error on confirmation_token: converting NULL to string"` at login time. All token fields (`confirmation_token`, `recovery_token`, etc.) must be `''` not `NULL`.
+3. Create the `profiles` row with `org_id = NULL`, `role = 'super_admin'`.
+
+### Production super admin account
+
+| Field      | Value                                                          |
+| ---------- | -------------------------------------------------------------- |
+| Email      | `superadmin@nanospaces.app`                                    |
+| 2FA method | `email_otp` (code sent to the super admin inbox on each login) |
+| TOTP       | disabled (`totp_secret = NULL`)                                |
+
+Login flow: email + password → `/verify-2fa?method=email_otp` → click **Send code** → enter 6-digit code from inbox.
+
+### Resend domain
+
+`nanospaces.app` is verified in Resend. Emails send from `noreply@nanospaces.app`. If the domain ever needs re-verification, check DNS for SPF, DKIM, and DMARC records required by Resend.
+
+---
+
 ## Architecture Reference
 
 ### Multi-tenant Model
