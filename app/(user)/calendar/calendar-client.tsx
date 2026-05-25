@@ -223,16 +223,26 @@ function ModalShell({
   wide?: boolean
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(16px)' }}
+    >
+      {/* Double-Bezel modal */}
       <div
-        className={`max-h-[90vh] w-full ${wide ? 'max-w-lg' : 'max-w-md'} overflow-y-auto rounded-2xl bg-white shadow-2xl`}
+        className={`max-h-[90vh] w-full ${wide ? 'max-w-lg' : 'max-w-md'} overflow-y-auto rounded-2xl ring-1 ring-white/[0.09]`}
+        style={{
+          background: '#181A24',
+          boxShadow:
+            '0 40px_100px_rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
+        }}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-          <h2 className="font-heading text-lg font-semibold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-4">
+          <h2 className="font-heading text-base font-semibold text-white/90">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-white/30 transition-colors hover:bg-white/[0.08] hover:text-white/70"
+            style={{ transition: 'all 0.3s cubic-bezier(0.32,0.72,0,1)' }}
           >
             ✕
           </button>
@@ -1460,177 +1470,268 @@ export default function CalendarClient() {
   return (
     <>
       <style>{`
-        .fc { font-family: Inter, sans-serif; font-size: 14px; }
-        .fc-toolbar-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; font-weight: 700; }
-        .fc-col-header-cell { background: #EFF1F5; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; font-weight: 600; padding: 8px 0; }
-        .fc-day-today { background: #EEF3FF !important; }
-        .fc-day-today .fc-daygrid-day-number { background: #4F7EFA; color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
-        .fc-event { border-radius: 6px; border: none !important; padding: 3px 8px; font-size: 12px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); cursor: pointer; }
-        .event-confirmed { background: #EEF3FF !important; color: #2D5DD6 !important; }
-        .event-mine { background: #4F7EFA !important; color: #fff !important; }
-        .event-pending { background: #FEFCE8 !important; color: #A16207 !important; border: 1.5px dashed #D97706 !important; }
-        .event-pending-mine { background: #FEF3C7 !important; color: #92400E !important; border: 1.5px dashed #D97706 !important; }
-        .event-waitlisted { background: #FFF7ED !important; color: #C2410C !important; opacity: 0.7; }
-        .event-waitlisted-mine { background: #FFEDD5 !important; color: #9A3412 !important; }
-        .event-blocked { background: #FEF2F2 !important; color: #F0544F !important; cursor: not-allowed !important; }
-        .event-buffer { opacity: 0.4; cursor: default; }
-        .event-buffer:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1F2937; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; pointer-events: none; z-index: 100; }
-        .fc-timegrid-slot { cursor: pointer; height: 24px; }
-        .fc-daygrid-day:hover { background: #F5F7FF; transition: background 0.1s; }
-        .fc-timegrid-now-indicator-line { border-color: #4F7EFA; }
+        @keyframes orb-drift-a { 0%,100% { transform: translate(0,0) scale(1); } 40% { transform: translate(3%,5%) scale(1.05); } }
+        @keyframes orb-drift-b { 0%,100% { transform: translate(0,0) scale(1); } 55% { transform: translate(-4%,-3%) scale(1.08); } }
+        .cal-orb-a { animation: orb-drift-a 20s ease-in-out infinite; }
+        .cal-orb-b { animation: orb-drift-b 26s ease-in-out infinite; }
+
+        /* ── Dark FullCalendar overrides ── */
+        .fc { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; }
+        .fc-theme-standard td, .fc-theme-standard th { border-color: rgba(255,255,255,0.06) !important; }
+        .fc-theme-standard .fc-scrollgrid { border-color: rgba(255,255,255,0.06) !important; }
+        .fc-col-header-cell { background: rgba(255,255,255,0.025) !important; color: rgba(255,255,255,0.35) !important; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; font-weight: 700; padding: 10px 0; }
+        .fc-col-header-cell a { color: inherit !important; text-decoration: none !important; }
+        .fc-daygrid-day { background: transparent !important; cursor: pointer; }
+        .fc-daygrid-day:hover { background: rgba(255,255,255,0.03) !important; transition: background 0.15s; }
+        .fc-day-today { background: rgba(79,126,250,0.09) !important; }
+        .fc-day-today .fc-daygrid-day-number { background: #4F7EFA !important; color: #fff !important; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; margin: 3px; }
+        .fc-daygrid-day-number { color: rgba(255,255,255,0.45) !important; font-size: 12px !important; font-weight: 500; }
+        .fc-day-other .fc-daygrid-day-number { color: rgba(255,255,255,0.18) !important; }
+        .fc-timegrid-slot { cursor: pointer; height: 22px; }
+        .fc-timegrid-slot:hover { background: rgba(255,255,255,0.02) !important; }
+        .fc-timegrid-slot-label { color: rgba(255,255,255,0.22) !important; font-size: 10.5px !important; font-weight: 500; }
+        .fc-timegrid-axis { border-color: rgba(255,255,255,0.06) !important; }
+        .fc-timegrid-now-indicator-line { border-color: #4F7EFA !important; border-width: 2px !important; }
+        .fc-timegrid-now-indicator-arrow { border-top-color: transparent !important; border-bottom-color: transparent !important; border-left-color: #4F7EFA !important; }
+        .fc-scrollgrid-section > * { border-color: rgba(255,255,255,0.06) !important; }
         .fc-button { display: none !important; }
-        .fc-scrollgrid { border-radius: 8px; overflow: hidden; }
+        .fc-scrollgrid { border: none !important; overflow: hidden; }
+        .fc-scrollgrid-section-header th { border-top: none !important; }
+        .fc-event { border-radius: 5px; padding: 2px 7px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none !important; }
+        .event-confirmed { background: rgba(79,126,250,0.18) !important; color: rgba(147,181,255,0.95) !important; }
+        .event-mine { background: #4F7EFA !important; color: #fff !important; box-shadow: 0 2px 10px rgba(79,126,250,0.4) !important; }
+        .event-pending { background: rgba(217,119,6,0.14) !important; color: rgba(251,191,36,0.95) !important; border: 1.5px dashed rgba(217,119,6,0.5) !important; }
+        .event-pending-mine { background: rgba(217,119,6,0.22) !important; color: #FCD34D !important; border: 1.5px dashed rgba(217,119,6,0.6) !important; }
+        .event-waitlisted { background: rgba(194,65,12,0.10) !important; color: rgba(251,146,60,0.75) !important; opacity: 0.75; }
+        .event-waitlisted-mine { background: rgba(194,65,12,0.20) !important; color: #FB923C !important; }
+        .event-blocked { background: rgba(239,68,68,0.12) !important; color: rgba(252,165,165,0.85) !important; cursor: not-allowed !important; }
+        .event-buffer { opacity: 0.22; cursor: default; background: rgba(255,255,255,0.05) !important; }
+        .event-god-mode { box-shadow: 0 0 0 1.5px rgba(139,92,246,0.6), 0 2px 8px rgba(139,92,246,0.3) !important; }
+        .fc-more-link { color: rgba(255,255,255,0.35) !important; font-size: 11px !important; }
+        .fc-popover { background: #1C1E2C !important; border: 1px solid rgba(255,255,255,0.09) !important; border-radius: 14px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important; }
+        .fc-popover-header { background: rgba(255,255,255,0.04) !important; color: rgba(255,255,255,0.7) !important; border-radius: 14px 14px 0 0 !important; padding: 8px 14px !important; }
+        .fc-popover-close { color: rgba(255,255,255,0.4) !important; }
+        .fc-daygrid-more-link { color: rgba(255,255,255,0.35) !important; font-size: 11px !important; }
       `}</style>
 
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Toolbar */}
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => calendarRef.current?.getApi().prev()}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <h2 className="min-w-[180px] text-center font-heading text-lg font-bold text-gray-900">
-              {viewTitle}
-            </h2>
-            <button
-              type="button"
-              onClick={() => calendarRef.current?.getApi().next()}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
-              aria-label="Next"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => calendarRef.current?.getApi().today()}
-              className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
-            >
-              Today
-            </button>
-          </div>
+      {/* Page canvas — Ethereal Glass dark */}
+      <div
+        className="relative min-h-[calc(100dvh-57px)] overflow-hidden bg-[#0B0C11]"
+        style={{ fontFamily: 'var(--font-jakarta), system-ui, sans-serif' }}
+      >
+        {/* Fixed grain */}
+        <div
+          className="pointer-events-none fixed inset-0 z-0 select-none"
+          style={{
+            opacity: 0.025,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }}
+        />
 
-          <div className="flex flex-wrap items-center gap-2">
-            {/* View switcher */}
-            <div className="flex overflow-hidden rounded-lg border border-gray-200 bg-white">
-              {(['dayGridMonth', 'timeGridWeek', 'timeGridDay'] as View[]).map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => changeView(v)}
-                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                    currentView === v ? 'bg-[#4F7EFA] text-white' : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {VIEW_LABELS[v]}
-                </button>
-              ))}
-            </div>
-
-            {/* Room filter */}
-            <select
-              value={selectedRoom}
-              onChange={(e) => {
-                setSelectedRoom(e.target.value)
-                setTimeout(() => calendarRef.current?.getApi().refetchEvents(), 0)
-              }}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
-            >
-              <option value="">All rooms</option>
-              {rooms.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Export */}
-            {upcomingReservations.length > 0 && (
-              <button
-                type="button"
-                onClick={() => downloadBulkIcs(upcomingReservations)}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
-                title="Export all upcoming bookings"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Export
-              </button>
-            )}
-
-            {/* Toast */}
-            {toast && (
-              <span className="rounded-lg bg-gray-800/90 px-3 py-1.5 text-sm font-medium text-white">
-                {toast}
-              </span>
-            )}
-
-            {/* Book button */}
-            <Button onClick={() => setModal({ type: 'new' })} className="flex items-center gap-1.5">
-              <Plus className="h-4 w-4" />
-              Book
-            </Button>
-          </div>
-        </div>
-
-        {/* FullCalendar */}
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView={currentView}
-            timeZone={userTimezone}
-            headerToolbar={false}
-            height="auto"
-            contentHeight={640}
-            events={fetchCalendarEvents}
-            dateClick={handleDateClick}
-            eventClick={handleEventClick}
-            datesSet={handleDatesSet}
-            nowIndicator
-            slotMinTime="06:00:00"
-            slotMaxTime="22:00:00"
-            slotDuration="00:30:00"
-            eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
-            dayMaxEvents={4}
-            eventDidMount={(info) => {
-              if (info.event.extendedProps['type'] === 'buffer') {
-                const mins = info.event.extendedProps['buffer_mins'] as number
-                info.el.setAttribute('title', `${mins}-minute buffer — room resetting`)
-              }
+        {/* Ambient orbs — GPU-safe: transform + opacity only */}
+        <div className="pointer-events-none fixed inset-0 z-0 select-none overflow-hidden">
+          <div
+            className="cal-orb-a absolute -top-[20%] -left-[10%] h-[60%] w-[60%] rounded-full opacity-[0.13]"
+            style={{
+              background: 'radial-gradient(circle, rgba(79,126,250,0.7) 0%, transparent 65%)',
+            }}
+          />
+          <div
+            className="cal-orb-b absolute -bottom-[15%] -right-[12%] h-[55%] w-[55%] rounded-full opacity-[0.09]"
+            style={{
+              background: 'radial-gradient(circle, rgba(139,92,246,0.7) 0%, transparent 65%)',
+            }}
+          />
+          <div
+            className="absolute top-[45%] left-[42%] h-[35%] w-[35%] rounded-full opacity-[0.05]"
+            style={{
+              background: 'radial-gradient(circle, rgba(16,185,129,0.6) 0%, transparent 65%)',
             }}
           />
         </div>
 
-        {/* Legend */}
-        <div className="mt-4 flex flex-wrap items-center gap-5 text-xs text-gray-500">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#4F7EFA]" />
-            My booking
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#EEF3FF]" />
-            Others
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm border border-dashed border-amber-500 bg-amber-50" />
-            Pending approval
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-orange-100" />
-            Waitlisted
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#FEF2F2]" />
-            Blocked
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#E5E7EB]" />
-            Buffer
-          </span>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+          {/* Toolbar — floating glass island */}
+          <div
+            className="mb-4 rounded-2xl bg-white/[0.045] ring-1 ring-white/[0.08] px-4 py-3"
+            style={{
+              backdropFilter: 'blur(24px)',
+              boxShadow: '0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
+            }}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* Left: nav arrows + title */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => calendarRef.current?.getApi().prev()}
+                  aria-label="Previous"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.06] ring-1 ring-white/[0.08] text-white/40 hover:bg-white/[0.12] hover:text-white/80"
+                  style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </button>
+                <h2 className="min-w-[160px] text-center text-sm font-bold text-white/85">
+                  {viewTitle}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => calendarRef.current?.getApi().next()}
+                  aria-label="Next"
+                  className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.06] ring-1 ring-white/[0.08] text-white/40 hover:bg-white/[0.12] hover:text-white/80"
+                  style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => calendarRef.current?.getApi().today()}
+                  className="rounded-xl bg-white/[0.05] ring-1 ring-white/[0.07] px-3 py-1.5 text-xs font-medium text-white/45 hover:bg-white/[0.10] hover:text-white/75"
+                  style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
+                >
+                  Today
+                </button>
+              </div>
+
+              {/* Right: controls */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* View switcher — Double-Bezel pill */}
+                <div className="flex rounded-xl bg-white/[0.04] ring-1 ring-white/[0.07] p-[3px]">
+                  {(['dayGridMonth', 'timeGridWeek', 'timeGridDay'] as View[]).map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => changeView(v)}
+                      className={`rounded-[calc(0.75rem-3px)] px-3 py-1.5 text-xs font-semibold ${
+                        currentView === v
+                          ? 'bg-[#4F7EFA] text-white shadow-[0_2px_10px_rgba(79,126,250,0.45)]'
+                          : 'text-white/35 hover:text-white/65 hover:bg-white/[0.05]'
+                      }`}
+                      style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
+                    >
+                      {VIEW_LABELS[v]}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Room filter — Double-Bezel */}
+                <div className="rounded-xl bg-white/[0.04] ring-1 ring-white/[0.07] p-[3px]">
+                  <select
+                    value={selectedRoom}
+                    onChange={(e) => {
+                      setSelectedRoom(e.target.value)
+                      setTimeout(() => calendarRef.current?.getApi().refetchEvents(), 0)
+                    }}
+                    className="rounded-[calc(0.75rem-3px)] bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/55 focus:outline-none focus:text-white/80 cursor-pointer"
+                    style={{
+                      appearance: 'none',
+                      transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)',
+                    }}
+                  >
+                    <option value="" style={{ background: '#1C1E2C' }}>
+                      All rooms
+                    </option>
+                    {rooms.map((r) => (
+                      <option key={r.id} value={r.id} style={{ background: '#1C1E2C' }}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Export */}
+                {upcomingReservations.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => downloadBulkIcs(upcomingReservations)}
+                    title="Export all upcoming bookings"
+                    className="flex items-center gap-1.5 rounded-xl bg-white/[0.05] ring-1 ring-white/[0.07] px-3 py-1.5 text-xs font-medium text-white/45 hover:bg-white/[0.10] hover:text-white/75"
+                    style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export
+                  </button>
+                )}
+
+                {/* Toast */}
+                {toast && (
+                  <span className="rounded-xl bg-white/[0.08] ring-1 ring-white/[0.10] px-3 py-1.5 text-xs font-medium text-white/75">
+                    {toast}
+                  </span>
+                )}
+
+                {/* Book — Button-in-Button pill */}
+                <button
+                  type="button"
+                  onClick={() => setModal({ type: 'new' })}
+                  className="group flex items-center gap-2 rounded-full bg-[#4F7EFA] pl-4 pr-1.5 py-1.5 hover:bg-[#3d6ef0] active:scale-[0.98]"
+                  style={{ transition: 'all 0.5s cubic-bezier(0.32,0.72,0,1)' }}
+                >
+                  <span className="text-xs font-semibold text-white">Book</span>
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded-full bg-black/15 group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110"
+                    style={{ transition: 'transform 0.5s cubic-bezier(0.32,0.72,0,1)' }}
+                  >
+                    <Plus className="h-3 w-3 text-white" />
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Calendar — Double-Bezel dark container */}
+          <div
+            className="rounded-2xl bg-white/[0.03] ring-1 ring-white/[0.07] p-[3px]"
+            style={{ boxShadow: '0 24px_80px_rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.35)' }}
+          >
+            <div className="overflow-hidden rounded-[calc(1rem-3px)] bg-[#12131A]">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView={currentView}
+                timeZone={userTimezone}
+                headerToolbar={false}
+                height="auto"
+                contentHeight={640}
+                events={fetchCalendarEvents}
+                dateClick={handleDateClick}
+                eventClick={handleEventClick}
+                datesSet={handleDatesSet}
+                nowIndicator
+                slotMinTime="06:00:00"
+                slotMaxTime="22:00:00"
+                slotDuration="00:30:00"
+                eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                dayMaxEvents={4}
+                eventDidMount={(info) => {
+                  if (info.event.extendedProps['type'] === 'buffer') {
+                    const mins = info.event.extendedProps['buffer_mins'] as number
+                    info.el.setAttribute('title', `${mins}-minute buffer — room resetting`)
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Legend — micro-chip badges */}
+          <div className="mt-4 flex flex-wrap items-center gap-2.5">
+            {[
+              { dot: 'bg-[#4F7EFA]', label: 'My booking' },
+              { dot: 'bg-[rgba(79,126,250,0.25)]', label: 'Others' },
+              { dot: 'border border-dashed border-amber-500/60 bg-amber-500/10', label: 'Pending' },
+              { dot: 'bg-orange-500/25', label: 'Waitlisted' },
+              { dot: 'bg-red-500/20', label: 'Blocked' },
+              { dot: 'bg-white/10', label: 'Buffer' },
+            ].map(({ dot, label }) => (
+              <span
+                key={label}
+                className="flex items-center gap-1.5 rounded-full bg-white/[0.04] ring-1 ring-white/[0.07] px-2.5 py-1 text-[10.5px] font-medium text-white/35"
+              >
+                <span className={`inline-block h-2 w-2 rounded-sm ${dot}`} />
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
