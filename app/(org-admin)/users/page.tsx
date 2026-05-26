@@ -113,7 +113,7 @@ function UserRow({
             {busy ? '…' : '⋯'}
           </Button>
           {showMenu && (
-            <div className="absolute right-0 z-10 mt-1 w-40 rounded-lg border dark:border-white/[0.08] bg-white dark:bg-[#12131A] py-1 shadow-lg">
+            <div className="absolute right-0 z-50 mt-1 w-40 rounded-lg border dark:border-white/[0.08] bg-white dark:bg-[#12131A] py-1 shadow-lg">
               {actions.map((a) => (
                 <button
                   key={a}
@@ -467,7 +467,7 @@ export default function UsersPage() {
         ))}
       </div>
 
-      <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-hidden">
+      <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] relative">
         {tab !== 'pending' ? (
           <table className="w-full">
             <thead className="border-b dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]">
