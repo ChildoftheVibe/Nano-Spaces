@@ -500,14 +500,16 @@ export default function SettingsPage() {
   if (profileLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--brand-primary)] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--ns-accent)] border-t-transparent" />
       </div>
     )
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="font-heading mb-6 text-2xl font-bold text-gray-900">Account Settings</h1>
+      <h1 className="font-heading mb-6 text-2xl font-bold text-gray-900 dark:text-white">
+        Account Settings
+      </h1>
 
       <Tabs defaultValue={defaultTab}>
         <TabsList className="mb-6 w-full justify-start gap-1">
@@ -522,11 +524,11 @@ export default function SettingsPage() {
 
         {/* ─── Profile tab ─────────────────────────────────────────────────── */}
         <TabsContent value="profile">
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Display name
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               This name appears in bookings and notifications.
             </p>
 
@@ -559,12 +561,12 @@ export default function SettingsPage() {
             <Separator className="my-6" />
 
             <div>
-              <p className="text-sm text-gray-500">
-                <span className="font-medium text-gray-900">Email address</span>
+              <p className="text-sm text-gray-500 dark:text-white/50">
+                <span className="font-medium text-gray-900 dark:text-white">Email address</span>
                 <br />
                 {profile?.email}
               </p>
-              <p className="mt-1 text-xs text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-white/35">
                 To change your email, go to the Security tab.
               </p>
             </div>
@@ -574,11 +576,11 @@ export default function SettingsPage() {
         {/* ─── Security tab ─────────────────────────────────────────────────── */}
         <TabsContent value="security" className="space-y-4">
           {/* Change email */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Change email address
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               Verification links will be sent to both your current and new address.
             </p>
 
@@ -628,11 +630,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Change password */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Change password
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               Minimum 12 characters with uppercase, lowercase, and a number. New password is checked
               against known breach databases.
             </p>
@@ -697,13 +699,13 @@ export default function SettingsPage() {
           </div>
 
           {/* 2FA */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Two-factor authentication
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               Currently using:{' '}
-              <strong className="font-medium text-gray-900">
+              <strong className="font-medium text-gray-900 dark:text-white">
                 {profile?.two_fa_method === 'totp'
                   ? 'Authenticator app (TOTP)'
                   : 'Email one-time code'}
@@ -734,9 +736,13 @@ export default function SettingsPage() {
         {/* ─── Preferences tab ──────────────────────────────────────────────── */}
         <TabsContent value="preferences" className="space-y-4">
           {/* Timezone */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">Timezone</h2>
-            <p className="mb-4 text-sm text-gray-500">Used for scheduling and booking reminders.</p>
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
+              Timezone
+            </h2>
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
+              Used for scheduling and booking reminders.
+            </p>
 
             <div className="space-y-2">
               <Label htmlFor="tz-search-settings">Search</Label>
@@ -748,7 +754,7 @@ export default function SettingsPage() {
                 onChange={(e) => setTzSearch(e.target.value)}
               />
               <select
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                className="w-full rounded-lg border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.04] px-2 py-1 text-sm text-gray-800 dark:text-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--ns-accent)]"
                 size={5}
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
@@ -759,8 +765,11 @@ export default function SettingsPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500">
-                Selected: <strong className="font-medium">{timezone.replace(/_/g, ' ')}</strong>
+              <p className="text-xs text-gray-500 dark:text-white/40">
+                Selected:{' '}
+                <strong className="font-medium dark:text-white/70">
+                  {timezone.replace(/_/g, ' ')}
+                </strong>
               </p>
             </div>
 
@@ -773,11 +782,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Email reminders */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Email reminders
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               Receive email reminders before your bookings.
             </p>
 
@@ -796,7 +805,7 @@ export default function SettingsPage() {
                   <Label htmlFor="reminder-timing">Reminder timing</Label>
                   <select
                     id="reminder-timing"
-                    className="input-brand w-full"
+                    className="input-brand w-full dark:bg-white/[0.04] dark:border-white/[0.08] dark:text-white/80"
                     value={reminderTiming}
                     onChange={(e) => setReminderTiming(e.target.value as '24h' | '1h' | 'both')}
                   >
@@ -817,11 +826,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Push notifications */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Push notifications
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               {pushSupported
                 ? 'Receive browser push notifications for booking confirmations and reminders.'
                 : 'Push notifications are not supported in this browser.'}
@@ -846,13 +855,13 @@ export default function SettingsPage() {
 
         {/* ─── Sessions tab ─────────────────────────────────────────────────── */}
         <TabsContent value="sessions">
-          <div className="rounded-xl border bg-white p-6">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="font-heading text-base font-semibold text-gray-900">
+                <h2 className="font-heading text-base font-semibold text-gray-900 dark:text-white">
                   Active sessions
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-white/50">
                   All devices currently signed in to your account.
                 </p>
               </div>
@@ -868,27 +877,24 @@ export default function SettingsPage() {
 
             {sessionsLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--brand-primary)] border-t-transparent" />
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--ns-accent)] border-t-transparent" />
               </div>
             ) : sessions.length === 0 ? (
-              <p className="py-4 text-center text-sm text-gray-400">
+              <p className="py-4 text-center text-sm text-gray-400 dark:text-white/35">
                 No active sessions found.{' '}
-                <button
-                  className="text-[var(--brand-primary)] hover:underline"
-                  onClick={loadSessions}
-                >
+                <button className="text-[var(--ns-accent)] hover:underline" onClick={loadSessions}>
                   Refresh
                 </button>
               </p>
             ) : (
-              <div className="divide-y">
+              <div className="divide-y dark:divide-white/[0.06]">
                 {sessions.map((sess) => (
                   <div key={sess.id} className="flex items-center justify-between py-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {parseBrowser(sess.user_agent)} on {parseDevice(sess.user_agent)}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-white/35">
                         {sess.ip ? `${sess.ip} · ` : ''}
                         Last active{' '}
                         {new Date(sess.updated_at).toLocaleDateString(undefined, {
@@ -916,11 +922,11 @@ export default function SettingsPage() {
         {/* ─── Data & Privacy tab ───────────────────────────────────────────── */}
         <TabsContent value="data" className="space-y-4">
           {/* Export */}
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
               Export your data
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               Download a ZIP archive containing your profile, all reservations, and activity log as
               JSON and CSV. Limited to once per 24 hours.
             </p>
@@ -930,11 +936,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Delete account */}
-          <div className="rounded-xl border border-red-100 bg-white p-6">
+          <div className="rounded-xl border border-red-100 dark:border-red-900/40 bg-white dark:bg-[#12131A] p-6">
             <h2 className="font-heading mb-1 text-base font-semibold text-red-600">
               Delete account
             </h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-4 text-sm text-gray-500 dark:text-white/50">
               Submits a deletion request to your organization administrator. Your data will be
               removed within 30 days after approval. This action cannot be undone.
             </p>
@@ -943,7 +949,7 @@ export default function SettingsPage() {
               <Feedback {...deleteMsg} />
             ) : deleteConfirm ? (
               <div className="space-y-3">
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <div className="rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-700 dark:text-red-400">
                   Are you sure? Your data will be permanently deleted within 30 days.
                 </div>
                 <div className="flex gap-2">
@@ -970,9 +976,9 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-white/35">
             Read our{' '}
-            <Link href="/privacy" className="text-[var(--brand-primary)] hover:underline">
+            <Link href="/privacy" className="text-[var(--ns-accent)] hover:underline">
               Privacy Policy
             </Link>{' '}
             to learn how we handle your data.
