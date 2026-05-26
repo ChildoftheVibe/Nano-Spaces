@@ -70,16 +70,16 @@ function UserRow({
 
   return (
     <tr className="border-b last:border-0 dark:border-white/[0.05] hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-      <td className="py-3 pr-4">
+      <td className="px-4 py-3">
         <p className="text-sm font-medium text-[var(--text-primary)]">{u.full_name ?? '—'}</p>
         <p className="text-xs text-gray-500">{u.email}</p>
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-4 py-3">
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize">
           {u.role === 'org_admin' ? 'Admin' : 'Member'}
         </span>
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-4 py-3">
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
             !u.is_active
@@ -157,18 +157,18 @@ function InvitationRow({
 
   return (
     <tr className="border-b last:border-0 dark:border-white/[0.05] hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-      <td className="py-3 pr-4">
+      <td className="px-4 py-3">
         <p className="text-sm font-medium text-[var(--text-primary)]">{inv.email}</p>
         <p className="text-xs text-gray-400">
           {expired ? 'Expired' : `Expires ${new Date(inv.expires_at).toLocaleDateString()}`}
         </p>
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-4 py-3">
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize">
           {inv.role === 'org_admin' ? 'Admin' : 'Member'}
         </span>
       </td>
-      <td className="py-3 pr-4">
+      <td className="px-4 py-3">
         {inv.revoked ? (
           <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
             Revoked

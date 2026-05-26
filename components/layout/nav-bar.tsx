@@ -54,14 +54,14 @@ export default function NavBar({
         {/* Brand — logo + name */}
         <Link href={brandHref} className="flex items-center gap-2.5 shrink-0 group">
           <Image
-            src="/assets/logos/logo-sm-dark.png"
+            src="/assets/logos/logo-sm-transparent-dark.png"
             alt="Nano Spaces"
             width={32}
             height={32}
             className="hidden dark:block h-8 w-8 object-contain"
           />
           <Image
-            src="/assets/logos/logo-sm-light.png"
+            src="/assets/logos/logo-sm-transparent-light.png"
             alt="Nano Spaces"
             width={32}
             height={32}

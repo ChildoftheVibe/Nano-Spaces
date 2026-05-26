@@ -166,7 +166,7 @@ export default function OrgSettingsPage() {
 
       {/* General settings */}
       <section className="mb-8 rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
-        <h2 className="mb-5 text-base font-semibold text-gray-900">General</h2>
+        <h2 className="mb-5 text-base font-semibold text-gray-900 dark:text-white">General</h2>
 
         <form onSubmit={(e) => void handleSubmit(onSave)(e)} className="space-y-4">
           <div>
