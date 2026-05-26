@@ -1033,8 +1033,8 @@ function RoomCard({
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <div className="relative flex flex-col overflow-hidden rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] shadow-sm transition-shadow hover:shadow-md">
-      <div className="relative h-36 bg-gray-100 dark:bg-white/[0.04]">
+    <div className="relative flex flex-col rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] shadow-sm transition-shadow hover:shadow-md">
+      <div className="relative h-36 overflow-hidden rounded-t-xl bg-gray-100 dark:bg-white/[0.04]">
         {room.photo_url ? (
           <Image src={room.photo_url} alt={room.name} fill className="object-cover" />
         ) : (
@@ -1067,7 +1067,7 @@ function RoomCard({
               ⋯
             </button>
             {menuOpen && (
-              <div className="absolute right-0 z-10 mt-1 w-44 rounded-lg border dark:border-white/[0.08] bg-white dark:bg-[#12131A] py-1 shadow-lg">
+              <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg border dark:border-white/[0.08] bg-white dark:bg-[#12131A] py-1 shadow-lg">
                 {(
                   [
                     { action: 'edit', label: 'Edit Room' },
