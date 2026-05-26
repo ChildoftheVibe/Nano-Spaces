@@ -97,14 +97,16 @@ function ModalShell({
   children: React.ReactNode
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="font-heading text-lg font-semibold text-[var(--text-primary)]">{title}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white dark:bg-[#12131A] shadow-xl ring-1 ring-black/[0.08] dark:ring-white/[0.07]">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/[0.07] px-6 py-4">
+          <h2 className="font-heading text-lg font-semibold text-gray-900 dark:text-white">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="rounded p-1 text-gray-400 dark:text-white/40 transition-colors hover:bg-gray-100 dark:hover:bg-white/[0.07] hover:text-gray-600 dark:hover:text-white/70"
           >
             ✕
           </button>
@@ -237,7 +239,7 @@ function RoomFormModal({
                   onChange={() => setType(t)}
                   className="accent-[var(--brand-primary)]"
                 />
-                <span className="text-sm capitalize">{t}</span>
+                <span className="text-sm capitalize dark:text-white/80">{t}</span>
               </label>
             ))}
           </div>
@@ -263,7 +265,7 @@ function RoomFormModal({
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             maxLength={500}
-            className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            className="w-full resize-none rounded-md border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-800 dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FA5D0C] placeholder:text-gray-400 dark:placeholder:text-white/25"
             placeholder="Short description shown to users"
           />
         </div>
@@ -276,7 +278,7 @@ function RoomFormModal({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             maxLength={500}
-            className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            className="w-full resize-none rounded-md border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-800 dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FA5D0C] placeholder:text-gray-400 dark:placeholder:text-white/25"
             placeholder="Internal notes (not shown to users)"
           />
         </div>
@@ -315,7 +317,9 @@ function RoomFormModal({
             className="hidden"
             onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
           />
-          <p className="mt-1 text-xs text-gray-400">JPEG, PNG, or WebP — max 5 MB</p>
+          <p className="mt-1 text-xs text-gray-400 dark:text-white/35">
+            JPEG, PNG, or WebP — max 5 MB
+          </p>
         </div>
 
         {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
@@ -480,7 +484,9 @@ function SettingsModal({
           <div className="flex items-center justify-between rounded-lg border px-4 py-3">
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">Ghost Buster</p>
-              <p className="text-xs text-gray-500">Auto-cancel if check-in not confirmed</p>
+              <p className="text-xs text-gray-500 dark:text-white/40">
+                Auto-cancel if check-in not confirmed
+              </p>
             </div>
             <Switch checked={ghostBusterEnabled} onCheckedChange={setGhostBusterEnabled} />
           </div>
@@ -630,7 +636,7 @@ function AvailabilityModal({
   if (rules === null) {
     return (
       <ModalShell title={`Availability — ${room.name}`} onClose={onClose}>
-        <p className="text-sm text-gray-400">Loading…</p>
+        <p className="text-sm text-gray-400 dark:text-white/35">Loading…</p>
       </ModalShell>
     )
   }
@@ -663,7 +669,7 @@ function AvailabilityModal({
                     className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
                       rule.day_of_week.includes(di)
                         ? 'bg-[var(--brand-primary)] text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-white/60 hover:bg-gray-200 dark:hover:bg-white/[0.10]'
                     }`}
                   >
                     {d}
@@ -799,9 +805,9 @@ function BlackoutModal({
     <ModalShell title={`Blackout Dates — ${room.name}`} onClose={onClose}>
       <div className="space-y-4">
         {blackouts === null ? (
-          <p className="text-sm text-gray-400">Loading…</p>
+          <p className="text-sm text-gray-400 dark:text-white/35">Loading…</p>
         ) : blackouts.length === 0 ? (
-          <p className="text-sm text-gray-400">No blackout dates.</p>
+          <p className="text-sm text-gray-400 dark:text-white/35">No blackout dates.</p>
         ) : (
           <ul className="space-y-2">
             {blackouts.map((b) => (
@@ -992,7 +998,7 @@ function MaintenanceModal({
                 onChange={(e) => setNote(e.target.value)}
                 rows={2}
                 maxLength={500}
-                className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                className="w-full resize-none rounded-md border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-800 dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FA5D0C] placeholder:text-gray-400 dark:placeholder:text-white/25"
                 placeholder="HVAC maintenance, electrical work, etc."
               />
             </div>
@@ -1027,12 +1033,12 @@ function RoomCard({
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <div className="relative flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="relative h-36 bg-gray-100">
+    <div className="relative flex flex-col overflow-hidden rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] shadow-sm transition-shadow hover:shadow-md">
+      <div className="relative h-36 bg-gray-100 dark:bg-white/[0.04]">
         {room.photo_url ? (
           <Image src={room.photo_url} alt={room.name} fill className="object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-5xl text-gray-200">
+          <div className="flex h-full items-center justify-center text-5xl text-gray-200 dark:text-white/10">
             {room.type === 'building' ? '🏢' : '🚪'}
           </div>
         )}
@@ -1047,7 +1053,7 @@ function RoomCard({
             <p className="truncate font-heading font-semibold text-[var(--text-primary)]">
               {room.name}
             </p>
-            <p className="text-xs capitalize text-gray-500">
+            <p className="text-xs capitalize text-gray-500 dark:text-white/40">
               {room.type}
               {room.capacity !== null ? ` · ${room.capacity} cap` : ''}
             </p>
@@ -1056,12 +1062,12 @@ function RoomCard({
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+              className="rounded p-1 text-gray-400 dark:text-white/40 transition-colors hover:bg-gray-100 dark:hover:bg-white/[0.07] hover:text-gray-600 dark:hover:text-white/70"
             >
               ⋯
             </button>
             {menuOpen && (
-              <div className="absolute right-0 z-10 mt-1 w-44 rounded-lg border bg-white py-1 shadow-lg">
+              <div className="absolute right-0 z-10 mt-1 w-44 rounded-lg border dark:border-white/[0.08] bg-white dark:bg-[#12131A] py-1 shadow-lg">
                 {(
                   [
                     { action: 'edit', label: 'Edit Room' },
@@ -1078,7 +1084,7 @@ function RoomCard({
                       setMenuOpen(false)
                       onAction(action, room)
                     }}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50"
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 dark:hover:bg-white/[0.05] dark:text-white/80"
                   >
                     {label}
                   </button>
@@ -1099,7 +1105,7 @@ function RoomCard({
           </div>
         </div>
 
-        <p className="mt-3 text-xs text-gray-500">
+        <p className="mt-3 text-xs text-gray-500 dark:text-white/40">
           {room.upcomingCount} upcoming booking{room.upcomingCount !== 1 ? 's' : ''}
         </p>
       </div>

@@ -66,19 +66,19 @@ export default function OnboardingChecklist({ orgId }: { orgId: string }) {
   const completedCount = items.filter((i) => i.complete).length
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 w-80 rounded-2xl border border-gray-100 bg-white shadow-xl ring-1 ring-black/5">
+    <div className="fixed bottom-6 right-6 z-40 w-80 rounded-2xl border border-gray-100 dark:border-white/[0.07] bg-white dark:bg-[#12131A] shadow-xl ring-1 ring-black/5 dark:ring-white/[0.06]">
       {/* Header */}
-      <div className="flex items-center justify-between rounded-t-2xl bg-[var(--brand-primary)] px-4 py-3">
+      <div className="flex items-center justify-between rounded-t-2xl bg-[#FA5D0C] px-4 py-3">
         <div>
           <p className="text-sm font-semibold text-white">Getting started</p>
-          <p className="text-xs text-blue-100">
+          <p className="text-xs text-white/70">
             {completedCount} of {items.length} complete
           </p>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setCollapsed((c) => !c)}
-            className="rounded p-1 text-blue-100 hover:bg-blue-600 hover:text-white transition-colors"
+            className="rounded p-1 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             aria-label={collapsed ? 'Expand checklist' : 'Collapse checklist'}
           >
             {collapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -88,7 +88,7 @@ export default function OnboardingChecklist({ orgId }: { orgId: string }) {
               dismiss(orgId)
               setVisible(false)
             }}
-            className="rounded p-1 text-blue-100 hover:bg-blue-600 hover:text-white transition-colors"
+            className="rounded p-1 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             aria-label="Dismiss checklist"
           >
             <X className="h-4 w-4" />
@@ -97,34 +97,36 @@ export default function OnboardingChecklist({ orgId }: { orgId: string }) {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-gray-100">
+      <div className="h-1 bg-gray-100 dark:bg-white/[0.06]">
         <div
-          className="h-1 bg-[var(--brand-primary)] transition-all duration-500"
+          className="h-1 bg-[#FA5D0C] transition-all duration-500"
           style={{ width: `${items.length ? (completedCount / items.length) * 100 : 0}%` }}
         />
       </div>
 
       {/* Items */}
       {!collapsed && (
-        <ul className="divide-y divide-gray-50 py-1">
+        <ul className="divide-y divide-gray-50 dark:divide-white/[0.05] py-1">
           {items.map((item) => (
             <li key={item.id}>
               <Link
                 href={item.href}
-                className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
               >
                 {item.complete ? (
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
                 ) : (
-                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
+                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 dark:text-white/20" />
                 )}
                 <div>
                   <p
-                    className={`text-sm font-medium ${item.complete ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+                    className={`text-sm font-medium ${item.complete ? 'text-gray-400 dark:text-white/30 line-through' : 'text-gray-700 dark:text-white/80'}`}
                   >
                     {item.label}
                   </p>
-                  {!item.complete && <p className="text-xs text-gray-400">{item.description}</p>}
+                  {!item.complete && (
+                    <p className="text-xs text-gray-400 dark:text-white/40">{item.description}</p>
+                  )}
                 </div>
               </Link>
             </li>
@@ -133,8 +135,10 @@ export default function OnboardingChecklist({ orgId }: { orgId: string }) {
       )}
 
       {!collapsed && allComplete && (
-        <div className="border-t border-gray-50 px-4 py-3 text-center">
-          <p className="text-xs text-green-600 font-medium">🎉 All set! You&apos;re ready to go.</p>
+        <div className="border-t border-gray-50 dark:border-white/[0.05] px-4 py-3 text-center">
+          <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+            🎉 All set! You&apos;re ready to go.
+          </p>
         </div>
       )}
     </div>

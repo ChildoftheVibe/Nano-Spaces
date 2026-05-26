@@ -302,7 +302,7 @@ function RecurringSection({
       )}
 
       <div>
-        <Label className="text-xs font-medium text-gray-700">Repeat</Label>
+        <Label className="text-xs font-medium text-gray-700 dark:text-white/60">Repeat</Label>
         <div className="mt-1.5 flex gap-1">
           {(['daily', 'weekly', 'specific_days'] as const).map((f) => (
             <button
@@ -312,7 +312,7 @@ function RecurringSection({
               className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                 frequency === f
                   ? 'border-[#FA5D0C] bg-[#FA5D0C] text-white'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#FA5D0C]/50'
+                  : 'border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-600 dark:text-white/60 hover:border-[#FA5D0C]/50'
               }`}
             >
               {f === 'specific_days' ? 'Custom' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -323,7 +323,9 @@ function RecurringSection({
 
       {frequency === 'specific_days' && (
         <div>
-          <Label className="text-xs font-medium text-gray-700">Days of week</Label>
+          <Label className="text-xs font-medium text-gray-700 dark:text-white/60">
+            Days of week
+          </Label>
           <div className="mt-1.5 flex flex-wrap gap-1">
             {DOW_LABELS.map((label, i) => (
               <button
@@ -333,7 +335,7 @@ function RecurringSection({
                 className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
                   days.includes(i)
                     ? 'border-[#FA5D0C] bg-[#FA5D0C] text-white'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-[#FA5D0C]/50'
+                    : 'border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-600 dark:text-white/60 hover:border-[#FA5D0C]/50'
                 }`}
               >
                 {label}
@@ -344,7 +346,7 @@ function RecurringSection({
       )}
 
       <div>
-        <Label className="text-xs font-medium text-gray-700">Ends</Label>
+        <Label className="text-xs font-medium text-gray-700 dark:text-white/60">Ends</Label>
         <div className="mt-1.5 flex gap-1">
           {(['count', 'date'] as const).map((t) => (
             <button
@@ -354,7 +356,7 @@ function RecurringSection({
               className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                 endType === t
                   ? 'border-[#FA5D0C] bg-[#FA5D0C] text-white'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#FA5D0C]/50'
+                  : 'border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-600 dark:text-white/60 hover:border-[#FA5D0C]/50'
               }`}
             >
               {t === 'count' ? 'After N times' : 'On date'}
@@ -365,7 +367,10 @@ function RecurringSection({
 
       {endType === 'count' ? (
         <div>
-          <Label htmlFor="rec-count" className="text-xs font-medium text-gray-700">
+          <Label
+            htmlFor="rec-count"
+            className="text-xs font-medium text-gray-700 dark:text-white/60"
+          >
             Occurrences (max 52)
           </Label>
           <Input
@@ -380,7 +385,10 @@ function RecurringSection({
         </div>
       ) : (
         <div>
-          <Label htmlFor="rec-end-date" className="text-xs font-medium text-gray-700">
+          <Label
+            htmlFor="rec-end-date"
+            className="text-xs font-medium text-gray-700 dark:text-white/60"
+          >
             End date
           </Label>
           <Input

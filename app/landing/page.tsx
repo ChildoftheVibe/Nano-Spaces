@@ -549,7 +549,7 @@ export default function LandingPage() {
 
         {/* ── Z-Axis product preview ── */}
         <div
-          className="hero-el relative mt-20 w-full max-w-4xl mx-auto"
+          className="hero-el relative mt-10 sm:mt-16 md:mt-20 w-full max-w-4xl mx-auto"
           style={{ perspective: '1200px' }}
         >
           {/* shadow layer — depth card */}
@@ -618,7 +618,7 @@ export default function LandingPage() {
       </div>
 
       {/* ════════════ FEATURES BENTO ════════════ */}
-      <section id="features" className="relative py-40 px-4">
+      <section id="features" className="relative py-16 sm:py-24 md:py-40 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="reveal text-center mb-16">
             <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40 mb-5">
@@ -706,9 +706,9 @@ export default function LandingPage() {
       </section>
 
       {/* ════════════ HOW IT WORKS ════════════ */}
-      <section id="how-it-works" className="relative py-40 px-4">
+      <section id="how-it-works" className="relative py-16 sm:py-24 md:py-40 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="reveal text-center mb-20">
+          <div className="reveal text-center mb-10 sm:mb-16 md:mb-20">
             <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40 mb-5">
               How it works
             </span>
@@ -749,7 +749,7 @@ export default function LandingPage() {
       </section>
 
       {/* ════════════ PRICING ════════════ */}
-      <section id="pricing" className="relative py-40 px-4">
+      <section id="pricing" className="relative py-16 sm:py-24 md:py-40 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="reveal text-center mb-16">
             <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40 mb-5">
@@ -884,7 +884,7 @@ export default function LandingPage() {
       </section>
 
       {/* ════════════ FINAL CTA ════════════ */}
-      <section className="relative py-40 px-4">
+      <section className="relative py-16 sm:py-24 md:py-40 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="reveal">
             {/* Double-Bezel CTA container */}
@@ -892,7 +892,7 @@ export default function LandingPage() {
               className="rounded-[2.5rem] bg-white/[0.03] ring-1 ring-white/[0.08] p-1.5
               shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_32px_80px_rgba(250,93,12,0.08)]"
             >
-              <div className="rounded-[calc(2.5rem-0.375rem)] bg-[#06070e] shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] px-8 py-20 flex flex-col items-center gap-6 text-center">
+              <div className="rounded-[calc(2.5rem-0.375rem)] bg-[#06070e] shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] px-6 py-10 sm:px-8 sm:py-16 md:py-20 flex flex-col items-center gap-6 text-center">
                 <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40">
                   Get started today
                 </span>
