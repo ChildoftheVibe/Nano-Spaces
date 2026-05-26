@@ -54,6 +54,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, ctx) => {
     throw new NotFoundError({ userMessage: 'User not found.', requestId })
   }
 
+  if (targetId === user.id) {
+    throw new ValidationError({ userMessage: 'You cannot modify your own account.', requestId })
+  }
+
   const { action } = parsed.data
   let updatePayload: Record<string, unknown> = {}
 

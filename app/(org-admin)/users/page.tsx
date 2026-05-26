@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SkeletonTable } from '@/components/ui/skeleton'
+import { createBrowserClient } from '@/lib/supabase/browser'
 
 interface OrgUser {
   id: string
@@ -44,10 +45,12 @@ const ACTION_LABELS: Record<string, string> = {
 
 function UserRow({
   u,
+  isSelf,
   onAction,
   onRemove,
 }: {
   u: OrgUser
+  isSelf: boolean
   onAction: (id: string, action: string) => Promise<void>
   onRemove: (id: string) => Promise<void>
 }) {
@@ -55,10 +58,12 @@ function UserRow({
   const [showMenu, setShowMenu] = useState(false)
 
   const actions: string[] = []
-  if (u.is_active) actions.push('suspend')
-  else actions.push('unsuspend')
-  if (u.hibernate_status !== 'hibernated') actions.push('hibernate')
-  else actions.push('wake')
+  if (!isSelf) {
+    if (u.is_active) actions.push('suspend')
+    else actions.push('unsuspend')
+    if (u.hibernate_status !== 'hibernated') actions.push('hibernate')
+    else actions.push('wake')
+  }
   actions.push('reset_2fa', 'force_logout')
 
   const run = async (action: string) => {
@@ -120,17 +125,21 @@ function UserRow({
                   {ACTION_LABELS[a] ?? a}
                 </button>
               ))}
-              <hr className="my-1" />
-              <button
-                type="button"
-                onClick={() => {
-                  setShowMenu(false)
-                  void onRemove(u.id)
-                }}
-                className="w-full px-3 py-1.5 text-left text-sm text-[var(--color-danger)] hover:bg-red-50"
-              >
-                Remove user
-              </button>
+              {!isSelf && (
+                <>
+                  <hr className="my-1" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false)
+                      void onRemove(u.id)
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-sm text-[var(--color-danger)] hover:bg-red-50"
+                  >
+                    Remove user
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -213,6 +222,7 @@ export default function UsersPage() {
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [loading, setLoading] = useState(true)
   const [statusMsg, setStatusMsg] = useState<string | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
   // Invite form
   const [inviteEmail, setInviteEmail] = useState('')
@@ -241,6 +251,10 @@ export default function UsersPage() {
 
   useEffect(() => {
     void fetchData()
+    const supabase = createBrowserClient()
+    void supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUserId(data.user.id)
+    })
   }, [])
 
   const handleUserAction = async (id: string, action: string) => {
@@ -489,7 +503,13 @@ export default function UsersPage() {
                 </tr>
               ) : (
                 (tab === 'active' ? activeUsers : hibernatedUsers).map((u) => (
-                  <UserRow key={u.id} u={u} onAction={handleUserAction} onRemove={handleRemove} />
+                  <UserRow
+                    key={u.id}
+                    u={u}
+                    isSelf={u.id === currentUserId}
+                    onAction={handleUserAction}
+                    onRemove={handleRemove}
+                  />
                 ))
               )}
             </tbody>
