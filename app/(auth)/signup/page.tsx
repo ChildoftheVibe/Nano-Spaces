@@ -63,9 +63,32 @@ export default function SignupPage() {
       <h1 className="font-heading mb-1 text-2xl font-bold text-[var(--text-primary)]">
         Create your workspace
       </h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-gray-500">
         Start your 14-day free trial. No credit card required.
       </p>
+
+      {/* Admin role callout */}
+      <div className="mb-5 rounded-xl border border-[#FA5D0C]/20 bg-[#FA5D0C]/[0.06] px-4 py-3">
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#FA5D0C]">
+          Organization Administrator Account
+        </p>
+        <ul className="space-y-0.5 text-xs text-gray-600 dark:text-white/60">
+          <li className="flex items-center gap-1.5">
+            <span className="text-[var(--color-success)]">&#10003;</span> Manage and book all spaces
+          </li>
+          <li className="flex items-center gap-1.5">
+            <span className="text-[var(--color-success)]">&#10003;</span> Invite team members
+          </li>
+          <li className="flex items-center gap-1.5">
+            <span className="text-[var(--color-success)]">&#10003;</span> Control billing and
+            subscription
+          </li>
+          <li className="flex items-center gap-1.5">
+            <span className="text-[var(--color-success)]">&#10003;</span> View usage analytics for
+            your entire org
+          </li>
+        </ul>
+      </div>
 
       <OAuthButtons />
 

@@ -42,6 +42,7 @@ const ORG_ADMIN_PREFIXES = [
   '/org-settings',
   '/reports',
   '/rooms',
+  '/settings/billing',
   '/users',
 ]
 const SUPER_ADMIN_PREFIXES = ['/god-mode-audit', '/marketing', '/orgs']

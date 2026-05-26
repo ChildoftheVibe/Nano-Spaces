@@ -172,6 +172,12 @@ export default function SettingsPage() {
   const [deleteMsg, setDeleteMsg] = useState<{ ok: boolean; msg: string } | null>(null)
   const [exportLoading, setExportLoading] = useState(false)
 
+  // Invite state
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState<'user' | 'org_admin'>('user')
+  const [inviteSending, setInviteSending] = useState(false)
+  const [inviteMsg, setInviteMsg] = useState<{ ok: boolean; msg: string } | null>(null)
+
   // ─── Load profile ───────────────────────────────────────────────────────────
   useEffect(() => {
     const supabase = createBrowserClient()
@@ -503,6 +509,33 @@ export default function SettingsPage() {
     }
   }
 
+  // ─── Invite handler ─────────────────────────────────────────────────────────
+
+  async function sendInvite(e: React.FormEvent) {
+    e.preventDefault()
+    if (!inviteEmail) return
+    setInviteSending(true)
+    setInviteMsg(null)
+    try {
+      const res = await fetch('/api/invitations/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inviteEmail, role: inviteRole }),
+      })
+      const json = (await res.json()) as { success: boolean; error?: { message: string } }
+      if (json.success) {
+        setInviteMsg({ ok: true, msg: `Invite sent to ${inviteEmail}` })
+        setInviteEmail('')
+      } else {
+        setInviteMsg({ ok: false, msg: json.error?.message ?? 'Failed to send invite.' })
+      }
+    } catch {
+      setInviteMsg({ ok: false, msg: 'Network error. Please try again.' })
+    } finally {
+      setInviteSending(false)
+    }
+  }
+
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   if (profileLoading) {
@@ -513,6 +546,8 @@ export default function SettingsPage() {
     )
   }
 
+  const isOrgAdmin = profile?.role === 'org_admin' || profile?.role === 'super_admin'
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-heading mb-6 text-2xl font-bold text-gray-900 dark:text-white">
@@ -520,7 +555,7 @@ export default function SettingsPage() {
       </h1>
 
       <Tabs defaultValue={defaultTab}>
-        <TabsList className="mb-6 w-full justify-start gap-1">
+        <TabsList className="mb-6 w-full justify-start gap-1 flex-wrap">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
@@ -528,6 +563,9 @@ export default function SettingsPage() {
             Sessions
           </TabsTrigger>
           <TabsTrigger value="data">Data & Privacy</TabsTrigger>
+          {isOrgAdmin && <TabsTrigger value="invite">Invite Members</TabsTrigger>}
+          {isOrgAdmin && <TabsTrigger value="billing">Billing</TabsTrigger>}
+          {isOrgAdmin && <TabsTrigger value="org">Organization</TabsTrigger>}
         </TabsList>
 
         {/* ─── Profile tab ─────────────────────────────────────────────────── */}
@@ -992,6 +1030,104 @@ export default function SettingsPage() {
             to learn how we handle your data.
           </p>
         </TabsContent>
+
+        {/* ─── Invite Members tab (org_admin only) ─────────────────────────── */}
+        {isOrgAdmin && (
+          <TabsContent value="invite" className="space-y-4">
+            <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+              <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
+                Invite team members
+              </h2>
+              <p className="mb-5 text-sm text-gray-500 dark:text-white/50">
+                Invited members join your organization. They will not have billing or admin access
+                unless you grant them the Admin role.
+              </p>
+
+              <form onSubmit={(e) => void sendInvite(e)} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="invite-email">Email address</Label>
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    placeholder="colleague@company.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="invite-role">Role</Label>
+                  <select
+                    id="invite-role"
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value as 'user' | 'org_admin')}
+                    className="w-full rounded-md border border-gray-200 dark:border-white/[0.1] bg-white dark:bg-[#0e0f18] px-3 py-2 text-sm text-gray-900 dark:text-white/80 outline-none focus:border-[var(--ns-accent)] focus:ring-2 focus:ring-[var(--ns-accent)]/20"
+                  >
+                    <option value="user">Member — can book spaces, no admin access</option>
+                    <option value="org_admin">Admin — full org and billing access</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Button type="submit" disabled={inviteSending || !inviteEmail}>
+                    {inviteSending ? 'Sending…' : 'Send invite'}
+                  </Button>
+                  {inviteMsg && <Feedback {...inviteMsg} />}
+                </div>
+              </form>
+
+              <Separator className="my-5" />
+              <p className="text-sm text-gray-500 dark:text-white/40">
+                Need to manage existing members?{' '}
+                <Link href="/users" className="text-[var(--ns-accent)] hover:underline font-medium">
+                  Go to Users page
+                </Link>
+              </p>
+            </div>
+          </TabsContent>
+        )}
+
+        {/* ─── Billing tab (org_admin only) ────────────────────────────────── */}
+        {isOrgAdmin && (
+          <TabsContent value="billing" className="space-y-4">
+            <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+              <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
+                Billing & Subscription
+              </h2>
+              <p className="mb-5 text-sm text-gray-500 dark:text-white/50">
+                Manage your organization&apos;s plan, invoices, and seat usage. Only Organization
+                Administrators can access billing.
+              </p>
+              <Link
+                href="/settings/billing"
+                className="inline-flex items-center gap-2 rounded-lg bg-[var(--ns-accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--ns-accent-hover)] transition-colors"
+              >
+                Open Billing Dashboard
+              </Link>
+            </div>
+          </TabsContent>
+        )}
+
+        {/* ─── Organization tab (org_admin only) ───────────────────────────── */}
+        {isOrgAdmin && (
+          <TabsContent value="org" className="space-y-4">
+            <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+              <h2 className="font-heading mb-1 text-base font-semibold text-gray-900 dark:text-white">
+                Organization Settings
+              </h2>
+              <p className="mb-5 text-sm text-gray-500 dark:text-white/50">
+                Update your organization name, logo, booking policies, and announcement banners.
+              </p>
+              <Link
+                href="/org-settings"
+                className="inline-flex items-center gap-2 rounded-lg bg-[var(--ns-accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--ns-accent-hover)] transition-colors"
+              >
+                Open Org Settings
+              </Link>
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   )

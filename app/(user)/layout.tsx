@@ -28,12 +28,12 @@ export default async function UserLayout({ children }: { children: React.ReactNo
         { href: '/reports', label: 'Reports' },
         { href: '/activity-log', label: 'Activity' },
         { href: '/org-settings', label: 'Org Settings' },
+        { href: '/settings/billing', label: 'Billing' },
         { href: '/settings', label: 'Settings' },
       ]
     : [
         { href: '/calendar', label: 'Calendar' },
         { href: '/settings', label: 'Settings' },
-        { href: '/settings/billing', label: 'Billing' },
       ]
 
   return (
