@@ -123,7 +123,7 @@ function OrgSelector({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700 bg-white"
+      className="rounded-md border border-gray-200 dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-700 dark:text-white/70 bg-white dark:bg-white/[0.04]"
     >
       <option value="">All orgs</option>
       {orgs.map((o) => (
@@ -203,24 +203,24 @@ function MonthlyReportTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs:
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700"
+          className="rounded-md border border-gray-200 dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-700 dark:text-white/70 dark:bg-white/[0.04]"
         />
         {isSuperAdmin && <OrgSelector orgs={orgs} value={orgId} onChange={setOrgId} />}
         <button
           onClick={exportXlsx}
           disabled={data.length === 0}
-          className="ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          className="ml-auto flex items-center gap-1.5 rounded-md border dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-600 dark:text-white/60 hover:bg-gray-50 dark:hover:bg-white/[0.05] disabled:opacity-40"
         >
           <Download className="h-3.5 w-3.5" /> Export Excel
         </button>
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-gray-400">Loading…</div>
+        <div className="py-16 text-center text-gray-400 dark:text-white/35">Loading…</div>
       ) : (
-        <div className="rounded-xl border bg-white overflow-auto">
+        <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-auto">
           <table className="w-full text-sm min-w-[900px]">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 dark:bg-white/[0.04] border-b dark:border-white/[0.06]">
               <tr>
                 {[
                   'Date',
@@ -235,26 +235,30 @@ function MonthlyReportTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs:
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                    className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-white/45 uppercase tracking-wide whitespace-nowrap"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {data.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
+                  <td className="px-3 py-2 text-xs text-gray-500 dark:text-white/45 whitespace-nowrap">
                     {r.start_time ? format(new Date(r.start_time), 'MMM d') : '—'}
                   </td>
-                  <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                  <td className="px-3 py-2 text-xs text-gray-500 dark:text-white/45 whitespace-nowrap">
                     {r.start_time ? format(new Date(r.start_time), 'HH:mm') : '—'}–
                     {r.end_time ? format(new Date(r.end_time), 'HH:mm') : '—'}
                   </td>
-                  <td className="px-3 py-2 text-gray-700 whitespace-nowrap">{r.room_name}</td>
-                  <td className="px-3 py-2 text-gray-700 whitespace-nowrap">{r.booked_by_name}</td>
-                  <td className="px-3 py-2 text-gray-800 max-w-[180px]">
+                  <td className="px-3 py-2 text-gray-700 dark:text-white/70 whitespace-nowrap">
+                    {r.room_name}
+                  </td>
+                  <td className="px-3 py-2 text-gray-700 dark:text-white/70 whitespace-nowrap">
+                    {r.booked_by_name}
+                  </td>
+                  <td className="px-3 py-2 text-gray-800 dark:text-white/80 max-w-[180px]">
                     <p className="truncate" title={r.title}>
                       {r.title || '—'}
                     </p>
@@ -266,7 +270,9 @@ function MonthlyReportTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs:
                       {r.status}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-gray-600 text-xs">{r.cancelled_by_name || '—'}</td>
+                  <td className="px-3 py-2 text-gray-600 dark:text-white/60 text-xs">
+                    {r.cancelled_by_name || '—'}
+                  </td>
                   <td className="px-3 py-2 text-gray-500 text-xs max-w-[140px]">
                     <p className="truncate" title={r.cancellation_reason}>
                       {r.cancellation_reason || '—'}
@@ -278,7 +284,7 @@ function MonthlyReportTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs:
                         Yes
                       </span>
                     ) : (
-                      <span className="text-gray-300">—</span>
+                      <span className="text-gray-300 dark:text-white/20">—</span>
                     )}
                   </td>
                 </tr>
@@ -286,7 +292,7 @@ function MonthlyReportTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs:
             </tbody>
           </table>
           {data.length === 0 && (
-            <p className="py-10 text-center text-sm text-gray-400">
+            <p className="py-10 text-center text-sm text-gray-400 dark:text-white/35">
               No reservations for this period.
             </p>
           )}
@@ -390,7 +396,7 @@ function UserHistoryTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
         <select
           value={selectedUser}
           onChange={(e) => setSelectedUser(e.target.value)}
-          className="rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700 bg-white min-w-[200px]"
+          className="rounded-md border border-gray-200 dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-700 dark:text-white/70 bg-white dark:bg-white/[0.04] min-w-[200px]"
         >
           <option value="">Select a user…</option>
           {users.map((u) => (
@@ -402,7 +408,7 @@ function UserHistoryTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
         <button
           onClick={exportXlsx}
           disabled={data.length === 0}
-          className="ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          className="ml-auto flex items-center gap-1.5 rounded-md border dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-600 dark:text-white/60 hover:bg-gray-50 dark:hover:bg-white/[0.05] disabled:opacity-40"
         >
           <Download className="h-3.5 w-3.5" /> Export Excel
         </button>
@@ -413,33 +419,35 @@ function UserHistoryTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
           Select a user to view their booking history.
         </div>
       ) : loading ? (
-        <div className="py-16 text-center text-gray-400">Loading…</div>
+        <div className="py-16 text-center text-gray-400 dark:text-white/35">Loading…</div>
       ) : (
-        <div className="rounded-xl border bg-white overflow-auto">
+        <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-auto">
           <table className="w-full text-sm min-w-[800px]">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 dark:bg-white/[0.04] border-b dark:border-white/[0.06]">
               <tr>
                 {['Date', 'Time', 'Room', 'Title', 'Status', 'Checked In', 'Notes'].map((h) => (
                   <th
                     key={h}
-                    className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                    className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-white/45 uppercase tracking-wide whitespace-nowrap"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {data.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
+                  <td className="px-3 py-2 text-xs text-gray-500 dark:text-white/45 whitespace-nowrap">
                     {r.start_time ? format(new Date(r.start_time), 'MMM d, yyyy') : '—'}
                   </td>
-                  <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                  <td className="px-3 py-2 text-xs text-gray-500 dark:text-white/45 whitespace-nowrap">
                     {r.start_time ? format(new Date(r.start_time), 'HH:mm') : '—'}–
                     {r.end_time ? format(new Date(r.end_time), 'HH:mm') : '—'}
                   </td>
-                  <td className="px-3 py-2 text-gray-700 whitespace-nowrap">{r.room_name}</td>
+                  <td className="px-3 py-2 text-gray-700 dark:text-white/70 whitespace-nowrap">
+                    {r.room_name}
+                  </td>
                   <td className="px-3 py-2 text-gray-800 max-w-[160px]">
                     <p className="truncate" title={r.title}>
                       {r.title || '—'}
@@ -469,7 +477,9 @@ function UserHistoryTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
             </tbody>
           </table>
           {data.length === 0 && (
-            <p className="py-10 text-center text-sm text-gray-400">No bookings found.</p>
+            <p className="py-10 text-center text-sm text-gray-400 dark:text-white/35">
+              No bookings found.
+            </p>
           )}
         </div>
       )}
@@ -538,14 +548,14 @@ function UtilizationTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
         <button
           onClick={exportXlsx}
           disabled={data.length === 0}
-          className="ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          className="ml-auto flex items-center gap-1.5 rounded-md border dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-600 dark:text-white/60 hover:bg-gray-50 dark:hover:bg-white/[0.05] disabled:opacity-40"
         >
           <Download className="h-3.5 w-3.5" /> Export Excel
         </button>
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-gray-400">Loading…</div>
+        <div className="py-16 text-center text-gray-400 dark:text-white/35">Loading…</div>
       ) : data.length === 0 ? (
         <div className="py-16 text-center text-gray-400 text-sm">No rooms found.</div>
       ) : (
@@ -553,18 +563,25 @@ function UtilizationTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
           {data
             .sort((a, b) => b.utilization_pct - a.utilization_pct)
             .map((r) => (
-              <div key={r.room_id} className="rounded-xl border bg-white p-4">
+              <div
+                key={r.room_id}
+                className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-4"
+              >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-800">{r.room_name}</span>
-                  <span className="text-sm font-semibold text-gray-700">{r.utilization_pct}%</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-white/80">
+                    {r.room_name}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-white/70">
+                    {r.utilization_pct}%
+                  </span>
                 </div>
-                <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+                <div className="h-3 rounded-full bg-gray-100 dark:bg-white/[0.07] overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${barColor(r.utilization_pct)}`}
                     style={{ width: `${Math.min(100, r.utilization_pct)}%` }}
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-gray-400">
+                <p className="mt-1.5 text-xs text-gray-400 dark:text-white/35">
                   {r.booked_hours}h booked / {r.available_hours}h available
                 </p>
               </div>
@@ -633,7 +650,7 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
   }
 
   const intensity = (count: number): string => {
-    if (count === 0) return 'bg-gray-50 text-gray-300'
+    if (count === 0) return 'bg-gray-50 dark:bg-white/[0.03] text-gray-300 dark:text-white/20'
     const pct = count / maxVal
     if (pct >= 0.8) return 'bg-[#4F7EFA] text-white'
     if (pct >= 0.6) return 'bg-blue-300 text-white'
@@ -650,16 +667,16 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
         <button
           onClick={exportXlsx}
           disabled={grid.length === 0}
-          className="ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          className="ml-auto flex items-center gap-1.5 rounded-md border dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-600 dark:text-white/60 hover:bg-gray-50 dark:hover:bg-white/[0.05] disabled:opacity-40"
         >
           <Download className="h-3.5 w-3.5" /> Export Excel
         </button>
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-gray-400">Loading…</div>
+        <div className="py-16 text-center text-gray-400 dark:text-white/35">Loading…</div>
       ) : (
-        <div className="rounded-xl border bg-white overflow-auto p-4">
+        <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-auto p-4">
           <div
             className="inline-grid gap-1"
             style={{ gridTemplateColumns: `60px repeat(7, 48px)` }}
@@ -667,7 +684,10 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
             {/* Header */}
             <div />
             {DAYS.map((d) => (
-              <div key={d} className="text-center text-xs font-semibold text-gray-500 py-1">
+              <div
+                key={d}
+                className="text-center text-xs font-semibold text-gray-500 dark:text-white/45 py-1"
+              >
                 {d}
               </div>
             ))}
@@ -677,7 +697,7 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
               <>
                 <div
                   key={`label-${h}`}
-                  className="text-right text-xs text-gray-400 pr-2 flex items-center justify-end"
+                  className="text-right text-xs text-gray-400 dark:text-white/35 pr-2 flex items-center justify-end"
                 >
                   {String(h).padStart(2, '0')}:00
                 </div>
@@ -698,11 +718,14 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
           </div>
 
           {/* Legend */}
-          <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+          <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 dark:text-white/45">
             <span>Low</span>
             {['bg-blue-50', 'bg-blue-100', 'bg-blue-200', 'bg-blue-300', 'bg-[#4F7EFA]'].map(
               (c, i) => (
-                <div key={i} className={`h-4 w-6 rounded ${c} border border-gray-200`} />
+                <div
+                  key={i}
+                  className={`h-4 w-6 rounded ${c} border border-gray-200 dark:border-white/10`}
+                />
               ),
             )}
             <span>High</span>
@@ -775,20 +798,20 @@ function GhostBusterTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700"
+          className="rounded-md border border-gray-200 dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-700 dark:text-white/70 dark:bg-white/[0.04]"
         />
         {isSuperAdmin && <OrgSelector orgs={orgs} value={orgId} onChange={setOrgId} />}
         <button
           onClick={exportXlsx}
           disabled={rooms.length === 0}
-          className="ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          className="ml-auto flex items-center gap-1.5 rounded-md border dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-600 dark:text-white/60 hover:bg-gray-50 dark:hover:bg-white/[0.05] disabled:opacity-40"
         >
           <Download className="h-3.5 w-3.5" /> Export Excel
         </button>
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-gray-400">Loading…</div>
+        <div className="py-16 text-center text-gray-400 dark:text-white/35">Loading…</div>
       ) : rooms.length === 0 ? (
         <div className="py-16 text-center text-gray-400 text-sm">
           No ghost-released bookings this period.
@@ -796,45 +819,54 @@ function GhostBusterTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
       ) : (
         <div className="space-y-3">
           {rooms.map((r) => (
-            <div key={r.room_id} className="rounded-xl border bg-white overflow-hidden">
+            <div
+              key={r.room_id}
+              className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-hidden"
+            >
               <button
                 onClick={() => setExpanded(expanded === r.room_id ? null : r.room_id)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-left"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/[0.04] text-left"
               >
-                <span className="font-medium text-gray-800 text-sm">{r.room_name}</span>
+                <span className="font-medium text-gray-800 dark:text-white/80 text-sm">
+                  {r.room_name}
+                </span>
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-red-100 text-red-700 px-2.5 py-0.5 text-xs font-semibold">
                     {r.count} no-show{r.count !== 1 ? 's' : ''}
                   </span>
-                  <span className="text-gray-400 text-xs">
+                  <span className="text-gray-400 dark:text-white/35 text-xs">
                     {expanded === r.room_id ? '▲' : '▼'}
                   </span>
                 </div>
               </button>
               {expanded === r.room_id && (
-                <div className="border-t">
+                <div className="border-t dark:border-white/[0.07]">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 dark:bg-white/[0.04]">
                       <tr>
                         {['Booking', 'Booked By', 'Slot Start', 'Released At'].map((h) => (
                           <th
                             key={h}
-                            className="px-4 py-2 text-left text-xs font-semibold text-gray-500"
+                            className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-white/45"
                           >
                             {h}
                           </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                       {r.entries.map((e) => (
-                        <tr key={e.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 text-gray-700">{e.booking_title}</td>
-                          <td className="px-4 py-2 text-gray-600">{e.booker_name}</td>
-                          <td className="px-4 py-2 text-gray-500 text-xs">
+                        <tr key={e.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
+                          <td className="px-4 py-2 text-gray-700 dark:text-white/70">
+                            {e.booking_title}
+                          </td>
+                          <td className="px-4 py-2 text-gray-600 dark:text-white/60">
+                            {e.booker_name}
+                          </td>
+                          <td className="px-4 py-2 text-gray-500 dark:text-white/45 text-xs">
                             {e.start_time ? format(new Date(e.start_time), 'MMM d, HH:mm') : '—'}
                           </td>
-                          <td className="px-4 py-2 text-gray-500 text-xs">
+                          <td className="px-4 py-2 text-gray-500 dark:text-white/45 text-xs">
                             {e.created_at ? format(new Date(e.created_at), 'MMM d, HH:mm') : '—'}
                           </td>
                         </tr>
@@ -845,7 +877,7 @@ function GhostBusterTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
               )}
             </div>
           ))}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-white/30">
             {total} total no-shows across {rooms.length} room{rooms.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -888,19 +920,19 @@ function OrgExportTab() {
 
   return (
     <div className="max-w-lg">
-      <div className="rounded-xl border bg-white p-6">
+      <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
         <div className="flex items-start gap-3 mb-4">
           <Database className="h-8 w-8 text-[#4F7EFA] mt-0.5 shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900">Full Org Data Export</h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <h3 className="font-semibold text-gray-900 dark:text-white">Full Org Data Export</h3>
+            <p className="text-sm text-gray-500 dark:text-white/45 mt-1">
               Downloads all reservations, users, rooms, and blackout dates as a ZIP archive
               containing CSV files. Rate limited to once per 24 hours per org.
             </p>
           </div>
         </div>
 
-        <ul className="mb-5 space-y-1.5 text-sm text-gray-600">
+        <ul className="mb-5 space-y-1.5 text-sm text-gray-600 dark:text-white/60">
           {[
             'reservations.csv — All org reservations',
             'users.csv — All org members',
@@ -930,7 +962,9 @@ function OrgExportTab() {
         </button>
 
         {lastExport && (
-          <p className="mt-2 text-center text-xs text-gray-400">Last exported at {lastExport}</p>
+          <p className="mt-2 text-center text-xs text-gray-400 dark:text-white/30">
+            Last exported at {lastExport}
+          </p>
         )}
       </div>
     </div>
@@ -992,11 +1026,11 @@ export default function ReportsPage() {
     <div className="mx-auto max-w-6xl px-6 py-8">
       <div className="flex items-center gap-2 mb-6">
         <FileText className="h-5 w-5 text-[#4F7EFA]" />
-        <h1 className="text-xl font-semibold text-gray-900">Reports</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Reports</h1>
       </div>
 
       {/* Tab Bar */}
-      <div className="flex gap-1 border-b mb-6">
+      <div className="flex gap-1 border-b dark:border-white/[0.07] mb-6">
         {visibleTabs.map((tab) => (
           <button
             key={tab.id}
@@ -1004,7 +1038,7 @@ export default function ReportsPage() {
             className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
               activeTab === tab.id
                 ? 'border-[#4F7EFA] text-[#4F7EFA]'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70'
             }`}
           >
             {tab.icon}

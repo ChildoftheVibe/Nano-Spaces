@@ -67,10 +67,10 @@ function ConfirmModal({
   danger?: boolean
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <h2 className="text-base font-semibold text-gray-900 mb-2">{title}</h2>
-        <p className="text-sm text-gray-500 mb-6">{message}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-[#12131A] dark:ring-1 dark:ring-white/[0.09] p-6 shadow-xl">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">{title}</h2>
+        <p className="text-sm text-gray-500 dark:text-white/45 mb-6">{message}</p>
         <div className="flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onCancel}>
             Cancel
@@ -125,9 +125,9 @@ function AddUserModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Add User</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-[#12131A] dark:ring-1 dark:ring-white/[0.09] p-6 shadow-xl">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Add User</h2>
         <div className="space-y-3">
           <div>
             <Label htmlFor="au-name" className="text-xs">
@@ -172,7 +172,7 @@ function AddUserModal({
               id="au-role"
               value={role}
               onChange={(e) => setRole(e.target.value as 'user' | 'org_admin')}
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              className="mt-1 w-full rounded-md border border-gray-300 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
             >
               <option value="user">User</option>
               <option value="org_admin">Org Admin</option>
@@ -233,9 +233,9 @@ function AddRoomModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Add Room</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-[#12131A] dark:ring-1 dark:ring-white/[0.09] p-6 shadow-xl">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Add Room</h2>
         <div className="space-y-3">
           <div>
             <Label htmlFor="ar-name" className="text-xs">
@@ -256,7 +256,7 @@ function AddRoomModal({
               id="ar-type"
               value={type}
               onChange={(e) => setType(e.target.value as 'room' | 'building')}
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              className="mt-1 w-full rounded-md border border-gray-300 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
             >
               <option value="room">Room</option>
               <option value="building">Building</option>
@@ -345,7 +345,7 @@ export default function OrgDetailPage() {
       const res = await fetch(`/api/super-admin/orgs/${orgId}`, { method: 'DELETE' })
       const json = (await res.json()) as { success: boolean; error?: { message: string } }
       if (json.success) {
-        router.push('/super-admin/orgs')
+        router.push('/orgs')
       } else {
         showToast(json.error?.message ?? 'Failed to delete org.', false)
       }
@@ -451,23 +451,25 @@ export default function OrgDetailPage() {
         <div className="flex items-start gap-3">
           <button
             onClick={() => router.push('/super-admin/orgs')}
-            className="mt-0.5 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="mt-0.5 rounded-md p-1 text-gray-400 dark:text-white/35 hover:bg-gray-100 dark:hover:bg-white/[0.07] hover:text-gray-600 dark:hover:text-white/60"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">{org.display_name ?? org.name}</h1>
-            <p className="text-xs text-gray-400 mt-0.5">{org.slug}</p>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {org.display_name ?? org.name}
+            </h1>
+            <p className="text-xs text-gray-400 dark:text-white/35 mt-0.5">{org.slug}</p>
             <div className="flex items-center gap-2 mt-1.5">
               <span
                 className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColor(org.subscription_status)}`}
               >
                 {org.subscription_status}
               </span>
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 capitalize">
+              <span className="rounded-full bg-gray-100 dark:bg-white/[0.07] px-2 py-0.5 text-xs text-gray-600 dark:text-white/60 capitalize">
                 {org.subscription_tier}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-white/35">
                 Created {format(new Date(org.created_at), 'MMM d, yyyy')}
               </span>
             </div>
@@ -476,7 +478,7 @@ export default function OrgDetailPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => void load()}
-            className="rounded-md border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-1"
+            className="rounded-md border dark:border-white/[0.07] px-3 py-1.5 text-sm text-gray-600 dark:text-white/60 hover:bg-gray-50 dark:hover:bg-white/[0.05] flex items-center gap-1"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
@@ -497,15 +499,20 @@ export default function OrgDetailPage() {
           { icon: Building2, label: 'Rooms', value: rooms.length, limit: org.tier_room_limit },
           { icon: Calendar, label: 'Active Reservations', value: reservationCount, limit: null },
         ].map(({ icon: Icon, label, value, limit }) => (
-          <div key={label} className="rounded-xl border bg-white p-4">
+          <div
+            key={label}
+            className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-4"
+          >
             <div className="flex items-center gap-2 mb-1">
-              <Icon className="h-4 w-4 text-gray-400" />
-              <span className="text-xs text-gray-500">{label}</span>
+              <Icon className="h-4 w-4 text-gray-400 dark:text-white/30" />
+              <span className="text-xs text-gray-500 dark:text-white/45">{label}</span>
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {value}
               {limit !== null && (
-                <span className="text-sm font-normal text-gray-400 ml-1">/ {limit}</span>
+                <span className="text-sm font-normal text-gray-400 dark:text-white/35 ml-1">
+                  / {limit}
+                </span>
               )}
             </p>
           </div>
@@ -513,7 +520,7 @@ export default function OrgDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b mb-6">
+      <div className="border-b dark:border-white/[0.07] mb-6">
         <nav className="flex gap-4">
           {(
             [
@@ -528,11 +535,11 @@ export default function OrgDetailPage() {
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                 tab === key
                   ? 'border-[var(--brand-primary)] text-[var(--brand-primary)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-gray-500 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70'
               }`}
             >
               {label}
-              <span className="ml-1.5 rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">
+              <span className="ml-1.5 rounded-full bg-gray-100 dark:bg-white/[0.07] px-1.5 py-0.5 text-xs text-gray-500 dark:text-white/40">
                 {count}
               </span>
             </button>
@@ -544,31 +551,33 @@ export default function OrgDetailPage() {
       {tab === 'users' && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-700">Members</h2>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-white/70">Members</h2>
             <Button size="sm" onClick={() => setShowAddUser(true)}>
               <Plus className="h-3.5 w-3.5 mr-1" /> Add User
             </Button>
           </div>
-          <div className="rounded-xl border bg-white overflow-hidden">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-gray-50 dark:bg-white/[0.04] border-b dark:border-white/[0.06]">
                 <tr>
                   {['Name', 'Email', 'Role', 'Status', 'Joined', ''].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-white/45 uppercase tracking-wide"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{u.full_name ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-500">{u.email}</td>
-                    <td className="px-4 py-3 capitalize text-gray-600">
+                  <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white/90">
+                      {u.full_name ?? '—'}
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-white/45">{u.email}</td>
+                    <td className="px-4 py-3 capitalize text-gray-600 dark:text-white/60">
                       {u.role.replace('_', ' ')}
                     </td>
                     <td className="px-4 py-3">
@@ -580,7 +589,7 @@ export default function OrgDetailPage() {
                         {u.is_active ? 'active' : 'suspended'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400">
+                    <td className="px-4 py-3 text-xs text-gray-400 dark:text-white/30">
                       {format(new Date(u.created_at), 'MMM d, yyyy')}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -597,7 +606,7 @@ export default function OrgDetailPage() {
               </tbody>
             </table>
             {users.length === 0 && (
-              <p className="py-10 text-center text-sm text-gray-400">
+              <p className="py-10 text-center text-sm text-gray-400 dark:text-white/35">
                 No users in this organization.
               </p>
             )}
@@ -609,31 +618,39 @@ export default function OrgDetailPage() {
       {tab === 'rooms' && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-700">Rooms & Spaces</h2>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-white/70">
+              Rooms & Spaces
+            </h2>
             <Button size="sm" onClick={() => setShowAddRoom(true)}>
               <Plus className="h-3.5 w-3.5 mr-1" /> Add Room
             </Button>
           </div>
-          <div className="rounded-xl border bg-white overflow-hidden">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-gray-50 dark:bg-white/[0.04] border-b dark:border-white/[0.06]">
                 <tr>
                   {['Name', 'Type', 'Capacity', 'Status', 'Created', ''].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-white/45 uppercase tracking-wide"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {rooms.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}</td>
-                    <td className="px-4 py-3 capitalize text-gray-600">{r.type}</td>
-                    <td className="px-4 py-3 text-gray-500">{r.capacity ?? '—'}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white/90">
+                      {r.name}
+                    </td>
+                    <td className="px-4 py-3 capitalize text-gray-600 dark:text-white/60">
+                      {r.type}
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-white/45">
+                      {r.capacity ?? '—'}
+                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -643,7 +660,7 @@ export default function OrgDetailPage() {
                         {r.is_active ? 'active' : 'inactive'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400">
+                    <td className="px-4 py-3 text-xs text-gray-400 dark:text-white/30">
                       {format(new Date(r.created_at), 'MMM d, yyyy')}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -660,7 +677,7 @@ export default function OrgDetailPage() {
               </tbody>
             </table>
             {rooms.length === 0 && (
-              <p className="py-10 text-center text-sm text-gray-400">
+              <p className="py-10 text-center text-sm text-gray-400 dark:text-white/35">
                 No rooms configured for this organization.
               </p>
             )}
@@ -671,14 +688,16 @@ export default function OrgDetailPage() {
       {/* Calendar Tab */}
       {tab === 'calendar' && (
         <div>
-          <div className="rounded-xl border bg-white p-6">
+          <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
             <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-amber-50 p-3">
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-500/10 p-3">
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
               </div>
               <div className="flex-1">
-                <h2 className="text-sm font-semibold text-gray-900 mb-1">Clear Calendar</h2>
-                <p className="text-sm text-gray-500 mb-4">
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                  Clear Calendar
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-white/45 mb-4">
                   This will permanently delete all {reservationCount} confirmed and pending
                   reservations for this organization. This action cannot be undone.
                 </p>
@@ -693,7 +712,9 @@ export default function OrgDetailPage() {
                   Clear All Reservations
                 </Button>
                 {reservationCount === 0 && (
-                  <p className="text-xs text-gray-400 mt-2">No active reservations to clear.</p>
+                  <p className="text-xs text-gray-400 dark:text-white/30 mt-2">
+                    No active reservations to clear.
+                  </p>
                 )}
               </div>
             </div>

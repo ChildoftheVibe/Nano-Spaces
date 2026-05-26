@@ -160,13 +160,13 @@ export default function OrgSettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <h1 className="font-heading mb-8 text-2xl font-bold text-[var(--text-primary)]">
+      <h1 className="font-heading mb-8 text-2xl font-bold text-gray-900 dark:text-white">
         Org Settings
       </h1>
 
       {/* General settings */}
-      <section className="mb-8 rounded-xl border bg-white p-6">
-        <h2 className="mb-5 text-base font-semibold text-[var(--text-primary)]">General</h2>
+      <section className="mb-8 rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+        <h2 className="mb-5 text-base font-semibold text-gray-900">General</h2>
 
         <form onSubmit={(e) => void handleSubmit(onSave)(e)} className="space-y-4">
           <div>
@@ -190,7 +190,7 @@ export default function OrgSettingsPage() {
             <select
               id="primary_timezone"
               {...register('primary_timezone')}
-              className="mt-1 block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              className="mt-1 block w-full rounded-md border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
             >
               {TIMEZONES.map((tz) => (
                 <option key={tz} value={tz}>
@@ -207,7 +207,7 @@ export default function OrgSettingsPage() {
               {...register('email_signature')}
               rows={3}
               placeholder="Added to org announcement emails…"
-              className="mt-1 block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] resize-none"
+              className="mt-1 block w-full rounded-md border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] dark:text-white/80 dark:placeholder:text-white/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] resize-none"
             />
             {errors.email_signature && (
               <p className="mt-1 text-xs text-[var(--color-danger)]">
@@ -230,17 +230,15 @@ export default function OrgSettingsPage() {
       </section>
 
       {/* Logo upload */}
-      <section className="mb-8 rounded-xl border bg-white p-6">
-        <h2 className="mb-5 text-base font-semibold text-[var(--text-primary)]">
-          Organisation Logo
-        </h2>
+      <section className="mb-8 rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+        <h2 className="mb-5 text-base font-semibold text-gray-900">Organisation Logo</h2>
         <div className="flex items-center gap-5">
-          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border bg-gray-50 flex items-center justify-center">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.04] flex items-center justify-center">
             {logoPreview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" />
             ) : (
-              <span className="text-xs text-gray-400">No logo</span>
+              <span className="text-xs text-gray-400 dark:text-white/30">No logo</span>
             )}
           </div>
           <div className="flex-1">
@@ -259,30 +257,32 @@ export default function OrgSettingsPage() {
             >
               {logoUploading ? 'Uploading…' : 'Upload Logo'}
             </Button>
-            <p className="mt-1.5 text-xs text-gray-400">JPEG, PNG, or WebP — max 2MB</p>
+            <p className="mt-1.5 text-xs text-gray-400 dark:text-white/30">
+              JPEG, PNG, or WebP — max 2MB
+            </p>
             {logoError && <p className="mt-1 text-xs text-[var(--color-danger)]">{logoError}</p>}
           </div>
         </div>
       </section>
 
       {/* Subscription info */}
-      <section className="mb-8 rounded-xl border bg-white p-6">
-        <h2 className="mb-4 text-base font-semibold text-[var(--text-primary)]">Plan</h2>
+      <section className="mb-8 rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
+        <h2 className="mb-4 text-base font-semibold text-gray-900">Plan</h2>
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="rounded-lg bg-gray-50 p-3">
-            <p className="text-xs text-gray-500">Tier</p>
+          <div className="rounded-lg bg-gray-50 dark:bg-white/[0.04] p-3">
+            <p className="text-xs text-gray-500 dark:text-white/45">Tier</p>
             <p className="font-medium capitalize">{org?.subscription_tier ?? '—'}</p>
           </div>
-          <div className="rounded-lg bg-gray-50 p-3">
-            <p className="text-xs text-gray-500">Rooms limit</p>
+          <div className="rounded-lg bg-gray-50 dark:bg-white/[0.04] p-3">
+            <p className="text-xs text-gray-500 dark:text-white/45">Rooms limit</p>
             <p className="font-medium">{org?.tier_room_limit ?? 'Unlimited'}</p>
           </div>
-          <div className="rounded-lg bg-gray-50 p-3">
-            <p className="text-xs text-gray-500">Admins limit</p>
+          <div className="rounded-lg bg-gray-50 dark:bg-white/[0.04] p-3">
+            <p className="text-xs text-gray-500 dark:text-white/45">Admins limit</p>
             <p className="font-medium">{org?.tier_admin_limit ?? 'Unlimited'}</p>
           </div>
-          <div className="rounded-lg bg-gray-50 p-3">
-            <p className="text-xs text-gray-500">Users limit</p>
+          <div className="rounded-lg bg-gray-50 dark:bg-white/[0.04] p-3">
+            <p className="text-xs text-gray-500 dark:text-white/45">Users limit</p>
             <p className="font-medium">{org?.tier_user_limit ?? 'Unlimited'}</p>
           </div>
         </div>
@@ -290,10 +290,8 @@ export default function OrgSettingsPage() {
 
       {/* Announcement composer */}
       <section className="rounded-xl border bg-white p-6">
-        <h2 className="mb-2 text-base font-semibold text-[var(--text-primary)]">
-          Send Announcement
-        </h2>
-        <p className="mb-4 text-sm text-gray-500">
+        <h2 className="mb-2 text-base font-semibold text-gray-900">Send Announcement</h2>
+        <p className="mb-4 text-sm text-gray-500 dark:text-white/45">
           Send a message to all active members of your organisation.
         </p>
         <textarea
@@ -302,9 +300,11 @@ export default function OrgSettingsPage() {
           rows={4}
           maxLength={5000}
           placeholder="Write your announcement…"
-          className="mb-3 block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] resize-none"
+          className="mb-3 block w-full rounded-md border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] dark:text-white/80 dark:placeholder:text-white/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] resize-none"
         />
-        {announcementStatus && <p className="mb-3 text-sm text-gray-600">{announcementStatus}</p>}
+        {announcementStatus && (
+          <p className="mb-3 text-sm text-gray-600 dark:text-white/60">{announcementStatus}</p>
+        )}
         <Button
           onClick={() => void sendAnnouncement()}
           disabled={!announcement.trim() || sendingAnnouncement}

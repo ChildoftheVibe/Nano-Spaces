@@ -69,7 +69,7 @@ function UserRow({
   }
 
   return (
-    <tr className="border-b last:border-0 hover:bg-gray-50">
+    <tr className="border-b last:border-0 dark:border-white/[0.05] hover:bg-gray-50 dark:hover:bg-white/[0.03]">
       <td className="py-3 pr-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">{u.full_name ?? '—'}</p>
         <p className="text-xs text-gray-500">{u.email}</p>
@@ -108,13 +108,13 @@ function UserRow({
             {busy ? '…' : '⋯'}
           </Button>
           {showMenu && (
-            <div className="absolute right-0 z-10 mt-1 w-40 rounded-lg border bg-white py-1 shadow-lg">
+            <div className="absolute right-0 z-10 mt-1 w-40 rounded-lg border dark:border-white/[0.08] bg-white dark:bg-[#12131A] py-1 shadow-lg">
               {actions.map((a) => (
                 <button
                   key={a}
                   type="button"
                   onClick={() => void run(a)}
-                  className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50"
+                  className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 dark:hover:bg-white/[0.05] dark:text-white/80"
                 >
                   {/* eslint-disable-next-line security/detect-object-injection */}
                   {ACTION_LABELS[a] ?? a}
@@ -156,7 +156,7 @@ function InvitationRow({
   }
 
   return (
-    <tr className="border-b last:border-0 hover:bg-gray-50">
+    <tr className="border-b last:border-0 dark:border-white/[0.05] hover:bg-gray-50 dark:hover:bg-white/[0.03]">
       <td className="py-3 pr-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">{inv.email}</p>
         <p className="text-xs text-gray-400">
@@ -359,7 +359,7 @@ export default function UsersPage() {
       </div>
 
       {/* Invite form */}
-      <section className="mb-8 rounded-xl border bg-white p-6">
+      <section className="mb-8 rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
         <h2 className="mb-4 text-base font-semibold text-[var(--text-primary)]">Invite a User</h2>
         <div className="flex gap-3">
           <div className="flex-1">
@@ -377,7 +377,7 @@ export default function UsersPage() {
           <select
             value={inviteRole}
             onChange={(e) => setInviteRole(e.target.value as 'user' | 'org_admin')}
-            className="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            className="rounded-md border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] dark:text-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
           >
             <option value="user">Member</option>
             <option value="org_admin">Admin</option>
@@ -388,8 +388,8 @@ export default function UsersPage() {
         </div>
         {inviteError && <p className="mt-2 text-xs text-[var(--color-danger)]">{inviteError}</p>}
 
-        <div className="mt-4 border-t pt-4">
-          <p className="mb-2 text-sm text-gray-500">
+        <div className="mt-4 border-t dark:border-white/[0.07] pt-4">
+          <p className="mb-2 text-sm text-gray-500 dark:text-white/45">
             Or bulk invite via CSV (email, role columns — max 100 rows):
           </p>
           <input
@@ -432,7 +432,7 @@ export default function UsersPage() {
       </section>
 
       {/* Tabs */}
-      <div className="mb-4 flex gap-1 border-b">
+      <div className="mb-4 flex gap-1 border-b dark:border-white/[0.07]">
         {(['active', 'hibernated', 'pending'] as Tab[]).map((t) => (
           <button
             key={t}
@@ -441,7 +441,7 @@ export default function UsersPage() {
             className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
               tab === t
                 ? 'border-b-2 border-[var(--brand-primary)] text-[var(--brand-primary)]'
-                : 'text-gray-500 hover:text-[var(--text-primary)]'
+                : 'text-gray-500 dark:text-white/40 hover:text-[var(--text-primary)]'
             }`}
           >
             {t === 'active'
@@ -453,24 +453,24 @@ export default function UsersPage() {
         ))}
       </div>
 
-      <div className="rounded-xl border bg-white overflow-hidden">
+      <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] overflow-hidden">
         {tab !== 'pending' ? (
           <table className="w-full">
-            <thead className="border-b bg-gray-50">
+            <thead className="border-b dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/45 uppercase tracking-wide">
                   User
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/45 uppercase tracking-wide">
                   Role
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/45 uppercase tracking-wide">
                   Status
                 </th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y dark:divide-white/[0.05]">
               {(tab === 'active' ? activeUsers : hibernatedUsers).length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-8">
@@ -496,24 +496,27 @@ export default function UsersPage() {
           </table>
         ) : (
           <table className="w-full">
-            <thead className="border-b bg-gray-50">
+            <thead className="border-b dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/45 uppercase tracking-wide">
                   Email
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/45 uppercase tracking-wide">
                   Role
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-white/45 uppercase tracking-wide">
                   Status
                 </th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y dark:divide-white/[0.05]">
               {invitations.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-sm text-gray-400">
+                  <td
+                    colSpan={4}
+                    className="py-8 text-center text-sm text-gray-400 dark:text-white/35"
+                  >
                     No pending invitations.
                   </td>
                 </tr>

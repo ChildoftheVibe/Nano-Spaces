@@ -36,16 +36,18 @@ function RejectDialog({
 }) {
   const [reason, setReason] = useState('')
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-        <h3 className="mb-3 font-heading text-base font-semibold text-gray-900">Reject Booking</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-sm rounded-xl bg-white dark:bg-[#12131A] dark:ring-1 dark:ring-white/[0.09] p-6 shadow-xl">
+        <h3 className="mb-3 font-heading text-base font-semibold text-gray-900 dark:text-white">
+          Reject Booking
+        </h3>
         <textarea
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder="Reason (optional)"
           rows={3}
           maxLength={500}
-          className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="w-full resize-none rounded-md border border-gray-200 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-white/80 dark:placeholder:text-white/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
         />
         <div className="mt-4 flex justify-end gap-2">
           <Button size="sm" variant="outline" onClick={onCancel}>
@@ -135,13 +137,15 @@ export default function ApprovalsPage() {
     <div className="mx-auto max-w-4xl px-6 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-gray-900">Pending Approvals</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="font-heading text-2xl font-bold text-gray-900 dark:text-white">
+            Pending Approvals
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-white/45">
             Review and approve or reject booking requests.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {toast && <span className="text-sm text-gray-600">{toast}</span>}
+          {toast && <span className="text-sm text-gray-600 dark:text-white/60">{toast}</span>}
           <Button
             variant="outline"
             size="sm"
@@ -161,19 +165,24 @@ export default function ApprovalsPage() {
           Loading…
         </div>
       ) : reservations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-gray-200 bg-gray-50 py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.03] py-16 text-center">
           <CheckCircle className="h-10 w-10 text-green-400" />
-          <p className="font-medium text-gray-600">No pending approvals</p>
-          <p className="text-sm text-gray-400">All booking requests have been reviewed.</p>
+          <p className="font-medium text-gray-600 dark:text-white/60">No pending approvals</p>
+          <p className="text-sm text-gray-400 dark:text-white/35">
+            All booking requests have been reviewed.
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
           {reservations.map((r) => (
-            <div key={r.id} className="rounded-xl border border-yellow-200 bg-white p-5 shadow-sm">
+            <div
+              key={r.id}
+              className="rounded-xl border border-yellow-200 dark:border-yellow-500/25 bg-white dark:bg-[#12131A] p-5 shadow-sm"
+            >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                    <span className="font-heading text-base font-semibold text-gray-900">
+                    <span className="font-heading text-base font-semibold text-gray-900 dark:text-white">
                       {r.title}
                     </span>
                     {r.recurring_group_id && (
@@ -187,24 +196,27 @@ export default function ApprovalsPage() {
                     </span>
                   </div>
 
-                  <div className="space-y-1 text-sm text-gray-600">
+                  <div className="space-y-1 text-sm text-gray-600 dark:text-white/60">
                     <p>
-                      <span className="font-medium text-gray-700">Room:</span> {r.room_name}
+                      <span className="font-medium text-gray-700 dark:text-white/70">Room:</span>{' '}
+                      {r.room_name}
                     </p>
                     <p>
-                      <span className="font-medium text-gray-700">Requested by:</span>{' '}
+                      <span className="font-medium text-gray-700 dark:text-white/70">
+                        Requested by:
+                      </span>{' '}
                       {r.booker_name}
                     </p>
                     <p>
-                      <span className="font-medium text-gray-700">Start:</span>{' '}
+                      <span className="font-medium text-gray-700 dark:text-white/70">Start:</span>{' '}
                       {formatDateTime(r.start_time)}
                     </p>
                     <p>
-                      <span className="font-medium text-gray-700">End:</span>{' '}
+                      <span className="font-medium text-gray-700 dark:text-white/70">End:</span>{' '}
                       {formatDateTime(r.end_time)}
                     </p>
                     {r.notes && (
-                      <p className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-500">
+                      <p className="mt-2 rounded-lg bg-gray-50 dark:bg-white/[0.04] px-3 py-2 text-sm text-gray-500 dark:text-white/45">
                         {r.notes}
                       </p>
                     )}

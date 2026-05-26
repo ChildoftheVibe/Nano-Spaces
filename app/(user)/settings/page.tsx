@@ -507,9 +507,7 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="font-heading mb-6 text-2xl font-bold text-[var(--text-primary)]">
-        Account Settings
-      </h1>
+      <h1 className="font-heading mb-6 text-2xl font-bold text-gray-900">Account Settings</h1>
 
       <Tabs defaultValue={defaultTab}>
         <TabsList className="mb-6 w-full justify-start gap-1">
@@ -525,7 +523,7 @@ export default function SettingsPage() {
         {/* ─── Profile tab ─────────────────────────────────────────────────── */}
         <TabsContent value="profile">
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Display name
             </h2>
             <p className="mb-4 text-sm text-gray-500">
@@ -562,7 +560,7 @@ export default function SettingsPage() {
 
             <div>
               <p className="text-sm text-gray-500">
-                <span className="font-medium text-[var(--text-primary)]">Email address</span>
+                <span className="font-medium text-gray-900">Email address</span>
                 <br />
                 {profile?.email}
               </p>
@@ -577,7 +575,7 @@ export default function SettingsPage() {
         <TabsContent value="security" className="space-y-4">
           {/* Change email */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Change email address
             </h2>
             <p className="mb-4 text-sm text-gray-500">
@@ -631,7 +629,7 @@ export default function SettingsPage() {
 
           {/* Change password */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Change password
             </h2>
             <p className="mb-4 text-sm text-gray-500">
@@ -700,12 +698,12 @@ export default function SettingsPage() {
 
           {/* 2FA */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Two-factor authentication
             </h2>
             <p className="mb-4 text-sm text-gray-500">
               Currently using:{' '}
-              <strong className="font-medium text-[var(--text-primary)]">
+              <strong className="font-medium text-gray-900">
                 {profile?.two_fa_method === 'totp'
                   ? 'Authenticator app (TOTP)'
                   : 'Email one-time code'}
@@ -737,9 +735,7 @@ export default function SettingsPage() {
         <TabsContent value="preferences" className="space-y-4">
           {/* Timezone */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
-              Timezone
-            </h2>
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">Timezone</h2>
             <p className="mb-4 text-sm text-gray-500">Used for scheduling and booking reminders.</p>
 
             <div className="space-y-2">
@@ -778,7 +774,7 @@ export default function SettingsPage() {
 
           {/* Email reminders */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Email reminders
             </h2>
             <p className="mb-4 text-sm text-gray-500">
@@ -822,7 +818,7 @@ export default function SettingsPage() {
 
           {/* Push notifications */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Push notifications
             </h2>
             <p className="mb-4 text-sm text-gray-500">
@@ -853,7 +849,7 @@ export default function SettingsPage() {
           <div className="rounded-xl border bg-white p-6">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="font-heading text-base font-semibold text-[var(--text-primary)]">
+                <h2 className="font-heading text-base font-semibold text-gray-900">
                   Active sessions
                 </h2>
                 <p className="text-sm text-gray-500">
@@ -889,7 +885,7 @@ export default function SettingsPage() {
                 {sessions.map((sess) => (
                   <div key={sess.id} className="flex items-center justify-between py-3">
                     <div>
-                      <p className="text-sm font-medium text-[var(--text-primary)]">
+                      <p className="text-sm font-medium text-gray-900">
                         {parseBrowser(sess.user_agent)} on {parseDevice(sess.user_agent)}
                       </p>
                       <p className="text-xs text-gray-400">
@@ -921,7 +917,7 @@ export default function SettingsPage() {
         <TabsContent value="data" className="space-y-4">
           {/* Export */}
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="font-heading mb-1 text-base font-semibold text-[var(--text-primary)]">
+            <h2 className="font-heading mb-1 text-base font-semibold text-gray-900">
               Export your data
             </h2>
             <p className="mb-4 text-sm text-gray-500">
