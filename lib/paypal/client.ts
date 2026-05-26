@@ -143,14 +143,14 @@ export const PLAN_TIER_MAP: Record<
 > = {
   [env.PAYPAL_STARTER_PLAN_ID]: {
     tier: 'starter',
-    amount: 45,
+    amount: 19.99,
     roomLimit: 5,
     adminLimit: 1,
     userLimit: 100,
   },
   [env.PAYPAL_GROWTH_PLAN_ID]: {
     tier: 'growth',
-    amount: 65,
+    amount: 39.99,
     roomLimit: 20,
     adminLimit: 3,
     userLimit: null,

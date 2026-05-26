@@ -56,7 +56,7 @@ function formatDate(iso: string): string {
   })
 }
 
-const PLAN_PRICES: Record<string, string> = { starter: '$45/mo', growth: '$65/mo' }
+const PLAN_PRICES: Record<string, string> = { starter: '$19.99/mo', growth: '$39.99/mo' }
 const PLAN_LABELS: Record<string, string> = { starter: 'Starter', growth: 'Growth' }
 
 function statusBadge(status: SubscriptionStatus) {
@@ -422,7 +422,7 @@ export default function BillingPage() {
                 {subscribing
                   ? 'Redirecting to PayPal…'
                   : canUpgrade
-                    ? 'Upgrade to Growth — $65/mo'
+                    ? 'Upgrade to Growth — $39.99/mo'
                     : 'Subscribe now'}
               </Button>
             )}
@@ -433,14 +433,14 @@ export default function BillingPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <TierCard
                     tier="starter"
-                    price="$45/mo"
+                    price="$19.99/mo"
                     features={['5 rooms', '1 admin', '100 users']}
                     selected={selectedTier === 'starter'}
                     onClick={() => setSelectedTier('starter')}
                   />
                   <TierCard
                     tier="growth"
-                    price="$65/mo"
+                    price="$39.99/mo"
                     features={['20 rooms', '3 admins', 'Unlimited users']}
                     selected={selectedTier === 'growth'}
                     onClick={() => setSelectedTier('growth')}

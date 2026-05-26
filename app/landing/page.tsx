@@ -784,7 +784,7 @@ export default function LandingPage() {
                   </p>
                   <div className="flex items-baseline gap-1.5">
                     <span className="ns-display text-5xl font-bold text-white tracking-tight">
-                      $29
+                      $19.99
                     </span>
                     <span className="text-sm text-white/25">/month</span>
                   </div>
@@ -836,7 +836,7 @@ export default function LandingPage() {
                   </div>
                   <div className="flex items-baseline gap-1.5">
                     <span className="ns-display text-5xl font-bold text-white tracking-tight">
-                      $79
+                      $39.99
                     </span>
                     <span className="text-sm text-white/25">/month</span>
                   </div>
