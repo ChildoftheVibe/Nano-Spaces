@@ -31,11 +31,12 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
     icon: [
-      { url: '/assets/logos/logo-sm-transparent-dark.png', sizes: '32x32', type: 'image/png' },
-      { url: '/assets/logos/logo-md-transparent-dark.png', sizes: '64x64', type: 'image/png' },
       { url: '/assets/icons/favicon.ico', type: 'image/x-icon' },
+      { url: '/assets/icons/icon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/assets/icons/icon-16x16.png', sizes: '16x16', type: 'image/png' },
     ],
-    apple: [{ url: '/assets/icons/icon-180x180.png', sizes: '180x180' }],
+    apple: [{ url: '/assets/icons/apple-touch-icon.png', sizes: '180x180' }],
+    other: [{ rel: 'msapplication-TileImage', url: '/assets/icons/icon-144x144.png' }],
   },
   appleWebApp: {
     capable: true,
@@ -65,11 +66,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable} ${rajdhani.variable}`}>
       <head>
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/assets/logos/logo-md-transparent-dark.png"
-        />
+        <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/icon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/icon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
+        <meta name="msapplication-TileImage" content="/assets/icons/icon-144x144.png" />
         {/* Apply stored theme before paint to prevent flash */}
         <script
           nonce={nonce}

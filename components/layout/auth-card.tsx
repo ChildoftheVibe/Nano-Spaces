@@ -110,11 +110,11 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
         {/* Logo */}
         <div className="anim-in relative z-10 flex items-center gap-3">
           <Image
-            src="/assets/logos/logo-sm-transparent-dark.png"
+            src="/assets/icons/icon-192x192.png"
             alt="Nano Spaces"
-            width={36}
-            height={36}
-            className="h-9 w-9 object-contain"
+            width={40}
+            height={40}
+            className="h-10 w-auto object-contain"
           />
           <span
             className="text-base font-bold tracking-wide uppercase text-white/80"
@@ -187,11 +187,11 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           {dark ? (
             <>
               <Image
-                src="/assets/logos/logo-sm-transparent-dark.png"
+                src="/assets/icons/icon-192x192.png"
                 alt="Nano Spaces"
-                width={32}
-                height={32}
-                className="h-8 w-8 object-contain"
+                width={40}
+                height={40}
+                className="h-10 w-auto object-contain"
               />
               <span
                 className="text-sm font-bold tracking-wide uppercase text-white/80"
@@ -206,11 +206,11 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           ) : (
             <>
               <Image
-                src="/assets/logos/logo-sm-transparent-dark.png"
+                src="/assets/icons/icon-192x192.png"
                 alt="Nano Spaces"
-                width={32}
-                height={32}
-                className="h-8 w-8 object-contain"
+                width={40}
+                height={40}
+                className="h-10 w-auto object-contain"
               />
               <span
                 className="text-sm font-bold tracking-wide uppercase text-[var(--ns-dark)]"

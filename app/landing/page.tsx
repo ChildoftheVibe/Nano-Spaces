@@ -387,11 +387,11 @@ export default function LandingPage() {
             className="flex items-center gap-2.5 text-sm font-semibold tracking-tight shrink-0"
           >
             <Image
-              src="/assets/logos/logo-sm-transparent-dark.png"
+              src="/assets/icons/icon-192x192.png"
               alt="Nano Spaces"
               width={40}
               height={40}
-              className="h-10 w-10 object-contain"
+              className="h-10 w-auto object-contain"
             />
             <span className="ns-display">Nano Spaces</span>
           </a>
@@ -950,11 +950,11 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <Image
-              src="/assets/logos/logo-sm-transparent-dark.png"
+              src="/assets/icons/icon-192x192.png"
               alt="Nano Spaces"
               width={28}
               height={28}
-              className="h-7 w-7 object-contain opacity-50"
+              className="h-7 w-auto object-contain opacity-50"
             />
             <span className="ns-display text-sm font-semibold text-white/50">Nano Spaces</span>
           </div>
