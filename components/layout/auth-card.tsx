@@ -110,7 +110,7 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
         {/* Logo */}
         <div className="anim-in relative z-10 flex items-center gap-3">
           <Image
-            src="/assets/icons/icon-192x192.png"
+            src="/assets/icons/icon-transparent.png"
             alt="Nano Spaces"
             width={40}
             height={40}
@@ -187,7 +187,7 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           {dark ? (
             <>
               <Image
-                src="/assets/icons/icon-192x192.png"
+                src="/assets/icons/icon-transparent.png"
                 alt="Nano Spaces"
                 width={40}
                 height={40}
@@ -206,7 +206,7 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           ) : (
             <>
               <Image
-                src="/assets/icons/icon-192x192.png"
+                src="/assets/icons/icon-transparent.png"
                 alt="Nano Spaces"
                 width={40}
                 height={40}

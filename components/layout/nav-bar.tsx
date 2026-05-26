@@ -54,7 +54,7 @@ export default function NavBar({
         {/* Brand — logo + name */}
         <Link href={brandHref} className="flex items-center gap-2.5 shrink-0 group">
           <Image
-            src="/assets/icons/icon-192x192.png"
+            src="/assets/icons/icon-transparent.png"
             alt="Nano Spaces"
             width={40}
             height={40}
