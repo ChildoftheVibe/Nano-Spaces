@@ -20,7 +20,6 @@ import {
   AlertTriangle,
   Shield,
 } from 'lucide-react'
-import { fromZonedTime } from 'date-fns-tz'
 import { createEvent, createEvents } from 'ics'
 import type { EventAttributes } from 'ics'
 import { QRCodeSVG } from 'qrcode.react'
@@ -407,7 +406,6 @@ function RecurringSection({
 
 function NewBookingModal({
   rooms,
-  userTimezone,
   defaultDate,
   defaultStartTime,
   prefill,
@@ -416,7 +414,6 @@ function NewBookingModal({
   onBooked,
 }: {
   rooms: Room[]
-  userTimezone: string
   defaultDate?: string
   defaultStartTime?: string
   prefill?: Partial<BookingFormData>
@@ -498,14 +495,10 @@ function NewBookingModal({
   }
 
   const onSubmit = async (data: BookingFormData) => {
-    const startIso = fromZonedTime(
-      new Date(`${data.date}T${data.start_time_local}`),
-      userTimezone,
-    ).toISOString()
-    const endIso = fromZonedTime(
-      new Date(`${data.date}T${data.end_time_local}`),
-      userTimezone,
-    ).toISOString()
+    // No-suffix date strings are treated as local time by the browser;
+    // toISOString() converts them to UTC — no manual tz conversion needed.
+    const startIso = new Date(`${data.date}T${data.start_time_local}`).toISOString()
+    const endIso = new Date(`${data.date}T${data.end_time_local}`).toISOString()
 
     const body: Record<string, unknown> = {
       location_id: data.location_id,
@@ -1212,7 +1205,6 @@ function WaitlistConfirmModal({
 
 export default function CalendarClient() {
   const calendarRef = useRef<FullCalendar>(null)
-  const [userTimezone, setUserTimezone] = useState('UTC')
   const [userRole, setUserRole] = useState<string>('user')
   const [rooms, setRooms] = useState<Room[]>([])
   const [selectedRoom, setSelectedRoom] = useState('')
@@ -1251,7 +1243,6 @@ export default function CalendarClient() {
     ]).then(([profileJson, roomsJson]) => {
       const profile = (profileJson as { data?: { profile?: { timezone?: string; role?: string } } })
         .data?.profile
-      setUserTimezone(profile?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone)
       setUserRole(profile?.role ?? 'user')
       setRooms((roomsJson as { data?: { rooms?: Room[] } }).data?.rooms ?? [])
     })
@@ -1687,7 +1678,7 @@ export default function CalendarClient() {
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView={currentView}
-                timeZone={userTimezone}
+                timeZone="local"
                 headerToolbar={false}
                 height="auto"
                 contentHeight={640}
@@ -1737,7 +1728,6 @@ export default function CalendarClient() {
       {modal.type === 'new' && (
         <NewBookingModal
           rooms={rooms}
-          userTimezone={userTimezone}
           isAdmin={userRole === 'super_admin'}
           {...(modal.date !== undefined ? { defaultDate: modal.date } : {})}
           {...(modal.startTime !== undefined ? { defaultStartTime: modal.startTime } : {})}
