@@ -15,7 +15,7 @@ function buildCsp(nonce: string): string {
     // unsafe-inline needed for Tailwind + Next.js inline styles
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' https://fonts.gstatic.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
     // Supabase REST + realtime WebSocket, Sentry, Turnstile
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://challenges.cloudflare.com",
     // Turnstile + PayPal render inside iframes
