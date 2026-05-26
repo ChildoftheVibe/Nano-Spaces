@@ -277,7 +277,7 @@ const steps = [
   },
 ]
 const starterFeatures = [
-  'Up to 10 rooms',
+  'Up to 5 rooms',
   'Up to 50 users',
   'Calendar & recurring bookings',
   'Email notifications',
