@@ -313,8 +313,7 @@ export default function LandingPage() {
     const ctx = gsap.context(() => {
       gsap.from('.hero-el', {
         y: 40,
-        opacity: 0,
-        filter: 'blur(8px)',
+        autoAlpha: 0,
         duration: 1,
         stagger: 0.11,
         ease: 'power3.out',
@@ -517,10 +516,8 @@ export default function LandingPage() {
           }}
         >
           Your spaces,{' '}
-          <span className="relative">
-            <span className="bg-gradient-to-r from-[#FA5D0C] via-[#7C6FFA] to-[#4FBADB] bg-clip-text text-transparent">
-              perfectly booked
-            </span>
+          <span className="bg-gradient-to-r from-[#FA5D0C] via-[#7C6FFA] to-[#4FBADB] bg-clip-text text-transparent">
+            perfectly booked
           </span>
         </h1>
 
