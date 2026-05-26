@@ -61,11 +61,26 @@ const PLAN_LABELS: Record<string, string> = { starter: 'Starter', growth: 'Growt
 
 function statusBadge(status: SubscriptionStatus) {
   const map: Record<SubscriptionStatus, { label: string; cls: string }> = {
-    trial: { label: 'Trial', cls: 'bg-blue-100 text-blue-700' },
-    active: { label: 'Active', cls: 'bg-green-100 text-green-700' },
-    grace: { label: 'Grace Period', cls: 'bg-yellow-100 text-yellow-700' },
-    inactive: { label: 'Inactive', cls: 'bg-red-100 text-red-700' },
-    expired: { label: 'Expired', cls: 'bg-red-100 text-red-700' },
+    trial: {
+      label: 'Trial',
+      cls: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+    },
+    active: {
+      label: 'Active',
+      cls: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+    },
+    grace: {
+      label: 'Grace Period',
+      cls: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300',
+    },
+    inactive: {
+      label: 'Inactive',
+      cls: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300',
+    },
+    expired: {
+      label: 'Expired',
+      cls: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300',
+    },
   }
   const { label, cls } = map[status]
   return (
@@ -80,8 +95,8 @@ function statusBadge(status: SubscriptionStatus) {
 function UsageBar({ current, limit }: { current: number; limit: number | null }) {
   if (limit === null) {
     return (
-      <span className="text-sm text-gray-500">
-        {current} / <span className="font-medium text-gray-700">Unlimited</span>
+      <span className="text-sm text-gray-500 dark:text-white/40">
+        {current} / <span className="font-medium text-gray-700 dark:text-white/70">Unlimited</span>
       </span>
     )
   }
@@ -90,12 +105,12 @@ function UsageBar({ current, limit }: { current: number; limit: number | null })
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-600">
+        <span className="text-gray-600 dark:text-white/60">
           {current} / {limit}
         </span>
-        <span className="text-xs text-gray-400">{pct}%</span>
+        <span className="text-xs text-gray-400 dark:text-white/35">{pct}%</span>
       </div>
-      <div className="h-1.5 w-full rounded-full bg-gray-100">
+      <div className="h-1.5 w-full rounded-full bg-gray-100 dark:bg-white/[0.08]">
         <div
           className={`h-1.5 rounded-full transition-all ${color}`}
           style={{ width: `${pct}%` }}
@@ -113,7 +128,11 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
   const urgent = days <= 2
   return (
     <div
-      className={`rounded-lg border px-4 py-3 text-sm ${urgent ? 'border-red-200 bg-red-50 text-red-800' : 'border-blue-200 bg-blue-50 text-blue-800'}`}
+      className={`rounded-lg border px-4 py-3 text-sm ${
+        urgent
+          ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-500/30 dark:bg-red-500/[0.08] dark:text-red-300'
+          : 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-500/30 dark:bg-blue-500/[0.08] dark:text-blue-300'
+      }`}
     >
       <strong>Free trial:</strong>{' '}
       {days === 0 ? 'Your trial expires today.' : `${days} day${days === 1 ? '' : 's'} remaining.`}{' '}
@@ -126,7 +145,7 @@ function GraceBanner({ graceEndsAt }: { graceEndsAt: string }) {
   const days = daysUntil(graceEndsAt)
   if (days < 0) return null
   return (
-    <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+    <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-500/30 dark:bg-yellow-500/[0.08] dark:text-yellow-300">
       <strong>Grace period:</strong> Your subscription was cancelled.{' '}
       {days === 0
         ? 'Access ends today.'
@@ -138,7 +157,7 @@ function GraceBanner({ graceEndsAt }: { graceEndsAt: string }) {
 
 function InactiveBanner() {
   return (
-    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/[0.08] dark:text-red-300">
       <strong>Subscription required.</strong> Your trial or subscription has ended. Subscribe to
       restore access for your team.
     </div>
@@ -147,13 +166,16 @@ function InactiveBanner() {
 
 function SuccessBanner({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-500/30 dark:bg-green-500/[0.08] dark:text-green-300">
       <div className="flex items-center justify-between">
         <span>
           <strong>Subscription initiated!</strong> It may take a few minutes to activate. Refresh
           this page shortly to see your updated status.
         </span>
-        <button onClick={onDismiss} className="ml-4 text-green-600 hover:text-green-800">
+        <button
+          onClick={onDismiss}
+          className="ml-4 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200"
+        >
           ✕
         </button>
       </div>
@@ -182,13 +204,13 @@ function TierCard({
       onClick={onClick}
       className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
         selected
-          ? 'border-[var(--brand-primary)] bg-[#EEF3FF]'
-          : 'border-gray-200 bg-white hover:border-gray-300'
+          ? 'border-[var(--brand-primary)] bg-[#EEF3FF] dark:bg-[var(--brand-primary)]/[0.1]'
+          : 'border-gray-200 bg-white hover:border-gray-300 dark:border-white/[0.1] dark:bg-[#0e0f18] dark:hover:border-white/[0.2]'
       }`}
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="font-heading font-semibold text-[var(--text-primary)]">
+          <p className="font-heading font-semibold text-gray-900 dark:text-white/90">
             {PLAN_LABELS[tier] ?? tier}
           </p>
           <p className="text-sm font-bold text-[var(--brand-primary)]">{price}</p>
@@ -210,7 +232,7 @@ function TierCard({
       </div>
       <ul className="mt-2 space-y-1">
         {features.map((f) => (
-          <li key={f} className="text-xs text-gray-500">
+          <li key={f} className="text-xs text-gray-500 dark:text-white/40">
             · {f}
           </li>
         ))}
@@ -324,10 +346,13 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-10">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-white/[0.08]" />
         <div className="mt-6 space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-lg bg-gray-100" />
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-lg bg-gray-100 dark:bg-white/[0.05]"
+            />
           ))}
         </div>
       </div>
@@ -337,7 +362,9 @@ export default function BillingPage() {
   if (error || !org) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-10">
-        <p className="text-sm text-red-600">{error ?? 'Unable to load billing.'}</p>
+        <p className="text-sm text-red-600 dark:text-red-400">
+          {error ?? 'Unable to load billing.'}
+        </p>
         <button
           onClick={() => void loadBilling()}
           className="mt-3 text-sm text-[var(--brand-primary)] hover:underline"
@@ -359,14 +386,14 @@ export default function BillingPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-10">
       <div>
-        <h1 className="font-heading text-2xl font-bold text-[var(--text-primary)]">Billing</h1>
-        <p className="mt-1 text-sm text-gray-500">{org.display_name}</p>
+        <h1 className="font-heading text-2xl font-bold text-gray-900 dark:text-white">Billing</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-white/40">{org.display_name}</p>
       </div>
 
       {/* Status banners */}
       {showSuccess && <SuccessBanner onDismiss={() => setShowSuccess(false)} />}
       {showCancelledNotice && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 dark:border-white/[0.07] dark:bg-white/[0.03] dark:text-white/50">
           Subscription checkout was cancelled. No changes were made.
         </div>
       )}
@@ -377,32 +404,38 @@ export default function BillingPage() {
       {(status === 'inactive' || status === 'expired') && <InactiveBanner />}
 
       {/* Plan card */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/[0.07] dark:bg-[#12131A] dark:shadow-none">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-white/35">
               Current Plan
             </p>
-            <p className="mt-1 font-heading text-xl font-bold text-[var(--text-primary)]">
+            <p className="mt-1 font-heading text-xl font-bold text-gray-900 dark:text-white">
               {PLAN_LABELS[org.subscription_tier] ?? org.subscription_tier}
               {status === 'trial' && (
-                <span className="ml-2 text-sm font-normal text-gray-400">(Free Trial)</span>
+                <span className="ml-2 text-sm font-normal text-gray-400 dark:text-white/35">
+                  (Free Trial)
+                </span>
               )}
             </p>
             {status === 'active' && (
-              <p className="text-sm text-gray-500">{PLAN_PRICES[org.subscription_tier]}</p>
+              <p className="text-sm text-gray-500 dark:text-white/40">
+                {PLAN_PRICES[org.subscription_tier]}
+              </p>
             )}
           </div>
           {statusBadge(status)}
         </div>
 
         {status === 'active' && org.subscription_expires_at && (
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-500 dark:text-white/40">
             Renews {formatDate(org.subscription_expires_at)}
           </p>
         )}
         {status === 'trial' && org.trial_ends_at && (
-          <p className="mt-2 text-sm text-gray-500">Trial ends {formatDate(org.trial_ends_at)}</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-white/40">
+            Trial ends {formatDate(org.trial_ends_at)}
+          </p>
         )}
 
         {(canSubscribe || canUpgrade) && isOrgAdmin && (
@@ -429,7 +462,9 @@ export default function BillingPage() {
 
             {showTierPicker && !canUpgrade && (
               <div className="space-y-3">
-                <p className="text-sm font-medium text-[var(--text-primary)]">Choose a plan:</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white/80">
+                  Choose a plan:
+                </p>
                 <div className="grid grid-cols-2 gap-3">
                   <TierCard
                     tier="starter"
@@ -474,7 +509,7 @@ export default function BillingPage() {
           <div className="mt-4">
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="text-sm text-gray-400 hover:text-red-600 hover:underline"
+              className="text-sm text-gray-400 hover:text-red-600 hover:underline dark:text-white/30 dark:hover:text-red-400"
             >
               Cancel subscription
             </button>
@@ -482,8 +517,8 @@ export default function BillingPage() {
         )}
 
         {showCancelConfirm && (
-          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
-            <p className="text-sm text-red-800">
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-500/30 dark:bg-red-500/[0.08]">
+            <p className="text-sm text-red-800 dark:text-red-300">
               <strong>Cancel subscription?</strong> Your team will have a 5-day grace period, then
               lose access. Your data will be preserved.
             </p>
@@ -491,7 +526,7 @@ export default function BillingPage() {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-red-300 text-red-700 hover:bg-red-100"
+                className="border-red-300 text-red-700 hover:bg-red-100 dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
                 onClick={handleCancel}
                 disabled={cancelling}
               >
@@ -512,23 +547,23 @@ export default function BillingPage() {
 
       {/* Seat usage */}
       {seatUsage && (status === 'active' || status === 'trial' || status === 'grace') && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="font-heading text-base font-semibold text-[var(--text-primary)]">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/[0.07] dark:bg-[#12131A] dark:shadow-none">
+          <h2 className="font-heading text-base font-semibold text-gray-900 dark:text-white">
             Seat usage
           </h2>
           <div className="mt-4 space-y-4">
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700">Rooms</p>
+              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-white/60">Rooms</p>
               <UsageBar current={seatUsage.rooms.current} limit={seatUsage.rooms.limit} />
             </div>
-            <Separator />
+            <Separator className="dark:border-white/[0.06]" />
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700">Admins</p>
+              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-white/60">Admins</p>
               <UsageBar current={seatUsage.admins.current} limit={seatUsage.admins.limit} />
             </div>
-            <Separator />
+            <Separator className="dark:border-white/[0.06]" />
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700">Users</p>
+              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-white/60">Users</p>
               <UsageBar current={seatUsage.users.current} limit={seatUsage.users.limit} />
             </div>
           </div>
@@ -537,17 +572,17 @@ export default function BillingPage() {
 
       {/* Invoice history */}
       {isOrgAdmin && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="font-heading text-base font-semibold text-[var(--text-primary)]">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/[0.07] dark:bg-[#12131A] dark:shadow-none">
+          <h2 className="font-heading text-base font-semibold text-gray-900 dark:text-white">
             Invoice history
           </h2>
           {invoices.length === 0 ? (
-            <p className="mt-4 text-sm text-gray-400">No invoices yet.</p>
+            <p className="mt-4 text-sm text-gray-400 dark:text-white/30">No invoices yet.</p>
           ) : (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs font-medium uppercase tracking-wide text-gray-400">
+                  <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase tracking-wide text-gray-400 dark:border-white/[0.06] dark:text-white/35">
                     <th className="pb-2 pr-4">Date</th>
                     <th className="pb-2 pr-4">Plan</th>
                     <th className="pb-2 pr-4">Amount</th>
@@ -557,13 +592,20 @@ export default function BillingPage() {
                 </thead>
                 <tbody>
                   {invoices.map((inv) => (
-                    <tr key={inv.id} className="border-b last:border-0 hover:bg-gray-50">
-                      <td className="py-3 pr-4 text-gray-600">{formatDate(inv.created_at)}</td>
-                      <td className="py-3 pr-4 capitalize text-gray-700">{inv.tier}</td>
-                      <td className="py-3 pr-4 font-medium text-gray-700">
+                    <tr
+                      key={inv.id}
+                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50 dark:border-white/[0.04] dark:hover:bg-white/[0.03]"
+                    >
+                      <td className="py-3 pr-4 text-gray-600 dark:text-white/55">
+                        {formatDate(inv.created_at)}
+                      </td>
+                      <td className="py-3 pr-4 capitalize text-gray-700 dark:text-white/70">
+                        {inv.tier}
+                      </td>
+                      <td className="py-3 pr-4 font-medium text-gray-700 dark:text-white/70">
                         ${Number(inv.amount_usd).toFixed(2)}
                       </td>
-                      <td className="py-3 pr-4 text-xs text-gray-500">
+                      <td className="py-3 pr-4 text-xs text-gray-500 dark:text-white/40">
                         {formatDate(inv.billing_period_start)} –{' '}
                         {formatDate(inv.billing_period_end)}
                       </td>
@@ -578,7 +620,7 @@ export default function BillingPage() {
                             PDF
                           </a>
                         ) : (
-                          <span className="text-gray-300">—</span>
+                          <span className="text-gray-300 dark:text-white/20">—</span>
                         )}
                       </td>
                     </tr>
