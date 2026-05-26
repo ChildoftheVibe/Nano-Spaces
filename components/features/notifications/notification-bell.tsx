@@ -131,7 +131,7 @@ export default function NotificationBell() {
               {unread > 0 && (
                 <button
                   onClick={() => void markAllRead()}
-                  className="flex items-center gap-1 text-xs text-[#4F7EFA] hover:underline"
+                  className="flex items-center gap-1 text-xs text-[#FA5D0C] hover:underline"
                 >
                   <CheckCheck className="h-3.5 w-3.5" />
                   Mark all read
@@ -167,7 +167,7 @@ export default function NotificationBell() {
                       {n.title}
                     </p>
                     {!n.read && (
-                      <span className="mt-1 h-2 w-2 rounded-full bg-[#4F7EFA] shrink-0" />
+                      <span className="mt-1 h-2 w-2 rounded-full bg-[#FA5D0C] shrink-0" />
                     )}
                   </div>
                   <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{n.body}</p>
@@ -181,7 +181,7 @@ export default function NotificationBell() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="w-full py-2.5 text-xs text-[#4F7EFA] hover:underline disabled:opacity-50"
+                className="w-full py-2.5 text-xs text-[#FA5D0C] hover:underline disabled:opacity-50"
               >
                 {loading ? 'Loading…' : 'Load more'}
               </button>

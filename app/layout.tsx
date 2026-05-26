@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans, Inter, Rajdhani } from 'next/font/google'
 import { headers } from 'next/headers'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import './globals.css'
@@ -14,24 +14,46 @@ const jakarta = Plus_Jakarta_Sans({
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  weight: ['400', '500'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+})
+
+const rajdhani = Rajdhani({
+  subsets: ['latin'],
+  variable: '--font-rajdhani',
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
 })
 
 export const metadata: Metadata = {
   title: 'Nano Spaces',
-  description: 'Multi-tenant scheduling platform — book shared rooms and spaces for your team.',
+  description: 'Nano Spaces — precision space management for your team.',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/assets/icons/favicon.ico', type: 'image/x-icon' },
+      { url: '/assets/icons/icon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/assets/icons/icon-180x180.png', sizes: '180x180' }],
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Nano Spaces',
   },
   formatDetection: { telephone: false },
+  openGraph: {
+    siteName: 'Nano Spaces',
+    images: [{ url: '/assets/logos/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/assets/logos/og-image.png'],
+  },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#4F7EFA',
+  themeColor: '#FA5D0C',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -40,9 +62,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const nonce = headers().get('x-nonce') ?? ''
   return (
-    <html lang="en" className={`${jakarta.variable} ${inter.variable}`}>
+    <html lang="en" className={`${jakarta.variable} ${inter.variable} ${rajdhani.variable}`}>
       <head>
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-180x180.png" />
         {/* Apply stored theme before paint to prevent flash */}
         <script
           nonce={nonce}

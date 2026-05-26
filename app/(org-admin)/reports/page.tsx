@@ -536,7 +536,7 @@ function UtilizationTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: O
   const barColor = (pct: number) => {
     if (pct >= 75) return 'bg-red-400'
     if (pct >= 50) return 'bg-amber-400'
-    if (pct >= 25) return 'bg-[#4F7EFA]'
+    if (pct >= 25) return 'bg-[#FA5D0C]'
     return 'bg-gray-300'
   }
 
@@ -652,7 +652,7 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
   const intensity = (count: number): string => {
     if (count === 0) return 'bg-gray-50 dark:bg-white/[0.03] text-gray-300 dark:text-white/20'
     const pct = count / maxVal
-    if (pct >= 0.8) return 'bg-[#4F7EFA] text-white'
+    if (pct >= 0.8) return 'bg-[#FA5D0C] text-white'
     if (pct >= 0.6) return 'bg-blue-300 text-white'
     if (pct >= 0.4) return 'bg-blue-200 text-blue-900'
     if (pct >= 0.2) return 'bg-blue-100 text-blue-700'
@@ -720,7 +720,7 @@ function PeakHoursTab({ isSuperAdmin, orgs }: { isSuperAdmin: boolean; orgs: Org
           {/* Legend */}
           <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 dark:text-white/45">
             <span>Low</span>
-            {['bg-blue-50', 'bg-blue-100', 'bg-blue-200', 'bg-blue-300', 'bg-[#4F7EFA]'].map(
+            {['bg-blue-50', 'bg-blue-100', 'bg-blue-200', 'bg-blue-300', 'bg-[#FA5D0C]'].map(
               (c, i) => (
                 <div
                   key={i}
@@ -922,7 +922,7 @@ function OrgExportTab() {
     <div className="max-w-lg">
       <div className="rounded-xl border dark:border-white/[0.07] bg-white dark:bg-[#12131A] p-6">
         <div className="flex items-start gap-3 mb-4">
-          <Database className="h-8 w-8 text-[#4F7EFA] mt-0.5 shrink-0" />
+          <Database className="h-8 w-8 text-[#FA5D0C] mt-0.5 shrink-0" />
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">Full Org Data Export</h3>
             <p className="text-sm text-gray-500 dark:text-white/45 mt-1">
@@ -940,7 +940,7 @@ function OrgExportTab() {
             'blackouts.csv — All blackout dates',
           ].map((item) => (
             <li key={item} className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#4F7EFA] shrink-0" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#FA5D0C] shrink-0" />
               {item}
             </li>
           ))}
@@ -955,7 +955,7 @@ function OrgExportTab() {
         <button
           onClick={() => void doExport()}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#4F7EFA] px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#FA5D0C] px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50 transition-colors"
         >
           <Download className="h-4 w-4" />
           {loading ? 'Preparing export…' : 'Download ZIP'}
@@ -1025,7 +1025,7 @@ export default function ReportsPage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-8">
       <div className="flex items-center gap-2 mb-6">
-        <FileText className="h-5 w-5 text-[#4F7EFA]" />
+        <FileText className="h-5 w-5 text-[#FA5D0C]" />
         <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Reports</h1>
       </div>
 
@@ -1037,7 +1037,7 @@ export default function ReportsPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
               activeTab === tab.id
-                ? 'border-[#4F7EFA] text-[#4F7EFA]'
+                ? 'border-[#FA5D0C] text-[#FA5D0C]'
                 : 'border-transparent text-gray-500 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/70'
             }`}
           >

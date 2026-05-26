@@ -20,6 +20,16 @@ const config: Config = {
     },
     extend: {
       colors: {
+        /* Nano Spaces brand palette */
+        'ns-accent': '#FA5D0C',
+        'ns-accent-hover': '#D94E08',
+        'ns-accent-light': '#FEE8DC',
+        'ns-main': '#556A7B',
+        'ns-dark': '#141033',
+        'ns-dark-surface': '#1C1845',
+        'ns-dark-border': '#2C2948',
+        'ns-alternate': '#C5CED5',
+        'ns-muted': '#7A8FA0',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

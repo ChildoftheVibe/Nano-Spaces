@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
 
@@ -80,20 +81,20 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
         <div
           className="orb-a pointer-events-none absolute -top-[15%] -left-[10%] h-[65%] w-[65%] rounded-full opacity-25"
           style={{
-            background: 'radial-gradient(circle, rgba(79,126,250,0.55) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(250,93,12,0.55) 0%, transparent 70%)',
           }}
         />
         <div
           className="orb-b pointer-events-none absolute -bottom-[10%] -right-[20%] h-[70%] w-[70%] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(217,78,8,0.45) 0%, transparent 70%)',
             opacity: 0.18,
           }}
         />
         <div
           className="orb-c pointer-events-none absolute top-[55%] left-[35%] h-[45%] w-[45%] rounded-full opacity-10"
           style={{
-            background: 'radial-gradient(circle, rgba(16,185,129,0.5) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(254,232,220,0.5) 0%, transparent 70%)',
           }}
         />
 
@@ -106,25 +107,30 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           }}
         />
 
-        {/* Logo — Double-Bezel mark */}
+        {/* Logo */}
         <div className="anim-in relative z-10 flex items-center gap-3">
-          <div className="rounded-[14px] bg-white/[0.06] ring-1 ring-white/[0.10] p-[5px]">
-            <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#4F7EFA] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
-                <rect x="11" y="2" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.55" />
-                <rect x="2" y="11" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.55" />
-                <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
-              </svg>
-            </div>
-          </div>
-          <span className="text-base font-semibold tracking-tight text-white/75">Nano Spaces</span>
+          <Image
+            src="/assets/logos/logo-sm-dark.png"
+            alt="Nano Spaces"
+            width={36}
+            height={36}
+            className="h-9 w-9 object-contain"
+          />
+          <span
+            className="text-base font-bold tracking-wide uppercase text-white/80"
+            style={{
+              fontFamily: 'var(--font-rajdhani), Rajdhani, sans-serif',
+              letterSpacing: '0.06em',
+            }}
+          >
+            Nano Spaces
+          </span>
         </div>
 
         {/* Headline + features */}
         <div className="relative z-10 space-y-10">
           <div className="anim-in">
-            <span className="inline-flex rounded-full border border-[#4F7EFA]/30 bg-[#4F7EFA]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4F7EFA]">
+            <span className="inline-flex rounded-full border border-[#FA5D0C]/30 bg-[#FA5D0C]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FA5D0C]">
               Space management platform
             </span>
           </div>
@@ -147,11 +153,11 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           <ul className="anim-in space-y-3.5">
             {FEATURES.map((f) => (
               <li key={f} className="flex items-center gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#4F7EFA]/15 ring-1 ring-[#4F7EFA]/25">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FA5D0C]/15 ring-1 ring-[#FA5D0C]/25">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
                     <path
                       d="M2 5.5L4.2 7.5L8 3"
-                      stroke="#4F7EFA"
+                      stroke="#FA5D0C"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -177,48 +183,44 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
         )}
       >
         {/* Mobile logo */}
-        <div className="mb-10 flex items-center gap-2 lg:hidden">
+        <div className="mb-10 flex items-center gap-2.5 lg:hidden">
           {dark ? (
             <>
-              <div className="rounded-xl bg-white/[0.06] ring-1 ring-white/10 p-[4px]">
-                <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#4F7EFA]">
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
-                    <rect
-                      x="11"
-                      y="2"
-                      width="7"
-                      height="7"
-                      rx="1.5"
-                      fill="white"
-                      fillOpacity="0.6"
-                    />
-                    <rect
-                      x="2"
-                      y="11"
-                      width="7"
-                      height="7"
-                      rx="1.5"
-                      fill="white"
-                      fillOpacity="0.6"
-                    />
-                    <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
-                  </svg>
-                </div>
-              </div>
-              <span className="text-sm font-semibold text-white/75">Nano Spaces</span>
+              <Image
+                src="/assets/logos/logo-sm-dark.png"
+                alt="Nano Spaces"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
+              <span
+                className="text-sm font-bold tracking-wide uppercase text-white/80"
+                style={{
+                  fontFamily: 'var(--font-rajdhani), Rajdhani, sans-serif',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Nano Spaces
+              </span>
             </>
           ) : (
             <>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7EFA]">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
-                  <rect x="11" y="2" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
-                  <rect x="2" y="11" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
-                  <rect x="11" y="11" width="7" height="7" rx="1.5" fill="white" />
-                </svg>
-              </div>
-              <span className="text-base font-bold text-gray-900">Nano Spaces</span>
+              <Image
+                src="/assets/logos/logo-sm-light.png"
+                alt="Nano Spaces"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
+              <span
+                className="text-sm font-bold tracking-wide uppercase text-[var(--ns-dark)]"
+                style={{
+                  fontFamily: 'var(--font-rajdhani), Rajdhani, sans-serif',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Nano Spaces
+              </span>
             </>
           )}
         </div>

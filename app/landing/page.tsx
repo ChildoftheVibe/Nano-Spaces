@@ -160,12 +160,12 @@ const CalendarPreview = () => {
     room: string
     color: string
   }[] = [
-    { day: 0, start: 9, span: 2, title: 'Design Sync', room: 'Conf A', color: '#4F7EFA' },
+    { day: 0, start: 9, span: 2, title: 'Design Sync', room: 'Conf A', color: '#FA5D0C' },
     { day: 1, start: 11, span: 1, title: 'Stand-up', room: 'Lounge', color: '#7C6FFA' },
-    { day: 2, start: 10, span: 3, title: 'Board Review', room: 'Board Rm', color: '#4F7EFA' },
+    { day: 2, start: 10, span: 3, title: 'Board Review', room: 'Board Rm', color: '#FA5D0C' },
     { day: 3, start: 14, span: 2, title: 'All Hands', room: 'Conf B', color: '#34C97B' },
     { day: 4, start: 9, span: 1, title: 'Retro', room: 'Conf A', color: '#7C6FFA' },
-    { day: 4, start: 15, span: 2, title: 'Planning', room: 'Board Rm', color: '#4F7EFA' },
+    { day: 4, start: 15, span: 2, title: 'Planning', room: 'Board Rm', color: '#FA5D0C' },
   ]
   return (
     <div className="flex h-full text-[10px]">
@@ -357,7 +357,7 @@ export default function LandingPage() {
         <div
           className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(79,126,250,0.09) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(250,93,12,0.09) 0%, transparent 65%)',
           }}
         />
         <div
@@ -369,7 +369,7 @@ export default function LandingPage() {
         <div
           className="absolute top-[30%] -left-[10%] w-[500px] h-[500px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(79,126,250,0.05) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(250,93,12,0.05) 0%, transparent 65%)',
           }}
         />
       </div>
@@ -385,7 +385,7 @@ export default function LandingPage() {
             href="/landing"
             className="flex items-center gap-2.5 text-sm font-semibold tracking-tight shrink-0"
           >
-            <div className="w-7 h-7 rounded-lg bg-[#4F7EFA] flex items-center justify-center shadow-[0_0_16px_rgba(79,126,250,0.5)]">
+            <div className="w-7 h-7 rounded-lg bg-[#FA5D0C] flex items-center justify-center shadow-[0_0_16px_rgba(250,93,12,0.5)]">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM11 11h2v2h-2z" fill="white" />
               </svg>
@@ -418,9 +418,9 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/signup"
-              className="group flex items-center gap-2 rounded-full bg-[#4F7EFA] px-4 py-2 text-xs font-semibold text-white
+              className="group flex items-center gap-2 rounded-full bg-[#FA5D0C] px-4 py-2 text-xs font-semibold text-white
               transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]
-              hover:bg-[#3D6FE8] hover:shadow-[0_0_24px_rgba(79,126,250,0.4)] active:scale-[0.97]"
+              hover:bg-[#D94E08] hover:shadow-[0_0_24px_rgba(250,93,12,0.4)] active:scale-[0.97]"
             >
               Start free trial
               <span
@@ -479,7 +479,7 @@ export default function LandingPage() {
             <Link
               href="/signup"
               onClick={() => setMenuOpen(false)}
-              className="rounded-full bg-[#4F7EFA] px-8 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(79,126,250,0.4)]"
+              className="rounded-full bg-[#FA5D0C] px-8 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(250,93,12,0.4)]"
             >
               Start free trial
             </Link>
@@ -496,7 +496,7 @@ export default function LandingPage() {
             text-[10px] uppercase tracking-[0.2em] font-medium
             border border-white/[0.1] bg-white/[0.04] text-white/40"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4F7EFA] shadow-[0_0_8px_rgba(79,126,250,0.8)]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FA5D0C] shadow-[0_0_8px_rgba(250,93,12,0.8)]" />
             Multi-tenant space booking platform
           </span>
         </div>
@@ -505,7 +505,7 @@ export default function LandingPage() {
         <h1 className="hero-el ns-display text-[clamp(44px,7vw,88px)] font-bold leading-[1.02] tracking-tight max-w-4xl">
           Your spaces,{' '}
           <span className="relative">
-            <span className="bg-gradient-to-r from-[#4F7EFA] via-[#7C6FFA] to-[#4FBADB] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#FA5D0C] via-[#7C6FFA] to-[#4FBADB] bg-clip-text text-transparent">
               perfectly booked
             </span>
           </span>
@@ -521,10 +521,10 @@ export default function LandingPage() {
         <div className="hero-el mt-9 flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/signup"
-            className="group flex items-center gap-2.5 rounded-full bg-[#4F7EFA] px-7 py-3.5 text-sm font-semibold text-white
+            className="group flex items-center gap-2.5 rounded-full bg-[#FA5D0C] px-7 py-3.5 text-sm font-semibold text-white
             transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]
-            hover:bg-[#3D6FE8] hover:shadow-[0_0_48px_rgba(79,126,250,0.45)] active:scale-[0.97]
-            shadow-[0_0_32px_rgba(79,126,250,0.3)]"
+            hover:bg-[#D94E08] hover:shadow-[0_0_48px_rgba(250,93,12,0.45)] active:scale-[0.97]
+            shadow-[0_0_32px_rgba(250,93,12,0.3)]"
           >
             Start your 14-day free trial
             <span
@@ -553,7 +553,7 @@ export default function LandingPage() {
           style={{ perspective: '1200px' }}
         >
           {/* shadow layer — depth card */}
-          <div className="absolute inset-4 -bottom-4 rounded-[2rem] bg-[#4F7EFA]/10 blur-2xl" />
+          <div className="absolute inset-4 -bottom-4 rounded-[2rem] bg-[#FA5D0C]/10 blur-2xl" />
 
           {/* Double-Bezel outer shell */}
           <div
@@ -580,7 +580,7 @@ export default function LandingPage() {
                   {['Month', 'Week', 'Day'].map((v, i) => (
                     <span
                       key={v}
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${i === 1 ? 'bg-[#4F7EFA]/20 text-[#4F7EFA]' : 'text-white/25'}`}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${i === 1 ? 'bg-[#FA5D0C]/20 text-[#FA5D0C]' : 'text-white/25'}`}
                     >
                       {v}
                     </span>
@@ -609,7 +609,7 @@ export default function LandingPage() {
                 key={`${rep}-${i}`}
                 className="inline-flex items-center gap-2.5 text-[11px] text-white/20 font-medium"
               >
-                <span className="w-1 h-1 rounded-full bg-[#4F7EFA]/50" />
+                <span className="w-1 h-1 rounded-full bg-[#FA5D0C]/50" />
                 {t}
               </span>
             )),
@@ -649,9 +649,9 @@ export default function LandingPage() {
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center"
                       style={{
-                        background: 'rgba(79,126,250,0.1)',
-                        color: '#4F7EFA',
-                        border: '1px solid rgba(79,126,250,0.2)',
+                        background: 'rgba(250,93,12,0.1)',
+                        color: '#FA5D0C',
+                        border: '1px solid rgba(250,93,12,0.2)',
                       }}
                     >
                       {f.icon}
@@ -674,7 +674,7 @@ export default function LandingPage() {
                       <div className="mt-auto grid grid-cols-2 gap-2.5">
                         {(
                           [
-                            ['Bookings today', '24', '#4F7EFA'],
+                            ['Bookings today', '24', '#FA5D0C'],
                             ['Utilization', '78%', '#34C97B'],
                             ['Active rooms', '12', '#7C6FFA'],
                             ['Pending approvals', '3', '#F5A623'],
@@ -719,7 +719,7 @@ export default function LandingPage() {
 
           <div className="relative grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* connector line */}
-            <div className="hidden md:block absolute top-1/2 left-[calc(33.33%+0.5rem)] right-[calc(33.33%+0.5rem)] h-px bg-gradient-to-r from-[#4F7EFA]/20 via-[#7C6FFA]/30 to-[#4F7EFA]/20 z-10" />
+            <div className="hidden md:block absolute top-1/2 left-[calc(33.33%+0.5rem)] right-[calc(33.33%+0.5rem)] h-px bg-gradient-to-r from-[#FA5D0C]/20 via-[#7C6FFA]/30 to-[#FA5D0C]/20 z-10" />
 
             {steps.map((s) => (
               <div key={s.n} className="reveal">
@@ -730,8 +730,8 @@ export default function LandingPage() {
                       <span className="ns-display text-4xl font-bold text-white/[0.08] tracking-tight leading-none">
                         {s.n}
                       </span>
-                      <div className="w-8 h-8 rounded-full bg-[#4F7EFA]/10 ring-1 ring-[#4F7EFA]/20 flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-[#4F7EFA]">{s.n}</span>
+                      <div className="w-8 h-8 rounded-full bg-[#FA5D0C]/10 ring-1 ring-[#FA5D0C]/20 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-[#FA5D0C]">{s.n}</span>
                       </div>
                     </div>
                     <div>
@@ -784,10 +784,10 @@ export default function LandingPage() {
                   {starterFeatures.map((f) => (
                     <li key={f} className="flex items-center gap-3 text-sm text-white/55">
                       <span
-                        className="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 text-[#4F7EFA]"
+                        className="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 text-[#FA5D0C]"
                         style={{
-                          background: 'rgba(79,126,250,0.12)',
-                          border: '1px solid rgba(79,126,250,0.2)',
+                          background: 'rgba(250,93,12,0.12)',
+                          border: '1px solid rgba(250,93,12,0.2)',
                           width: 18,
                           height: 18,
                         }}
@@ -810,16 +810,16 @@ export default function LandingPage() {
 
             {/* Growth — Double-Bezel, glowing ring */}
             <div
-              className="reveal rounded-[2rem] bg-[#4F7EFA]/[0.12] ring-1 ring-[#4F7EFA]/30 p-1.5
-              shadow-[0_0_64px_rgba(79,126,250,0.1)]"
+              className="reveal rounded-[2rem] bg-[#FA5D0C]/[0.12] ring-1 ring-[#FA5D0C]/30 p-1.5
+              shadow-[0_0_64px_rgba(250,93,12,0.1)]"
             >
               <div className="h-full rounded-[calc(2rem-0.375rem)] bg-[#07080d] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] p-8 flex flex-col gap-7">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#4F7EFA]/80">
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#FA5D0C]/80">
                       Growth
                     </p>
-                    <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-[#4F7EFA]/15 text-[#4F7EFA]">
+                    <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-[#FA5D0C]/15 text-[#FA5D0C]">
                       Most popular
                     </span>
                   </div>
@@ -831,15 +831,15 @@ export default function LandingPage() {
                   </div>
                   <p className="text-xs text-white/25 mt-1.5">Billed monthly via PayPal</p>
                 </div>
-                <div className="h-px bg-[#4F7EFA]/[0.15]" />
+                <div className="h-px bg-[#FA5D0C]/[0.15]" />
                 <ul className="flex flex-col gap-3.5 flex-1">
                   {growthFeatures.map((f) => (
                     <li key={f} className="flex items-center gap-3 text-sm text-white/65">
                       <span
-                        className="shrink-0 flex items-center justify-center text-[#4F7EFA]"
+                        className="shrink-0 flex items-center justify-center text-[#FA5D0C]"
                         style={{
-                          background: 'rgba(79,126,250,0.15)',
-                          border: '1px solid rgba(79,126,250,0.25)',
+                          background: 'rgba(250,93,12,0.15)',
+                          border: '1px solid rgba(250,93,12,0.25)',
                           borderRadius: '50%',
                           width: 18,
                           height: 18,
@@ -853,10 +853,10 @@ export default function LandingPage() {
                 </ul>
                 <Link
                   href="/signup"
-                  className="group flex items-center justify-center gap-2.5 rounded-full bg-[#4F7EFA] px-6 py-3.5 text-sm font-semibold text-white
+                  className="group flex items-center justify-center gap-2.5 rounded-full bg-[#FA5D0C] px-6 py-3.5 text-sm font-semibold text-white
                   transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]
-                  hover:bg-[#3D6FE8] hover:shadow-[0_0_32px_rgba(79,126,250,0.45)] active:scale-[0.97]
-                  shadow-[0_0_24px_rgba(79,126,250,0.3)]"
+                  hover:bg-[#D94E08] hover:shadow-[0_0_32px_rgba(250,93,12,0.45)] active:scale-[0.97]
+                  shadow-[0_0_24px_rgba(250,93,12,0.3)]"
                 >
                   Start free trial
                   <span
@@ -890,7 +890,7 @@ export default function LandingPage() {
             {/* Double-Bezel CTA container */}
             <div
               className="rounded-[2.5rem] bg-white/[0.03] ring-1 ring-white/[0.08] p-1.5
-              shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_32px_80px_rgba(79,126,250,0.08)]"
+              shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_32px_80px_rgba(250,93,12,0.08)]"
             >
               <div className="rounded-[calc(2.5rem-0.375rem)] bg-[#06070e] shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)] px-8 py-20 flex flex-col items-center gap-6 text-center">
                 <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40">
@@ -898,7 +898,7 @@ export default function LandingPage() {
                 </span>
                 <h2 className="ns-display text-[clamp(28px,4.5vw,52px)] font-bold tracking-tight leading-tight">
                   Ready to reclaim your{' '}
-                  <span className="bg-gradient-to-r from-[#4F7EFA] to-[#7C6FFA] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#FA5D0C] to-[#7C6FFA] bg-clip-text text-transparent">
                     shared spaces?
                   </span>
                 </h2>
@@ -908,10 +908,10 @@ export default function LandingPage() {
                 </p>
                 <Link
                   href="/signup"
-                  className="group flex items-center gap-2.5 rounded-full bg-[#4F7EFA] px-8 py-4 text-sm font-semibold text-white
+                  className="group flex items-center gap-2.5 rounded-full bg-[#FA5D0C] px-8 py-4 text-sm font-semibold text-white
                   transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]
-                  hover:bg-[#3D6FE8] hover:shadow-[0_0_56px_rgba(79,126,250,0.5)] active:scale-[0.97]
-                  shadow-[0_0_40px_rgba(79,126,250,0.35)]"
+                  hover:bg-[#D94E08] hover:shadow-[0_0_56px_rgba(250,93,12,0.5)] active:scale-[0.97]
+                  shadow-[0_0_40px_rgba(250,93,12,0.35)]"
                 >
                   Start your free 14-day trial
                   <span
@@ -935,7 +935,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/[0.06] px-4 py-10">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-md bg-[#4F7EFA] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-md bg-[#FA5D0C] flex items-center justify-center">
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
                 <path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM11 11h2v2h-2z" fill="white" />
               </svg>

@@ -52,7 +52,7 @@ export default function MarketingOptInsPage() {
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Megaphone className="h-5 w-5 text-[#4F7EFA]" />
+          <Megaphone className="h-5 w-5 text-[#FA5D0C]" />
           <h1 className="text-xl font-semibold text-gray-900">Marketing Opt-Ins</h1>
           <span className="rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 text-xs font-medium">
             {optIns.length}

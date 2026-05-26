@@ -43,7 +43,7 @@ function InputField({
           {...inputProps}
           className="w-full rounded-[calc(1rem-5px)] bg-white px-4 py-3 text-sm text-[#0A0A0F]
             placeholder:text-[#C1C7D0] outline-none
-            focus:ring-1 focus:ring-[#4F7EFA]/25
+            focus:ring-1 focus:ring-[#FA5D0C]/25
             shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]
             transition-all duration-700"
           style={{ transition: 'all 0.7s cubic-bezier(0.32,0.72,0,1)' }}
@@ -82,11 +82,11 @@ function GoogleIcon() {
 function LogoMark({ size = 36 }: { size?: number }) {
   return (
     <div
-      className="rounded-[10px] bg-[#4F7EFA]/10 ring-1 ring-[#4F7EFA]/20 p-[4px]"
+      className="rounded-[10px] bg-[#FA5D0C]/10 ring-1 ring-[#FA5D0C]/20 p-[4px]"
       style={{ transition: 'all 0.7s cubic-bezier(0.32,0.72,0,1)' }}
     >
       <div
-        className="flex items-center justify-center rounded-[7px] bg-[#4F7EFA] shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)]"
+        className="flex items-center justify-center rounded-[7px] bg-[#FA5D0C] shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)]"
         style={{ width: size, height: size }}
       >
         <svg
@@ -253,7 +253,7 @@ export default function LoginPage() {
         <div
           className="absolute -top-[20%] -left-[15%] h-[55%] w-[55%] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(79,126,250,0.12) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(250,93,12,0.12) 0%, transparent 65%)',
           }}
         />
         <div
@@ -316,7 +316,7 @@ export default function LoginPage() {
             <div ref={formRef}>
               {/* Eyebrow tag + heading */}
               <div className="form-el mb-7">
-                <span className="inline-flex rounded-full bg-[#4F7EFA]/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4F7EFA] ring-1 ring-[#4F7EFA]/[0.15]">
+                <span className="inline-flex rounded-full bg-[#FA5D0C]/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FA5D0C] ring-1 ring-[#FA5D0C]/[0.15]">
                   {hasVisited ? 'Welcome back' : 'Get started'}
                 </span>
                 <h1 className="mt-3 text-[1.85rem] font-bold tracking-tight text-[#0A0A0F] leading-[1.15]">
@@ -406,7 +406,7 @@ export default function LoginPage() {
                     right={
                       <Link
                         href="/forgot-password"
-                        className="text-[11px] font-medium text-[#4F7EFA] hover:text-[#3d6ef0] transition-colors duration-300"
+                        className="text-[11px] font-medium text-[#FA5D0C] hover:text-[#3d6ef0] transition-colors duration-300"
                         style={{ transition: 'color 0.3s cubic-bezier(0.32,0.72,0,1)' }}
                       >
                         Forgot password?
@@ -442,7 +442,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !!lockedUntil || (showTurnstile && !turnstileToken)}
-                    className="group flex w-full items-center justify-between rounded-full bg-[#4F7EFA] px-5 py-3.5
+                    className="group flex w-full items-center justify-between rounded-full bg-[#FA5D0C] px-5 py-3.5
                       hover:bg-[#3d6ef0] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ transition: 'all 0.7s cubic-bezier(0.32,0.72,0,1)' }}
                   >
@@ -480,7 +480,7 @@ export default function LoginPage() {
                 No account?{' '}
                 <Link
                   href="/signup"
-                  className="font-semibold text-[#4F7EFA] hover:text-[#3d6ef0]"
+                  className="font-semibold text-[#FA5D0C] hover:text-[#3d6ef0]"
                   style={{ transition: 'color 0.3s cubic-bezier(0.32,0.72,0,1)' }}
                 >
                   Create one free

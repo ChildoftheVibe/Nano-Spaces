@@ -1,9 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* ── Nano Spaces Brand Tokens ── */
+    --ns-accent: #fa5d0c;
+    --ns-main: #556a7b;
+    --ns-dark: #141033;
+    --ns-alternate: #c5ced5;
+    --ns-dark-surface: #1c1845;
+    --ns-dark-border: #2c2948;
+    --ns-accent-hover: #d94e08;
+    --ns-accent-light: #fee8dc;
+    --ns-text-light: #ffffff;
+    --ns-text-dark: #141033;
+    --ns-text-muted: #7a8fa0;
+    --ns-font-display: 'Rajdhani', 'var(--font-rajdhani)', sans-serif;
+    --ns-font-body: 'Inter', 'var(--font-inter)', sans-serif;
+
     /* shadcn/ui defaults */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -26,10 +43,10 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
 
-    /* Nano Spaces brand tokens */
-    --brand-primary: #4f7efa;
-    --brand-dark: #2d5dd6;
-    --brand-light: #eef3ff;
+    /* Nano Spaces brand tokens (mapped from brand guide) */
+    --brand-primary: #fa5d0c;
+    --brand-dark: #d94e08;
+    --brand-light: #fee8dc;
     --bg-base: #f7f8fa;
     --bg-surface: #ffffff;
     --text-primary: #1a1d23;
@@ -42,7 +59,7 @@
     --fc-cal-header-bg: rgba(0, 0, 0, 0.02);
     --fc-cal-header-color: rgba(0, 0, 0, 0.38);
     --fc-cal-day-hover: rgba(0, 0, 0, 0.02);
-    --fc-cal-today-bg: rgba(79, 126, 250, 0.07);
+    --fc-cal-today-bg: rgba(250, 93, 12, 0.07);
     --fc-cal-day-number: rgba(0, 0, 0, 0.55);
     --fc-cal-other-day: rgba(0, 0, 0, 0.25);
     --fc-cal-slot-label: rgba(0, 0, 0, 0.32);
@@ -103,7 +120,7 @@
     --fc-cal-header-bg: rgba(255, 255, 255, 0.025);
     --fc-cal-header-color: rgba(255, 255, 255, 0.35);
     --fc-cal-day-hover: rgba(255, 255, 255, 0.03);
-    --fc-cal-today-bg: rgba(79, 126, 250, 0.09);
+    --fc-cal-today-bg: rgba(250, 93, 12, 0.09);
     --fc-cal-day-number: rgba(255, 255, 255, 0.45);
     --fc-cal-other-day: rgba(255, 255, 255, 0.18);
     --fc-cal-slot-label: rgba(255, 255, 255, 0.22);
@@ -149,8 +166,9 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-jakarta), system-ui, sans-serif;
+    font-family: var(--font-rajdhani), 'Rajdhani', var(--font-jakarta), system-ui, sans-serif;
     font-weight: 600;
+    letter-spacing: 0.03em;
   }
 }
 
@@ -193,7 +211,7 @@
   }
   .input-brand:focus {
     border-color: var(--brand-primary);
-    box-shadow: 0 0 0 4px rgba(79, 126, 250, 0.12);
+    box-shadow: 0 0 0 4px rgba(250, 93, 12, 0.12);
   }
 
   .auth-card {

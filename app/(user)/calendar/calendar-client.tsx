@@ -311,8 +311,8 @@ function RecurringSection({
               onClick={() => setValue('recurring.frequency', f)}
               className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                 frequency === f
-                  ? 'border-[#4F7EFA] bg-[#4F7EFA] text-white'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#4F7EFA]/50'
+                  ? 'border-[#FA5D0C] bg-[#FA5D0C] text-white'
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#FA5D0C]/50'
               }`}
             >
               {f === 'specific_days' ? 'Custom' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -332,8 +332,8 @@ function RecurringSection({
                 onClick={() => toggleDay(i)}
                 className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
                   days.includes(i)
-                    ? 'border-[#4F7EFA] bg-[#4F7EFA] text-white'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-[#4F7EFA]/50'
+                    ? 'border-[#FA5D0C] bg-[#FA5D0C] text-white'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-[#FA5D0C]/50'
                 }`}
               >
                 {label}
@@ -353,8 +353,8 @@ function RecurringSection({
               onClick={() => setValue('recurring.end_type', t)}
               className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                 endType === t
-                  ? 'border-[#4F7EFA] bg-[#4F7EFA] text-white'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#4F7EFA]/50'
+                  ? 'border-[#FA5D0C] bg-[#FA5D0C] text-white'
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-[#FA5D0C]/50'
               }`}
             >
               {t === 'count' ? 'After N times' : 'On date'}
@@ -557,7 +557,7 @@ function NewBookingModal({
           <select
             id="nb-room"
             {...register('location_id')}
-            className="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
+            className="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FA5D0C]"
           >
             <option value="">Select a room…</option>
             {rooms.map((r) => (
@@ -595,7 +595,7 @@ function NewBookingModal({
             {...register('notes')}
             rows={2}
             maxLength={1000}
-            className="mt-1.5 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
+            className="mt-1.5 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FA5D0C]"
             placeholder="Optional notes…"
           />
         </div>
@@ -944,7 +944,7 @@ function ReservationModal({
                 value={editNotes}
                 onChange={(e) => setEditNotes(e.target.value)}
                 rows={3}
-                className="mt-1.5 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F7EFA]"
+                className="mt-1.5 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FA5D0C]"
               />
             </div>
             {error && <p className="text-xs text-red-500">{error}</p>}
@@ -1484,22 +1484,22 @@ export default function CalendarClient() {
         .fc-daygrid-day { background: transparent !important; cursor: pointer; }
         .fc-daygrid-day:hover { background: var(--fc-cal-day-hover) !important; transition: background 0.15s; }
         .fc-day-today { background: var(--fc-cal-today-bg) !important; }
-        .fc-day-today .fc-daygrid-day-number { background: #4F7EFA !important; color: #fff !important; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; margin: 3px; }
+        .fc-day-today .fc-daygrid-day-number { background: #FA5D0C !important; color: #fff !important; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; margin: 3px; }
         .fc-daygrid-day-number { color: var(--fc-cal-day-number) !important; font-size: 12px !important; font-weight: 500; }
         .fc-day-other .fc-daygrid-day-number { color: var(--fc-cal-other-day) !important; }
         .fc-timegrid-slot { cursor: pointer; height: 22px; }
         .fc-timegrid-slot:hover { background: var(--fc-cal-slot-hover) !important; }
         .fc-timegrid-slot-label { color: var(--fc-cal-slot-label) !important; font-size: 10.5px !important; font-weight: 500; }
         .fc-timegrid-axis { border-color: var(--fc-cal-border) !important; }
-        .fc-timegrid-now-indicator-line { border-color: #4F7EFA !important; border-width: 2px !important; }
-        .fc-timegrid-now-indicator-arrow { border-top-color: transparent !important; border-bottom-color: transparent !important; border-left-color: #4F7EFA !important; }
+        .fc-timegrid-now-indicator-line { border-color: #FA5D0C !important; border-width: 2px !important; }
+        .fc-timegrid-now-indicator-arrow { border-top-color: transparent !important; border-bottom-color: transparent !important; border-left-color: #FA5D0C !important; }
         .fc-scrollgrid-section > * { border-color: var(--fc-cal-border) !important; }
         .fc-button { display: none !important; }
         .fc-scrollgrid { border: none !important; overflow: hidden; }
         .fc-scrollgrid-section-header th { border-top: none !important; }
         .fc-event { border-radius: 5px; padding: 2px 7px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none !important; }
         .event-confirmed { background: var(--fc-ev-confirmed-bg) !important; color: var(--fc-ev-confirmed-color) !important; }
-        .event-mine { background: #4F7EFA !important; color: #fff !important; box-shadow: 0 2px 10px rgba(79,126,250,0.4) !important; }
+        .event-mine { background: #FA5D0C !important; color: #fff !important; box-shadow: 0 2px 10px rgba(250,93,12,0.4) !important; }
         .event-pending { background: var(--fc-ev-pending-bg) !important; color: var(--fc-ev-pending-color) !important; border: 1.5px dashed var(--fc-ev-pending-border) !important; }
         .event-pending-mine { background: var(--fc-ev-pending-mine-bg) !important; color: var(--fc-ev-pending-mine-color) !important; border: 1.5px dashed var(--fc-ev-pending-mine-border) !important; }
         .event-waitlisted { background: var(--fc-ev-waitlisted-bg) !important; color: var(--fc-ev-waitlisted-color) !important; opacity: 0.75; }
@@ -1532,7 +1532,7 @@ export default function CalendarClient() {
           <div
             className="cal-orb-a absolute -top-[20%] -left-[10%] h-[60%] w-[60%] rounded-full opacity-0 dark:opacity-[0.13]"
             style={{
-              background: 'radial-gradient(circle, rgba(79,126,250,0.7) 0%, transparent 65%)',
+              background: 'radial-gradient(circle, rgba(250,93,12,0.7) 0%, transparent 65%)',
             }}
           />
           <div
@@ -1597,7 +1597,7 @@ export default function CalendarClient() {
                       onClick={() => changeView(v)}
                       className={`rounded-[calc(0.75rem-3px)] px-2 sm:px-3 py-1.5 text-xs font-semibold ${
                         currentView === v
-                          ? 'bg-[#4F7EFA] text-white shadow-[0_2px_10px_rgba(79,126,250,0.35)]'
+                          ? 'bg-[#FA5D0C] text-white shadow-[0_2px_10px_rgba(250,93,12,0.35)]'
                           : 'text-gray-500 dark:text-white/35 hover:text-gray-700 dark:hover:text-white/65 hover:bg-black/[0.04] dark:hover:bg-white/[0.05]'
                       }`}
                       style={{ transition: 'all 0.4s cubic-bezier(0.32,0.72,0,1)' }}
@@ -1657,7 +1657,7 @@ export default function CalendarClient() {
                 <button
                   type="button"
                   onClick={() => setModal({ type: 'new' })}
-                  className="group flex items-center gap-2 rounded-full bg-[#4F7EFA] pl-4 pr-1.5 py-1.5 hover:bg-[#3d6ef0] active:scale-[0.98]"
+                  className="group flex items-center gap-2 rounded-full bg-[#FA5D0C] pl-4 pr-1.5 py-1.5 hover:bg-[#3d6ef0] active:scale-[0.98]"
                   style={{ transition: 'all 0.5s cubic-bezier(0.32,0.72,0,1)' }}
                 >
                   <span className="text-xs font-semibold text-white">Book</span>
@@ -1706,8 +1706,8 @@ export default function CalendarClient() {
           {/* Legend — micro-chip badges */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {[
-              { dot: 'bg-[#4F7EFA]', label: 'My booking' },
-              { dot: 'bg-[rgba(79,126,250,0.3)]', label: 'Others' },
+              { dot: 'bg-[#FA5D0C]', label: 'My booking' },
+              { dot: 'bg-[rgba(250,93,12,0.3)]', label: 'Others' },
               { dot: 'border border-dashed border-amber-500/60 bg-amber-500/10', label: 'Pending' },
               { dot: 'bg-orange-500/25', label: 'Waitlisted' },
               { dot: 'bg-red-500/20', label: 'Blocked' },

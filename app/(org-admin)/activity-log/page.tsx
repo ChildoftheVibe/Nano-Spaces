@@ -57,7 +57,7 @@ export default function ActivityLogPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="mb-6 flex items-center gap-2">
-        <ClipboardList className="h-5 w-5 text-[#4F7EFA]" />
+        <ClipboardList className="h-5 w-5 text-[#FA5D0C]" />
         <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Activity Log</h1>
         <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
           {total} entries

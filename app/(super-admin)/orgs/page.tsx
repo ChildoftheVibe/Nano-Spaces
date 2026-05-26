@@ -249,7 +249,7 @@ function AddOrgModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
               id="co-org"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#4F7EFA]/60 focus:ring-[#4F7EFA]/20"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#FA5D0C]/60 focus:ring-[#FA5D0C]/20"
               placeholder="Acme Corp"
             />
           </div>
@@ -265,7 +265,7 @@ function AddOrgModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 id="co-name"
                 value={adminFullName}
                 onChange={(e) => setAdminFullName(e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#4F7EFA]/60"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#FA5D0C]/60"
                 placeholder="Jane Smith"
               />
             </div>
@@ -278,7 +278,7 @@ function AddOrgModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 type="email"
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#4F7EFA]/60"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#FA5D0C]/60"
                 placeholder="jane@acmecorp.com"
               />
             </div>
@@ -291,7 +291,7 @@ function AddOrgModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 type="password"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#4F7EFA]/60"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#FA5D0C]/60"
               />
             </div>
           </div>
@@ -313,7 +313,7 @@ function AddOrgModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
           <button
             onClick={() => void submit()}
             disabled={loading}
-            className="rounded-lg bg-[#4F7EFA] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3d6ef0] disabled:opacity-50 transition-colors"
+            className="rounded-lg bg-[#FA5D0C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3d6ef0] disabled:opacity-50 transition-colors"
           >
             {loading ? 'Creating…' : 'Create organization'}
           </button>
@@ -424,8 +424,8 @@ export default function SuperAdminOrgsPage() {
           <div className="flex items-start justify-between mb-8">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Building2 className="h-4 w-4 text-[#4F7EFA]" />
-                <span className="text-xs font-semibold tracking-widest text-[#4F7EFA] uppercase">
+                <Building2 className="h-4 w-4 text-[#FA5D0C]" />
+                <span className="text-xs font-semibold tracking-widest text-[#FA5D0C] uppercase">
                   Super Admin
                 </span>
               </div>
@@ -441,7 +441,7 @@ export default function SuperAdminOrgsPage() {
               </button>
               <button
                 onClick={() => setShowAddOrg(true)}
-                className="flex items-center gap-1.5 rounded-xl bg-[#4F7EFA] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6ef0] transition-colors duration-200 shadow-lg shadow-[#4F7EFA]/20"
+                className="flex items-center gap-1.5 rounded-xl bg-[#FA5D0C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6ef0] transition-colors duration-200 shadow-lg shadow-[#FA5D0C]/20"
               >
                 <Plus className="h-3.5 w-3.5" />
                 New org
@@ -452,7 +452,7 @@ export default function SuperAdminOrgsPage() {
           {/* Stat grid (Bento — 4 cols, 0 empty cells, grid-flow-dense) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 grid-flow-dense">
             <div className="stat-tile">
-              <StatTile label="Total" value={total} accent="#4F7EFA" />
+              <StatTile label="Total" value={total} accent="#FA5D0C" />
             </div>
             <div className="stat-tile">
               <StatTile label="Active" value={activeCount} accent="#10b981" />
@@ -480,7 +480,7 @@ export default function SuperAdminOrgsPage() {
             placeholder="Search by name or slug…"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/25 focus:border-[#4F7EFA]/50 focus:bg-white/7 focus:outline-none transition-all duration-200"
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/25 focus:border-[#FA5D0C]/50 focus:bg-white/7 focus:outline-none transition-all duration-200"
           />
           {search && (
             <button
@@ -495,7 +495,7 @@ export default function SuperAdminOrgsPage() {
         {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center py-32">
-            <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-[#4F7EFA] animate-spin" />
+            <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-[#FA5D0C] animate-spin" />
           </div>
         ) : (
           <>
@@ -524,7 +524,7 @@ export default function SuperAdminOrgsPage() {
                         <div className="flex items-center gap-3">
                           <OrgAvatar name={o.display_name ?? o.name} />
                           <div>
-                            <p className="text-sm font-semibold text-white group-hover:text-[#4F7EFA] transition-colors duration-150">
+                            <p className="text-sm font-semibold text-white group-hover:text-[#FA5D0C] transition-colors duration-150">
                               {o.display_name ?? o.name}
                             </p>
                             <p className="text-xs text-white/30 font-mono mt-0.5">{o.slug}</p>

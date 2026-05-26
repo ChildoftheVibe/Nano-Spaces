@@ -17,7 +17,7 @@ export default function TermsPage() {
       <header className="sticky top-0 z-10 border-b bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5 text-gray-900 hover:opacity-80">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#4F7EFA]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FA5D0C]">
               <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <rect x="2" y="2" width="7" height="7" rx="1.5" fill="white" />
                 <rect x="11" y="2" width="7" height="7" rx="1.5" fill="white" fillOpacity="0.6" />
@@ -33,7 +33,7 @@ export default function TermsPage() {
             </Link>
             <Link
               href="/login"
-              className="rounded-lg bg-[#4F7EFA] px-4 py-1.5 text-white hover:bg-[#3b6ef8]"
+              className="rounded-lg bg-[#FA5D0C] px-4 py-1.5 text-white hover:bg-[#3b6ef8]"
             >
               Sign in
             </Link>
@@ -44,7 +44,7 @@ export default function TermsPage() {
       <main className="mx-auto max-w-3xl px-6 py-14">
         {/* Title block */}
         <div className="mb-10">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#4F7EFA]">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#FA5D0C]">
             <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path
                 fillRule="evenodd"
@@ -87,7 +87,7 @@ export default function TermsPage() {
               By creating an account, clicking &ldquo;I agree,&rdquo; accessing, or using the
               Service, you acknowledge that you have read, understood, and agree to be bound by
               these Terms and our{' '}
-              <Link href="/privacy" className="text-[#4F7EFA] hover:underline">
+              <Link href="/privacy" className="text-[#FA5D0C] hover:underline">
                 Privacy Policy
               </Link>
               . If you do not agree, do not access or use the Service.
@@ -119,7 +119,7 @@ export default function TermsPage() {
               </li>
               <li>
                 You must notify us immediately at{' '}
-                <a href="mailto:security@nanospaces.app" className="text-[#4F7EFA] hover:underline">
+                <a href="mailto:security@nanospaces.app" className="text-[#FA5D0C] hover:underline">
                   security@nanospaces.app
                 </a>{' '}
                 upon becoming aware of any unauthorized access or breach.
@@ -239,7 +239,7 @@ export default function TermsPage() {
               license to store, process, and transmit Customer Data solely to provide the Service.
               We will not access or use Customer Data except as necessary to operate the Service, as
               directed by you, or as required by law. Our use of personal data is governed by our{' '}
-              <Link href="/privacy" className="text-[#4F7EFA] hover:underline">
+              <Link href="/privacy" className="text-[#FA5D0C] hover:underline">
                 Privacy Policy
               </Link>
               .
@@ -426,7 +426,7 @@ export default function TermsPage() {
               </li>
               <li>
                 <strong>Notices:</strong> Legal notices to us must be sent to{' '}
-                <a href="mailto:legal@nanospaces.app" className="text-[#4F7EFA] hover:underline">
+                <a href="mailto:legal@nanospaces.app" className="text-[#FA5D0C] hover:underline">
                   legal@nanospaces.app
                 </a>
                 . We may send notices to you via the email address on your account.
@@ -448,19 +448,19 @@ export default function TermsPage() {
               </p>
               <p className="mt-1">
                 Legal inquiries:{' '}
-                <a href="mailto:legal@nanospaces.app" className="text-[#4F7EFA] hover:underline">
+                <a href="mailto:legal@nanospaces.app" className="text-[#FA5D0C] hover:underline">
                   legal@nanospaces.app
                 </a>
               </p>
               <p className="mt-1">
                 Security issues:{' '}
-                <a href="mailto:security@nanospaces.app" className="text-[#4F7EFA] hover:underline">
+                <a href="mailto:security@nanospaces.app" className="text-[#FA5D0C] hover:underline">
                   security@nanospaces.app
                 </a>
               </p>
               <p className="mt-1">
                 General support:{' '}
-                <a href="mailto:support@nanospaces.app" className="text-[#4F7EFA] hover:underline">
+                <a href="mailto:support@nanospaces.app" className="text-[#FA5D0C] hover:underline">
                   support@nanospaces.app
                 </a>
               </p>
@@ -471,7 +471,7 @@ export default function TermsPage() {
         {/* Footer nav */}
         <div className="mt-14 flex items-center justify-between border-t pt-6 text-sm text-gray-400">
           <div className="flex gap-4">
-            <Link href="/privacy" className="text-[#4F7EFA] hover:underline">
+            <Link href="/privacy" className="text-[#FA5D0C] hover:underline">
               Privacy Policy
             </Link>
             <span>&middot;</span>

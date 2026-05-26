@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import NotificationBell from '@/components/features/notifications/notification-bell'
@@ -21,9 +23,6 @@ interface NavBarProps {
   maxWidth?: string
 }
 
-const linkCls =
-  'rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[var(--text-primary)] dark:text-white/50 dark:hover:bg-white/[0.07] dark:hover:text-white/80 transition-colors duration-200'
-
 export default function NavBar({
   brand,
   brandHref = '/calendar',
@@ -33,21 +32,57 @@ export default function NavBar({
   maxWidth = 'max-w-7xl',
 }: NavBarProps) {
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
+
+  const linkCls = (href: string) => {
+    const active = pathname === href || (href !== '/calendar' && pathname.startsWith(href))
+    return [
+      'rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-200',
+      'font-[family-name:var(--font-rajdhani)] tracking-wide uppercase text-[11px]',
+      active
+        ? 'text-[#FA5D0C] bg-[#FA5D0C]/[0.08] dark:text-[#FA5D0C] dark:bg-[#FA5D0C]/[0.1]'
+        : 'text-gray-600 hover:bg-gray-100 hover:text-[#FA5D0C] dark:text-white/50 dark:hover:bg-white/[0.07] dark:hover:text-[#FA5D0C]',
+    ].join(' ')
+  }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-gray-200 bg-white dark:border-white/[0.06] dark:bg-[#0E0F16] px-4 sm:px-6 py-3">
+    <header
+      className="sticky top-0 z-10 border-b border-gray-200 bg-white dark:border-[#2C2948] dark:bg-[#141033] px-4 sm:px-6 py-2.5"
+      style={{ borderBottomWidth: '1px' }}
+    >
       <div className={`mx-auto flex ${maxWidth} items-center justify-between gap-3`}>
-        {/* Brand */}
-        <Link
-          href={brandHref}
-          className="font-heading text-lg font-bold text-[var(--text-primary)] dark:text-white/90 hover:text-[var(--brand-primary)] transition-colors shrink-0"
-        >
-          {brand}
-          {brandSub && (
-            <span className="ml-1 text-xs font-normal text-gray-400 dark:text-white/25">
-              {brandSub}
+        {/* Brand — logo + name */}
+        <Link href={brandHref} className="flex items-center gap-2.5 shrink-0 group">
+          <Image
+            src="/assets/logos/logo-sm-dark.png"
+            alt="Nano Spaces"
+            width={32}
+            height={32}
+            className="hidden dark:block h-8 w-8 object-contain"
+          />
+          <Image
+            src="/assets/logos/logo-sm-light.png"
+            alt="Nano Spaces"
+            width={32}
+            height={32}
+            className="block dark:hidden h-8 w-8 object-contain"
+          />
+          <div>
+            <span
+              className="text-base font-bold tracking-wide uppercase leading-none text-[var(--ns-dark)] dark:text-white/90 group-hover:text-[#FA5D0C] dark:group-hover:text-[#FA5D0C] transition-colors"
+              style={{
+                fontFamily: 'var(--font-rajdhani), Rajdhani, sans-serif',
+                letterSpacing: '0.06em',
+              }}
+            >
+              {brand}
             </span>
-          )}
+            {brandSub && (
+              <span className="block text-[9px] font-medium tracking-widest uppercase text-gray-400 dark:text-white/25 leading-none mt-0.5">
+                {brandSub}
+              </span>
+            )}
+          </div>
         </Link>
 
         {/* Desktop nav */}
@@ -57,7 +92,7 @@ export default function NavBar({
           </div>
           <nav className="flex items-center gap-1">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className={linkCls}>
+              <Link key={l.href} href={l.href} className={linkCls(l.href)}>
                 {l.label}
               </Link>
             ))}

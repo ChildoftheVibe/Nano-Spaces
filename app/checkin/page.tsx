@@ -94,7 +94,7 @@ function CheckInContent() {
   if (loading) {
     return (
       <div className="flex flex-col items-center gap-3 text-center text-gray-500">
-        <Loader2 className="h-8 w-8 animate-spin text-[#4F7EFA]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#FA5D0C]" />
         <p>Loading reservation…</p>
       </div>
     )
@@ -199,13 +199,13 @@ export default function CheckInPage() {
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
           <h1 className="font-heading text-xl font-bold text-[#1A1D23]">
-            <span className="text-[#4F7EFA]">Nano</span> Check-In
+            <span className="text-[#FA5D0C]">Nano</span> Check-In
           </h1>
         </div>
         <Suspense
           fallback={
             <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-[#4F7EFA]" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#FA5D0C]" />
             </div>
           }
         >
