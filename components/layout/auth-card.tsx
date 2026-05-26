@@ -110,7 +110,7 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
         {/* Logo */}
         <div className="anim-in relative z-10 flex items-center gap-3">
           <Image
-            src="/assets/logos/logo-sm-dark.png"
+            src="/assets/logos/logo-sm-transparent-dark.png"
             alt="Nano Spaces"
             width={36}
             height={36}
@@ -187,7 +187,7 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           {dark ? (
             <>
               <Image
-                src="/assets/logos/logo-sm-dark.png"
+                src="/assets/logos/logo-sm-transparent-dark.png"
                 alt="Nano Spaces"
                 width={32}
                 height={32}
@@ -206,7 +206,7 @@ export function AuthCard({ children, className, dark = false }: AuthCardProps) {
           ) : (
             <>
               <Image
-                src="/assets/logos/logo-sm-light.png"
+                src="/assets/logos/logo-sm-transparent-dark.png"
                 alt="Nano Spaces"
                 width={32}
                 height={32}

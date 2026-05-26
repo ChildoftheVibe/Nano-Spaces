@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -385,11 +386,13 @@ export default function LandingPage() {
             href="/landing"
             className="flex items-center gap-2.5 text-sm font-semibold tracking-tight shrink-0"
           >
-            <div className="w-7 h-7 rounded-lg bg-[#FA5D0C] flex items-center justify-center shadow-[0_0_16px_rgba(250,93,12,0.5)]">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM11 11h2v2h-2z" fill="white" />
-              </svg>
-            </div>
+            <Image
+              src="/assets/logos/logo-sm-transparent-dark.png"
+              alt="Nano Spaces"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain"
+            />
             <span className="ns-display">Nano Spaces</span>
           </a>
 
@@ -488,9 +491,9 @@ export default function LandingPage() {
       )}
 
       {/* ════════════ HERO ════════════ */}
-      <section className="relative min-h-[100dvh] flex flex-col items-center justify-center text-center px-4 pt-36 pb-20">
+      <section className="relative min-h-[100dvh] flex flex-col items-center justify-center text-center px-4 pt-24 sm:pt-36 pb-10 sm:pb-20">
         {/* eyebrow */}
-        <div className="hero-el mb-7">
+        <div className="hero-el mb-3 sm:mb-7">
           <span
             className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5
             text-[10px] uppercase tracking-[0.2em] font-medium
@@ -502,7 +505,17 @@ export default function LandingPage() {
         </div>
 
         {/* headline */}
-        <h1 className="hero-el ns-display text-[clamp(44px,7vw,88px)] font-bold leading-[1.02] tracking-tight max-w-4xl">
+        <h1
+          className="hero-el ns-display font-bold tracking-tight max-w-4xl whitespace-normal break-words"
+          style={{
+            fontSize: 'clamp(2rem, 8vw, 4rem)',
+            lineHeight: 1.05,
+            height: 'auto',
+            overflow: 'visible',
+            whiteSpace: 'normal',
+            wordWrap: 'break-word',
+          }}
+        >
           Your spaces,{' '}
           <span className="relative">
             <span className="bg-gradient-to-r from-[#FA5D0C] via-[#7C6FFA] to-[#4FBADB] bg-clip-text text-transparent">
@@ -512,16 +525,17 @@ export default function LandingPage() {
         </h1>
 
         {/* sub */}
-        <p className="hero-el mt-7 max-w-lg text-[15px] leading-relaxed text-white/40">
+        <p className="hero-el mt-3 sm:mt-7 max-w-lg text-[15px] leading-relaxed text-white/40">
           Nano Spaces gives your organization a frictionless way to manage shared rooms, desks, and
           buildings — with real-time calendars, smart waitlists, and detailed usage analytics.
         </p>
 
         {/* CTAs */}
-        <div className="hero-el mt-9 flex flex-col sm:flex-row items-center gap-3">
+        <div className="hero-el mt-4 sm:mt-9 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto px-4 sm:px-0">
           <Link
             href="/signup"
-            className="group flex items-center gap-2.5 rounded-full bg-[#FA5D0C] px-7 py-3.5 text-sm font-semibold text-white
+            className="group flex items-center justify-center gap-2.5 rounded-full bg-[#FA5D0C] px-7 py-3.5 text-sm font-semibold text-white
+            w-full sm:w-auto
             transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]
             hover:bg-[#D94E08] hover:shadow-[0_0_48px_rgba(250,93,12,0.45)] active:scale-[0.97]
             shadow-[0_0_32px_rgba(250,93,12,0.3)]"
@@ -543,7 +557,7 @@ export default function LandingPage() {
           </Link>
         </div>
 
-        <p className="hero-el mt-4 text-[11px] text-white/20 tracking-wide">
+        <p className="hero-el mt-2 sm:mt-4 text-[11px] text-white/20 tracking-wide">
           No credit card required · Cancel anytime
         </p>
 
@@ -620,11 +634,11 @@ export default function LandingPage() {
       {/* ════════════ FEATURES BENTO ════════════ */}
       <section id="features" className="relative py-16 sm:py-24 md:py-40 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="reveal text-center mb-16">
+          <div className="reveal text-center mb-8 sm:mb-16">
             <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40 mb-5">
               Features
             </span>
-            <h2 className="ns-display text-[clamp(32px,4vw,52px)] font-bold tracking-tight">
+            <h2 className="ns-display text-[clamp(28px,4vw,52px)] font-bold tracking-tight whitespace-normal break-words">
               Everything your org needs
             </h2>
             <p className="mt-4 text-white/40 text-[15px] leading-relaxed max-w-sm mx-auto">
@@ -751,11 +765,11 @@ export default function LandingPage() {
       {/* ════════════ PRICING ════════════ */}
       <section id="pricing" className="relative py-16 sm:py-24 md:py-40 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="reveal text-center mb-16">
+          <div className="reveal text-center mb-8 sm:mb-16">
             <span className="inline-flex rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-white/[0.1] bg-white/[0.04] text-white/40 mb-5">
               Pricing
             </span>
-            <h2 className="ns-display text-[clamp(32px,4vw,52px)] font-bold tracking-tight">
+            <h2 className="ns-display text-[clamp(28px,4vw,52px)] font-bold tracking-tight whitespace-normal break-words">
               Simple, transparent pricing
             </h2>
             <p className="mt-4 text-white/40 text-[15px]">
@@ -935,11 +949,13 @@ export default function LandingPage() {
       <footer className="border-t border-white/[0.06] px-4 py-10">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-md bg-[#FA5D0C] flex items-center justify-center">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                <path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM11 11h2v2h-2z" fill="white" />
-              </svg>
-            </div>
+            <Image
+              src="/assets/logos/logo-sm-transparent-dark.png"
+              alt="Nano Spaces"
+              width={28}
+              height={28}
+              className="h-7 w-7 object-contain opacity-50"
+            />
             <span className="ns-display text-sm font-semibold text-white/50">Nano Spaces</span>
           </div>
           <div className="flex items-center gap-7 text-xs text-white/25">

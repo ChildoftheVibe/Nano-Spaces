@@ -118,6 +118,12 @@ export async function middleware(req: NextRequest) {
     return applySecurityHeaders(response, nonce)
   }
 
+  // Root path: authenticated users go to calendar, new visitors go to landing
+  if (pathname === '/') {
+    const dest = isAuthenticated ? '/calendar' : '/landing'
+    return applySecurityHeaders(NextResponse.redirect(new URL(dest, req.url)), nonce)
+  }
+
   // Redirect logged-in users away from auth pages
   if (isAuthRoute(pathname) && isAuthenticated) {
     return applySecurityHeaders(NextResponse.redirect(new URL('/calendar', req.url)), nonce)
