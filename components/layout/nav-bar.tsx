@@ -47,7 +47,7 @@ export default function NavBar({
 
   return (
     <header
-      className="sticky top-0 z-10 border-b border-gray-200 bg-white dark:border-[#2C2948] dark:bg-[#141033] px-4 sm:px-6 py-2.5"
+      className="sticky top-0 z-[200] border-b border-gray-200 bg-white dark:border-[#2C2948] dark:bg-[#141033] px-4 sm:px-6 py-2.5"
       style={{ borderBottomWidth: '1px' }}
     >
       <div className={`mx-auto flex ${maxWidth} items-center justify-between gap-3`}>

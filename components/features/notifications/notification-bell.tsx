@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { Bell, X, CheckCheck, Calendar, AlertCircle, Info } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -14,6 +15,11 @@ interface Notification {
   read_at: string | null
   action_url: string | null
   created_at: string
+}
+
+interface PanelPosition {
+  top: number
+  right: number
 }
 
 function NotifIcon({ type }: { type: string }) {
@@ -32,6 +38,8 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [panelPos, setPanelPos] = useState<PanelPosition>({ top: 0, right: 0 })
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const fetchNotifications = useCallback(async (pg = 1) => {
@@ -74,13 +82,27 @@ export default function NotificationBell() {
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false)
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false)
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
   const handleOpen = () => {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setPanelPos({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      })
+    }
     setOpen((v) => !v)
     void fetchNotifications(1)
   }
@@ -106,12 +128,94 @@ export default function NotificationBell() {
   const displayCount = Math.min(unread, 99)
   const hasMore = notifications.length < total
 
+  const panel = open ? (
+    <div
+      ref={panelRef}
+      style={{
+        position: 'fixed',
+        top: panelPos.top,
+        right: panelPos.right,
+        zIndex: 10000,
+        width: '24rem',
+        maxHeight: '520px',
+      }}
+      className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl flex flex-col dark:border-[#2C2948] dark:bg-[#12131A]"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#2C2948]">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white/90">Notifications</h2>
+        <div className="flex items-center gap-2">
+          {unread > 0 && (
+            <button
+              onClick={() => void markAllRead()}
+              className="flex items-center gap-1 text-xs text-[#FA5D0C] hover:underline"
+            >
+              <CheckCheck className="h-3.5 w-3.5" />
+              Mark all read
+            </button>
+          )}
+          <button
+            onClick={() => setOpen(false)}
+            className="rounded p-0.5 text-gray-400 hover:text-gray-600 dark:text-white/30 dark:hover:text-white/70"
+            aria-label="Close notifications"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="overflow-y-auto flex-1">
+        {notifications.length === 0 && !loading && (
+          <p className="py-10 text-center text-sm text-gray-400 dark:text-white/30">
+            No notifications
+          </p>
+        )}
+        {notifications.map((n) => (
+          <button
+            key={n.id}
+            onClick={() => void markRead(n)}
+            className={`w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors border-b last:border-b-0 border-gray-100 dark:border-white/[0.05] ${!n.read ? 'bg-blue-50/40 dark:bg-blue-500/[0.06]' : ''}`}
+          >
+            <NotifIcon type={n.type} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <p
+                  className={`text-sm leading-snug line-clamp-1 ${!n.read ? 'font-semibold text-gray-900 dark:text-white/90' : 'font-medium text-gray-700 dark:text-white/60'}`}
+                >
+                  {n.title}
+                </p>
+                {!n.read && <span className="mt-1 h-2 w-2 rounded-full bg-[#FA5D0C] shrink-0" />}
+              </div>
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-white/40 line-clamp-2">
+                {n.body}
+              </p>
+              <p className="mt-1 text-[11px] text-gray-400 dark:text-white/25">
+                {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+              </p>
+            </div>
+          </button>
+        ))}
+        {hasMore && (
+          <button
+            onClick={loadMore}
+            disabled={loading}
+            className="w-full py-2.5 text-xs text-[#FA5D0C] hover:underline disabled:opacity-50"
+          >
+            {loading ? 'Loading…' : 'Load more'}
+          </button>
+        )}
+      </div>
+    </div>
+  ) : null
+
   return (
-    <div className="relative" ref={panelRef}>
+    <>
       <button
+        ref={buttonRef}
         onClick={handleOpen}
         aria-label={`Notifications${unread > 0 ? `, ${unread} unread` : ''}`}
-        className="relative flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+        className="relative flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors dark:text-white/50 dark:hover:bg-white/[0.07] dark:hover:text-white/80"
       >
         <Bell className="h-5 w-5" />
         {unread > 0 && (
@@ -122,73 +226,7 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-96 max-h-[520px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b">
-            <h2 className="text-sm font-semibold text-gray-900">Notifications</h2>
-            <div className="flex items-center gap-2">
-              {unread > 0 && (
-                <button
-                  onClick={() => void markAllRead()}
-                  className="flex items-center gap-1 text-xs text-[#FA5D0C] hover:underline"
-                >
-                  <CheckCheck className="h-3.5 w-3.5" />
-                  Mark all read
-                </button>
-              )}
-              <button
-                onClick={() => setOpen(false)}
-                className="rounded p-0.5 text-gray-400 hover:text-gray-600"
-                aria-label="Close notifications"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* List */}
-          <div className="overflow-y-auto flex-1">
-            {notifications.length === 0 && !loading && (
-              <p className="py-10 text-center text-sm text-gray-400">No notifications</p>
-            )}
-            {notifications.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => void markRead(n)}
-                className={`w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors border-b last:border-b-0 ${!n.read ? 'bg-blue-50/40' : ''}`}
-              >
-                <NotifIcon type={n.type} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <p
-                      className={`text-sm leading-snug line-clamp-1 ${!n.read ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'}`}
-                    >
-                      {n.title}
-                    </p>
-                    {!n.read && (
-                      <span className="mt-1 h-2 w-2 rounded-full bg-[#FA5D0C] shrink-0" />
-                    )}
-                  </div>
-                  <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{n.body}</p>
-                  <p className="mt-1 text-[11px] text-gray-400">
-                    {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
-                  </p>
-                </div>
-              </button>
-            ))}
-            {hasMore && (
-              <button
-                onClick={loadMore}
-                disabled={loading}
-                className="w-full py-2.5 text-xs text-[#FA5D0C] hover:underline disabled:opacity-50"
-              >
-                {loading ? 'Loading…' : 'Load more'}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+      {typeof document !== 'undefined' && panel ? createPortal(panel, document.body) : null}
+    </>
   )
 }

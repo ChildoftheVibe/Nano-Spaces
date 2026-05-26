@@ -1478,7 +1478,7 @@ export default function CalendarClient() {
         .fc { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; }
         .fc-theme-standard td, .fc-theme-standard th { border-color: var(--fc-cal-border) !important; }
         .fc-theme-standard .fc-scrollgrid { border-color: var(--fc-cal-border) !important; }
-        .fc-col-header-cell { background: var(--fc-cal-header-bg) !important; color: var(--fc-cal-header-color) !important; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; font-weight: 700; padding: 10px 0; }
+        .fc-col-header-cell { background: var(--fc-cal-header-bg) !important; color: var(--fc-cal-header-color) !important; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; font-weight: 600; padding: 10px 0; border-bottom: 1px solid var(--fc-cal-border) !important; }
         .fc-col-header-cell a { color: inherit !important; text-decoration: none !important; }
         .fc-daygrid-day { background: transparent !important; cursor: pointer; }
         .fc-daygrid-day:hover { background: var(--fc-cal-day-hover) !important; transition: background 0.15s; }

@@ -175,22 +175,30 @@ export default function SettingsPage() {
   // ─── Load profile ───────────────────────────────────────────────────────────
   useEffect(() => {
     const supabase = createBrowserClient()
-    void supabase
-      .from('profiles')
-      .select(
-        'id, full_name, email, timezone, role, org_id, totp_enabled, two_fa_method, email_reminders, reminder_timing',
-      )
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          const p = data as Profile
-          setProfile(p)
-          setTimezone(p.timezone ?? '')
-          setEmailReminders(p.email_reminders ?? false)
-          setReminderTiming((p.reminder_timing as '24h' | '1h' | 'both') ?? '24h')
-        }
+    void (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
         setProfileLoading(false)
-      })
+        return
+      }
+      const { data } = await supabase
+        .from('profiles')
+        .select(
+          'id, full_name, email, timezone, role, org_id, totp_enabled, two_fa_method, email_reminders, reminder_timing',
+        )
+        .eq('id', user.id)
+        .single()
+      if (data) {
+        const p = data as Profile
+        setProfile(p)
+        setTimezone(p.timezone ?? '')
+        setEmailReminders(p.email_reminders ?? false)
+        setReminderTiming((p.reminder_timing as '24h' | '1h' | 'both') ?? '24h')
+      }
+      setProfileLoading(false)
+    })()
   }, [])
 
   // ─── Check push subscription ────────────────────────────────────────────────

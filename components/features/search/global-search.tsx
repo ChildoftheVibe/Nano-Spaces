@@ -145,7 +145,7 @@ export default function GlobalSearch({ isSuperAdmin = false }: GlobalSearchProps
 
       {/* Modal overlay */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] px-4">
+        <div className="fixed inset-0 z-[10000] flex items-start justify-center pt-[10vh] px-4">
           <div
             className="absolute inset-0 bg-black/30"
             role="button"
