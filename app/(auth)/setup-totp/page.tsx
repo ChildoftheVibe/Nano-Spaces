@@ -14,7 +14,9 @@ import { QRCodeSVG } from 'qrcode.react'
 export default function SetupTotpPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') ?? '/settings?totp=enrolled'
+  const rawNext = searchParams.get('next') ?? '/settings?totp=enrolled'
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/settings?totp=enrolled'
   const [totpUri, setTotpUri] = useState<string | null>(null)
   const [totpSecret, setTotpSecret] = useState<string | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)

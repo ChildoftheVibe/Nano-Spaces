@@ -8,7 +8,14 @@ import { sendEmail } from '@/lib/email/send'
 import { invitationEmailTemplate } from '@/lib/email/auth-templates'
 import { checkUserLimit } from '@/lib/tiers'
 import { env } from '@/lib/env'
-import { AuthError, ValidationError, ConflictError, TierLimitError } from '@/lib/errors/AppError'
+import {
+  AuthError,
+  RateLimitError,
+  ValidationError,
+  ConflictError,
+  TierLimitError,
+} from '@/lib/errors/AppError'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 const bodySchema = z.object({
   email: z.string().email(),
@@ -17,6 +24,7 @@ const bodySchema = z.object({
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
   const requestId = crypto.randomUUID()
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
 
   const body = await req.json().catch(() => null)
   const parsed = bodySchema.safeParse(body)
@@ -45,9 +53,17 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     throw new AuthError({ userMessage: 'Org admin access required.', requestId })
   }
 
+  const orgId = profile.org_id as string
+  const rl = await checkRateLimit('inviteSend', `${orgId}:${ip}`)
+  if (!rl.success) {
+    throw new RateLimitError({
+      userMessage: 'Too many invitation requests. Please wait before sending more.',
+      requestId,
+    })
+  }
+
   const admin = createAdminClient()
   const { email, role } = parsed.data
-  const orgId = profile.org_id
 
   // Check no existing active member with this email
   const { data: existing } = await admin

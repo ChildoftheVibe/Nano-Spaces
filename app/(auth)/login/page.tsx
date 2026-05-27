@@ -109,7 +109,8 @@ function LogoMark({ size = 36 }: { size?: number }) {
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') ?? '/calendar'
+  const rawNext = searchParams.get('next') ?? '/calendar'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/calendar'
   const emailChanged = searchParams.get('emailChanged') === '1'
   const passwordReset = searchParams.get('passwordReset') === '1'
   const oauthFailed = searchParams.get('error') === 'oauth_failed'

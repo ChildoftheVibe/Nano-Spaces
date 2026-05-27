@@ -64,11 +64,29 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     userEmail = user.email
   }
 
+  const adminClient = createAdminClient()
+
+  // If a valid OTP was sent within the last 2 minutes, silently return success.
+  // This prevents page-mount auto-sends from flooding the user's inbox when
+  // an attacker repeatedly loads /verify-2fa?method=email_otp&userId=<id>.
+  const cooldownCutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+  const { data: recentOtp } = await adminClient
+    .from('email_otp_codes')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('purpose', purpose)
+    .eq('is_used', false)
+    .gt('created_at', cooldownCutoff)
+    .limit(1)
+    .maybeSingle()
+
+  if (recentOtp) {
+    return success({ sent: true })
+  }
+
   const code = generateOtpCode()
   const codeHash = hashOtpCode(code)
   const expiresAt = getOtpExpiry()
-
-  const adminClient = createAdminClient()
 
   // Invalidate any existing unused OTPs for this user+purpose
   await adminClient

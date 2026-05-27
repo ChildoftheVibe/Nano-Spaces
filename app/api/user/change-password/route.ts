@@ -4,10 +4,20 @@ import { success } from '@/lib/api-response/helpers'
 import { changePasswordSchema } from '@/lib/validation/user'
 import { createSessionClient } from '@/lib/supabase/server'
 import { isPasswordBreached } from '@/lib/auth/password'
-import { AuthError, ValidationError } from '@/lib/errors/AppError'
+import { AuthError, RateLimitError, ValidationError } from '@/lib/errors/AppError'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
   const requestId = crypto.randomUUID()
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+
+  const rl = await checkRateLimit('login', ip)
+  if (!rl.success) {
+    throw new RateLimitError({
+      userMessage: 'Too many attempts. Please wait before trying again.',
+      requestId,
+    })
+  }
 
   const body = await req.json().catch(() => null)
   const parsed = changePasswordSchema.safeParse(body)

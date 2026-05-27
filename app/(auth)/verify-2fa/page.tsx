@@ -15,7 +15,8 @@ export default function Verify2faPage() {
   const searchParams = useSearchParams()
   const userId = searchParams.get('userId') ?? ''
   const method = (searchParams.get('method') ?? 'totp') as 'totp' | 'email_otp'
-  const next = searchParams.get('next') ?? '/calendar'
+  const rawNext = searchParams.get('next') ?? '/calendar'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/calendar'
 
   const [serverError, setServerError] = useState<string | null>(null)
   const [otpSent, setOtpSent] = useState(false)

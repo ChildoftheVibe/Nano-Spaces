@@ -40,6 +40,11 @@ const LIMITS = {
     limiter: Ratelimit.slidingWindow(20, '60 m'),
     prefix: 'rl:invite_send',
   }),
+  signup: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(5, '60 m'),
+    prefix: 'rl:signup',
+  }),
 } as const
 
 export type RateLimitKey = keyof typeof LIMITS

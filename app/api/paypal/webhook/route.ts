@@ -47,15 +47,21 @@ export const POST = async (req: NextRequest): Promise<Response> => {
 
   const admin = createAdminClient()
 
-  // 2. Idempotency check
-  const { data: alreadyProcessed } = await admin
+  // 2. Idempotency: insert-first to close the TOCTOU window between the SELECT
+  // and the eventual INSERT. A PK conflict means this event was already processed.
+  const { error: idempotencyError } = await admin
     .from('processed_webhooks')
-    .select('event_id')
-    .eq('event_id', event.id)
-    .single()
+    .insert({ event_id: event.id, source: 'paypal' })
 
-  if (alreadyProcessed) {
-    return Response.json({ ok: true, skipped: true })
+  if (idempotencyError) {
+    // PK violation (code 23505) = duplicate delivery; anything else = real error
+    if (idempotencyError.code === '23505') {
+      return Response.json({ ok: true, skipped: true })
+    }
+    Sentry.captureException(idempotencyError, {
+      extra: { eventId: event.id, requestId },
+    })
+    return Response.json({ error: 'Processing failed' }, { status: 500 })
   }
 
   try {
@@ -66,12 +72,6 @@ export const POST = async (req: NextRequest): Promise<Response> => {
     })
     return Response.json({ error: 'Processing failed' }, { status: 500 })
   }
-
-  // 3. Mark as processed (at the end for atomicity)
-  await admin.from('processed_webhooks').insert({
-    event_id: event.id,
-    source: 'paypal',
-  })
 
   return Response.json({ ok: true })
 }

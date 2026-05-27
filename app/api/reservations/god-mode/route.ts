@@ -37,7 +37,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   if (!profile || profile.role !== 'super_admin') {
     throw new AuthError({ userMessage: 'Super admin access required.', requestId })
   }
-  if (!profile.org_id) throw new AuthError({ userMessage: 'Not authenticated.', requestId })
+  // Note: super_admin has org_id = NULL by design; org context comes from the target room.
 
   const body = await req.json().catch(() => null)
   const parsed = createSchema.safeParse(body)
@@ -58,26 +58,28 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
   const admin = createAdminClient()
 
-  const [{ data: room }, { data: org }] = await Promise.all([
-    admin
-      .from('locations')
-      .select('id, org_id, name, is_active, in_maintenance')
-      .eq('id', location_id)
-      .single(),
-    admin
-      .from('organizations')
-      .select('primary_timezone, display_name')
-      .eq('id', profile.org_id as string)
-      .single(),
-  ])
+  // Load the room first; its org_id becomes the effective org context for the booking.
+  const { data: room } = await admin
+    .from('locations')
+    .select('id, org_id, name, is_active, in_maintenance')
+    .eq('id', location_id)
+    .single()
 
-  if (!room || room.org_id !== profile.org_id) {
+  if (!room) {
     throw new ValidationError({ userMessage: 'Room not found.', requestId })
   }
   if (!room.is_active) throw new ValidationError({ userMessage: 'Room is not active.', requestId })
   if (room.in_maintenance) {
     throw new ValidationError({ userMessage: 'Room is under maintenance.', requestId })
   }
+
+  const effectiveOrgId = room.org_id as string
+
+  const { data: org } = await admin
+    .from('organizations')
+    .select('primary_timezone, display_name')
+    .eq('id', effectiveOrgId)
+    .single()
 
   const tz = (org?.primary_timezone as string | null) ?? 'UTC'
   const startFormatted = format(toZonedTime(startDate, tz), "EEE, MMM d yyyy 'at' h:mm a zzz", {
@@ -126,7 +128,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
         await admin.from('reservations').insert({
           location_id,
           booked_by: conflict.booked_by as string,
-          org_id: profile.org_id as string,
+          org_id: effectiveOrgId,
           title: conflict.title as string,
           status: 'waitlisted',
           start_time,
@@ -173,7 +175,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     .insert({
       location_id,
       booked_by: user.id,
-      org_id: profile.org_id as string,
+      org_id: effectiveOrgId,
       title,
       notes: notes ?? null,
       start_time,
@@ -191,7 +193,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   // Insert in-app notification for the admin
   await admin.from('notifications').insert({
     user_id: user.id,
-    org_id: profile.org_id as string,
+    org_id: effectiveOrgId,
     type: 'reservation_confirmed',
     title: 'God Mode Booking Created',
     body: `"${title}" was created with God Mode override.`,
@@ -200,7 +202,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
   // Log to activity_log with full details
   await admin.from('activity_log').insert({
-    org_id: profile.org_id as string,
+    org_id: effectiveOrgId,
     actor_id: user.id,
     action: 'reservation.god_mode_override',
     target_type: 'reservation',

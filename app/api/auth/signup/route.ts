@@ -4,7 +4,8 @@ import { withErrorHandling } from '@/lib/api-response/handler'
 import { success } from '@/lib/api-response/helpers'
 import { createAdminClient } from '@/lib/supabase/server'
 import { isPasswordBreached } from '@/lib/auth/password'
-import { ValidationError } from '@/lib/errors/AppError'
+import { RateLimitError, ValidationError } from '@/lib/errors/AppError'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 const bodySchema = z.object({
   fullName: z.string().min(1, 'Name is required').max(100),
@@ -25,6 +26,15 @@ function buildSlug(name: string): string {
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
   const requestId = crypto.randomUUID()
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+
+  const rl = await checkRateLimit('signup', ip)
+  if (!rl.success) {
+    throw new RateLimitError({
+      userMessage: 'Too many sign-up attempts. Please try again later.',
+      requestId,
+    })
+  }
 
   const body = await req.json().catch(() => null)
   const parsed = bodySchema.safeParse(body)

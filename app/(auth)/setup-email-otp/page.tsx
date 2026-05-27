@@ -13,7 +13,9 @@ import { Label } from '@/components/ui/label'
 export default function SetupEmailOtpPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') ?? '/settings?emailOtp=enrolled'
+  const rawNext = searchParams.get('next') ?? '/settings?emailOtp=enrolled'
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/settings?emailOtp=enrolled'
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)

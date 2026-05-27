@@ -970,7 +970,12 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      <style>{`
+      {/* dangerouslySetInnerHTML prevents Next.js SSR from HTML-entity-encoding
+          the @import url() quotes, which would produce a malformed relative URL
+          like nanospaces.app/'https://fonts.googleapis.com/... */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap');
 
         .ns-display {
@@ -981,7 +986,9 @@ export default function LandingPage() {
           from { transform: translateX(0); }
           to   { transform: translateX(-33.333%); }
         }
-      `}</style>
+      `,
+        }}
+      />
     </div>
   )
 }

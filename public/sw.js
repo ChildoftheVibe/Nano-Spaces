@@ -1,19 +1,23 @@
-const CACHE_NAME = 'nano-spaces-v1'
+const CACHE_VERSION = 'v2'
+const CACHE_NAME = `nano-spaces-${CACHE_VERSION}`
 
-// App-shell assets to cache on install
-const SHELL_ASSETS = ['/', '/calendar', '/manifest.json', '/icon-192.png', '/icon-512.png']
+// Only truly static, never-changing assets belong here.
+// Navigation pages (/, /calendar, etc.) are intentionally excluded:
+// serving a stale navigation response would bypass Next.js middleware (auth,
+// 2FA checks, role redirects) and break session-dependent routing.
+const STATIC_ASSETS = ['/manifest.json', '/icon-192.png', '/icon-512.png', '/icon-badge.png']
 
-// ─── Install: cache shell assets ────────────────────────────────────────────
+// ─── Install: cache static assets only ──────────────────────────────────────
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
+      .then((cache) => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting()),
   )
 })
 
-// ─── Activate: remove old caches ────────────────────────────────────────────
+// ─── Activate: remove all old-version caches ────────────────────────────────
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
@@ -25,25 +29,36 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// ─── Fetch: network-first with shell fallback ───────────────────────────────
+// ─── Fetch ───────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Always pass API calls through — never serve from cache
+  // API calls and Next.js compiled chunks must never be served from SW cache.
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
     event.respondWith(fetch(request))
     return
   }
 
-  // Shell assets: stale-while-revalidate
+  // Navigation requests (HTML pages) always hit the network so that
+  // Next.js middleware can run: auth checks, 2FA verification, role-based
+  // redirects, and session cookie refresh all depend on the server responding.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(
+        () => caches.match('/manifest.json').then((r) => r ?? Response.error()),
+      ),
+    )
+    return
+  }
+
+  // Static assets (icons, manifest): stale-while-revalidate
   event.respondWith(
     caches.match(request).then((cached) => {
       const networkFetch = fetch(request)
         .then((res) => {
           if (res.ok) {
-            const clone = res.clone()
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone))
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, res.clone()))
           }
           return res
         })

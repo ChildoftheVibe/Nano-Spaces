@@ -3,7 +3,7 @@ import { withErrorHandling } from '@/lib/api-response/handler'
 import { success } from '@/lib/api-response/helpers'
 import { twoFaCodeSchema } from '@/lib/validation/auth'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createSessionClient } from '@/lib/supabase/server'
 import { verifyTotpCode, decryptTotpSecret } from '@/lib/auth/totp'
 import { hashOtpCode } from '@/lib/auth/otp'
 import { create2faCookieValue, build2faCookieHeader } from '@/lib/auth/2fa-token'
@@ -31,6 +31,17 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   }
 
   const { userId, code, method } = parsed.data
+
+  // Ensure the request comes from an authenticated session and that the
+  // session belongs to the userId in the body. Without this check, any
+  // authenticated user could burn another user's rate-limit window.
+  const sessionClient = await createSessionClient()
+  const {
+    data: { user: sessionUser },
+  } = await sessionClient.auth.getUser()
+  if (!sessionUser || sessionUser.id !== userId) {
+    throw new AuthError({ userMessage: 'Not authenticated.', requestId })
+  }
 
   // Rate limit per user (not IP) to prevent targeted brute force on 2FA codes
   const rl = await checkRateLimit('twoFaVerify', userId)

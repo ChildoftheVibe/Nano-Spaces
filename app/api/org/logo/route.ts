@@ -4,17 +4,23 @@ import { success } from '@/lib/api-response/helpers'
 import { createSessionClient, createAdminClient } from '@/lib/supabase/server'
 import { AuthError, ValidationError } from '@/lib/errors/AppError'
 
-const ALLOWED_SIGNATURES: Array<[number[], string]> = [
-  [[0xff, 0xd8, 0xff], 'image/jpeg'],
-  [[0x89, 0x50, 0x4e, 0x47], 'image/png'],
-  [[0x52, 0x49, 0x46, 0x46], 'image/webp'],
-]
-
+// WebP shares the RIFF container with WAV/AVI — verify bytes 8-11 spell "WEBP"
+// to avoid accepting audio/video files that pass the 4-byte RIFF prefix check.
 function detectMimeType(bytes: Uint8Array): string | null {
-  for (const [sig, mime] of ALLOWED_SIGNATURES) {
-    // eslint-disable-next-line security/detect-object-injection
-    if (sig.every((b, i) => bytes[i] === b)) return mime
-  }
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg'
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47)
+    return 'image/png'
+  if (
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  )
+    return 'image/webp'
   return null
 }
 

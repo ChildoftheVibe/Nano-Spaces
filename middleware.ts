@@ -59,6 +59,13 @@ const TOS_EXEMPT = ['/onboarding', '/accept-tos']
 // Public routes that bypass the entire middleware pipeline
 const PUBLIC_BYPASS = ['/auth/callback', '/auth/oauth-signup']
 
+// Prevent open-redirect attacks on the `next=` query param.
+// Only allow relative paths; reject absolute URLs (//) and external origins.
+function safeNext(raw: string | null): string {
+  if (!raw) return '/calendar'
+  return raw.startsWith('/') && !raw.startsWith('//') ? raw : '/calendar'
+}
+
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 }
@@ -138,7 +145,7 @@ export async function middleware(req: NextRequest) {
     if (secret && twoFaCookie) {
       const verifiedUserId = await verify2faCookieValue(twoFaCookie, secret)
       if (verifiedUserId === user.id) {
-        const next = req.nextUrl.searchParams.get('next') ?? '/calendar'
+        const next = safeNext(req.nextUrl.searchParams.get('next'))
         return applySecurityHeaders(NextResponse.redirect(new URL(next, req.url)), nonce)
       }
     }
